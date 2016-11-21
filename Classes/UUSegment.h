@@ -8,11 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSUInteger, UUSegmentType) {
-    UUSegmentTypeDefault,
-    UUSegmentTypeTabbed,
-};
-
 typedef NS_ENUM(NSUInteger, UUSegmentAutosizingMode) {
     UUSegmentAutosizingModeEqualWidths,
     UUSegmentAutosizingModeProportionalToContent,
@@ -89,21 +84,23 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 
 @property (nonatomic, assign)   UUFont                              font;
 
-//@property (nonatomic, assign)   CGRect                            frame;
-
-//@property (nonatomic, copy)     NSArray                             *segmentTitles;
 
 @property (nonatomic, copy)     UUSegmentContentSelectedBlock       contentSelectedAction;
 
+/**
+ Initializes and returns a segmented control with segments having the given items.
 
-+ (instancetype)segmentWithType:(UUSegmentType)type items:(NSArray *)items;
+ @param items Items showed in segment control, this array could be `NSString`, `UIImage`, custom `UIView`, also could be a mixture of the above elements.
+ @return The newly-created instance of `UUSegment`.
+ */
+- (instancetype)initWithItems:(NSArray *)items;
 
-- (void)resetItemWithText:(NSString *)text forSegmentAtIndex:(NSUInteger)index;
+- (void)setItemWithText:(NSString *)text forSegmentAtIndex:(NSUInteger)index;
 
-- (void)resetItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
+- (void)setItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
 
-- (void)resetItemWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
+- (void)setItemWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
-- (void)resetItemWithView:(UIView *)view forSegmentAtIndex:(NSUInteger)index;
+- (void)setItemWithView:(UIView *)view forSegmentAtIndex:(NSUInteger)index;
 
 @end
