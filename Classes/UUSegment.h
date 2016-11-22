@@ -34,37 +34,43 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 
 @end
 
-@protocol UUSegmentDataSource <NSObject>
-
-- (NSAttributedString *)segmentControl:(UUSegment *)segmentControl setAttributedTextForSegmentUsingCurrentText:(NSString *)text;
-
-@end
+//@protocol UUSegmentDataSource <NSObject>
+//
+//- (NSAttributedString *)segmentControl:(UUSegment *)segmentControl setAttributedTextForSegmentUsingCurrentText:(NSString *)text;
+//
+//@end
 
 @interface UUSegment : UIView
 
-@property (nonatomic, weak)     id<UUSegmentDataSource>             dataSource;
+///------------------------
+/// @name Managing Segments
+///------------------------
 
-@property (nonatomic, weak)     id<UUSegmentDelegate>               delegate;
+@property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
+
+///------------------------
+/// @name Managing Protocol
+///------------------------
+
+//@property (nonatomic, weak) id<UUSegmentDataSource> dataSource;
+
+@property (nonatomic, weak) id<UUSegmentDelegate> delegate;
 
 @property (nonatomic, assign)   UUSegmentAutosizingMode             autosizingMode;
 
-///----------------------------
-/// @name Backgorund Of Segment
-///----------------------------
+///----------------------------------
+/// @name Managing Segment Appearance
+///----------------------------------
 
 /**
  The background color of the segment.
  */
-@property (nonatomic, strong)   UIColor                             *backgroundColor;
+@property (nonatomic, strong) UIColor *backgroundColor;
 
 /**
  The radius to use when drawing rounded corners of the segement' background.
  */
-@property (nonatomic, assign)   CGFloat                             cornerRadius;
-
-///------------------------
-/// @name Border Of Segment
-///------------------------
+@property (nonatomic, assign) CGFloat cornerRadius;
 
 /**
  The width of the segment's border.
@@ -76,16 +82,28 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
  */
 @property (nonatomic, strong)   UIColor                             *borderColor;
 
+///-------------------------------
+/// @name Managing Text Appearance
+///-------------------------------
 
-/**
- The color of the text. Only works in the case that the elements of `items` is `NSString` when you use `+segmentWithType:items:`.
- */
-@property (nonatomic, strong)   UIColor                             *textColor;
+@property (nonatomic, strong) UIColor           *textColor;
 
-@property (nonatomic, assign)   UUFont                              font;
+@property (nonatomic, assign) UUFont            font;
+
+@property (nonatomic, assign) NSUInteger        numberOfLine;
+
+///---------------------------
+/// @name Managing Scroll View
+///---------------------------
+
+@property (nonatomic, assign, getter = isScrollOn) BOOL scrollOn;
 
 
 @property (nonatomic, copy)     UUSegmentContentSelectedBlock       contentSelectedAction;
+
+///---------------------
+/// @name Initialization
+///---------------------
 
 /**
  Initializes and returns a segmented control with segments having the given items.
@@ -95,12 +113,48 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
  */
 - (instancetype)initWithItems:(NSArray *)items;
 
+///---------------------------------------
+/// @name Managing Segment Content Setting
+///---------------------------------------
+
 - (void)setItemWithText:(NSString *)text forSegmentAtIndex:(NSUInteger)index;
 
-- (void)setItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
+//- (void)setItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
 
 - (void)setItemWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
 - (void)setItemWithView:(UIView *)view forSegmentAtIndex:(NSUInteger)index;
+
+///---------------------------------------
+/// @name Managing Segment Content Getting
+///---------------------------------------
+
+- (NSString *)textForSegmentAtIndex:(NSUInteger)index;
+
+- (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
+
+- (UIView *)viewForSegmentAtIndex:(NSUInteger)index;
+
+///-------------------------------
+/// @name Managing Segments Insert
+///-------------------------------
+
+- (void)addItemWithText:(NSString *)text;
+
+- (void)addItemWithImage:(UIImage *)image;
+
+- (void)insertItemWithText:(NSString *)text atIndex:(NSUInteger)index;
+
+- (void)insertItemWithImage:(UIImage *)image atIndex:(NSUInteger)index;
+
+///-------------------------------
+/// @name Managing Segments Delete
+///-------------------------------
+
+- (void)removeAllItems;
+
+- (void)removeLastItem;
+
+- (void)removeItemAtIndex:(NSUInteger)index;
 
 @end
