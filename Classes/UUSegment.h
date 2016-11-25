@@ -56,8 +56,6 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 
 @property (nonatomic, weak) id<UUSegmentDelegate> delegate;
 
-@property (nonatomic, assign)   UUSegmentAutosizingMode             autosizingMode;
-
 ///----------------------------------
 /// @name Managing Segment Appearance
 ///----------------------------------
@@ -75,22 +73,33 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 /**
  The width of the segment's border.
  */
-@property (nonatomic, assign)   CGFloat                             borderWidth;
+@property (nonatomic, assign) CGFloat borderWidth;
 
 /**
  The color of the segment's border.
  */
-@property (nonatomic, strong)   UIColor                             *borderColor;
+@property (nonatomic, strong) UIColor *borderColor;
+
+@property (nonatomic, assign) UUSegmentAutosizingMode autosizingMode;
 
 ///-------------------------------
 /// @name Managing Text Appearance
 ///-------------------------------
 
-@property (nonatomic, strong) UIColor           *textColor;
+/**
+ The color of the text, it only works when the type of items is `NSString`.
+ */
+@property (nonatomic, strong) UIColor *textColor;
 
-@property (nonatomic, assign) UUFont            font;
+/**
+ The font of the text, identical to `textColor`, it only works when the type of items is `NSString`..
+ */
+@property (nonatomic, assign) UUFont font;
 
-@property (nonatomic, assign) NSUInteger        numberOfLine;
+/**
+ The maximum number of lines to use for rendering text, it only works when the type of items is `NSString`.
+ */
+@property (nonatomic, assign) NSUInteger numberOfLines;
 
 ///---------------------------
 /// @name Managing Scroll View

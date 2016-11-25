@@ -26,8 +26,9 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 /// @name UI
 ///---------
 
-@property (nonatomic, strong) UIView        *containerView;
-@property (nonatomic, strong) UIScrollView  *scrollView;
+@property (nonatomic, strong) UIView                                *containerView;
+@property (nonatomic, strong) UIScrollView                          *scrollView;
+@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
 
 ///-----------------------
 /// @name Segment Elements
@@ -74,7 +75,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
         [self setupScrollView];
         [self setupContainerView];
 
-        [self setupConstraintsForSegmentViewsToContainerView];
+        [self setupConstraintsWithSegmentViewsToContainerView];
         
 //        [self addObserver:self forKeyPath:@"dataSource" options:NSKeyValueObservingOptionNew context:UUSegmentDefaultKVODataSourceContext];
         [self addObserver:self forKeyPath:@"fontConverted" options:NSKeyValueObservingOptionNew context:UUSegmentDefaultKVOFontConvertedContext];
@@ -377,10 +378,47 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 - (void)insertSegment:(UUSegmentView *)segmentView atIndex:(NSUInteger)index {
     
     [self.segmentViews insertObject:segmentView atIndex:index];
+    [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
 }
 
 
 #pragma mark - Items Delete
+
+- (void)removeAllItems {
+    
+}
+
+- (void)removeLastItem {
+    [self removeItemAtIndex:_segments - 1];
+}
+
+- (void)removeItemAtIndex:(NSUInteger)index {
+    NSAssert1(index < _segments, @"Parameter index should in the range of 0...%lu", _segments - 1);
+    
+    UUSegmentView *segmentView = _segmentViews[index];
+    
+    // remove from the mapping table
+    NSUInteger indexInTable = segmentView.indexInTable;
+    UUSegmentViewMappingTable mappingTo = segmentView.mappingTo;
+    switch (mappingTo) {
+        case UUSegmentViewMappingTableLabel: {
+            [self.labelTable removeObjectAtIndex:indexInTable];
+            break;
+        }
+        case UUSegmentViewMappingTableImage: {
+            [self.imageTable removeObjectAtIndex:indexInTable];
+            break;
+        }
+        case UUSegmentViewMappingTableView: {
+            
+        }
+    }
+    
+    [self.segmentItems removeObjectAtIndex:index];
+    [self.segmentViews removeObjectAtIndex:index];
+    
+    [self updateConstraintsWithDeleteSegmentViewAtIndex:index];
+}
 
 
 #pragma mark - Private Methods
@@ -513,11 +551,12 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
      ].active = YES;
 }
 
-- (void)setupConstraintsForSegmentViewsToContainerView {
+- (void)setupConstraintsWithSegmentViewsToContainerView {
     
     UIView *lastView;
     
-    for (UIView *view in _segmentViews) {
+    for (int i = 0; i < _segments; i++) {
+        UIView *view = _segmentViews[i];
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [_containerView addSubview:view];
         
@@ -543,14 +582,16 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
         
         if (lastView) {
             // view's left equal to lastView offset 8
-            [NSLayoutConstraint constraintWithItem:view
+            NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:view
                                          attribute:NSLayoutAttributeLeading
                                          relatedBy:NSLayoutRelationEqual
                                             toItem:lastView
                                          attribute:NSLayoutAttributeTrailing
                                         multiplier:1.0
-                                          constant:8.0
-             ].active = YES;
+                                          constant:8.0];
+            leading.active = YES;
+            [self.leadingConstraints addObject:leading];
+            
             
             // view's width equal to lastView
             [NSLayoutConstraint constraintWithItem:view
@@ -564,14 +605,15 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
         }
         else {
             // the first view's left equal to containerView offset 16
-            [NSLayoutConstraint constraintWithItem:view
+            NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:view
                                          attribute:NSLayoutAttributeLeading
                                          relatedBy:NSLayoutRelationEqual
                                             toItem:_containerView
                                          attribute:NSLayoutAttributeLeading
                                         multiplier:1.0
-                                          constant:16.0
-             ].active = YES;
+                                          constant:16.0];
+            leading.active = YES;
+            [self.leadingConstraints addObject:leading];
         }
         
         lastView = view;
@@ -678,6 +720,71 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
      ].active = YES;
 }
 
+- (void)updateConstraintsWithInsertSegmentView:(UUSegmentView *)segmentView atIndex:(NSUInteger)index {
+    
+    if (_leadingConstraints) {
+        
+        NSLayoutConstraint *oldLeading = _leadingConstraints[index];
+        id item = oldLeading.firstItem;
+        id toItem = oldLeading.secondItem;
+        oldLeading.active = NO;
+        
+        NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:segmentView
+                                                                   attribute:NSLayoutAttributeLeading
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:toItem
+                                                                   attribute:NSLayoutAttributeTrailing
+                                                                  multiplier:1.0
+                                                                    constant:8.0];
+        leading.active = YES;
+        [self.leadingConstraints insertObject:leading atIndex:index];
+        
+        [NSLayoutConstraint constraintWithItem:segmentView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:toItem
+                                     attribute:NSLayoutAttributeWidth
+                                    multiplier:1.0
+                                      constant:0.0
+         ].active = YES;
+        
+        [NSLayoutConstraint constraintWithItem:segmentView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_containerView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.0
+                                      constant:0.0
+         ].active = YES;
+        
+        [NSLayoutConstraint constraintWithItem:segmentView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_containerView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.0
+                                      constant:0.0
+         ].active = YES;
+        
+        oldLeading = [NSLayoutConstraint constraintWithItem:item
+                                                  attribute:NSLayoutAttributeLeading
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:segmentView
+                                                  attribute:NSLayoutAttributeTrailing
+                                                 multiplier:1.0
+                                                   constant:8.0];
+        oldLeading.active = YES;
+        self.leadingConstraints[index + 1] = oldLeading;
+        
+        [self layoutIfNeeded];
+        [self updateConstraintsIfNeeded];
+    }
+}
+
+- (void)updateConstraintsWithDeleteSegmentViewAtIndex:(NSUInteger)index {
+    
+}
+
 
 #pragma mark - Setters
 
@@ -707,8 +814,25 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     self.fontConverted = [UIFont systemFontOfSize:fontSize weight:fontWeight];
 }
 
+- (void)setBorderWidth:(CGFloat)borderWidth {
+    _borderWidth = borderWidth;
+    self.layer.borderWidth = borderWidth;
+}
+
+- (void)setBorderColor:(UIColor *)borderColor {
+    
+}
+
 
 #pragma mark - Getters
+
+- (NSMutableArray <NSLayoutConstraint *> *)leadingConstraints {
+    if (_leadingConstraints) {
+        return _leadingConstraints;
+    }
+    _leadingConstraints = [NSMutableArray array];
+    return _leadingConstraints;
+}
 
 - (NSMutableArray <UULabel *> *)labelTable {
     if (_labelTable) {
