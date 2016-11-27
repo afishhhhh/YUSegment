@@ -92,7 +92,7 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 @property (nonatomic, strong) UIColor *textColor;
 
 /**
- The font of the text, identical to `textColor`, it only works when the type of items is `NSString`..
+ The font of the text, identical to `textColor`, it only works when the type of items is `NSString`.
  */
 @property (nonatomic, assign) UUFont font;
 
@@ -155,7 +155,7 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 - (void)insertItemWithText:(NSString *)text atIndex:(NSUInteger)index;
 
 - (void)insertItemWithImage:(UIImage *)image atIndex:(NSUInteger)index;
-
+ 
 ///-------------------------------
 /// @name Managing Segments Delete
 ///-------------------------------

@@ -34,7 +34,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 /// @name Segment Elements
 ///-----------------------
 
-@property (nonatomic, strong) NSMutableArray                    *segmentItems;
+@property (nonatomic, strong) NSMutableArray                    *items;
 @property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <UUSegmentView *>  *segmentViews;
 
@@ -61,20 +61,16 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (instancetype)initWithItems:(NSArray *)items {
-    
     self = [super initWithFrame:CGRectZero];
-    
     if (self) {
-        
         NSAssert((items && [items count]), @"Items can not be empty. If you are using `-init` or `-initWithFrame:`, please use `-initWithItems:` instead.");
-        
-        _segmentItems = [items mutableCopy];
+        _items = [items mutableCopy];
         _segments = [items count];
-        
-        [self setupSegmentViewsByTraversingSegmentItems];
+        // Initialize views
         [self setupScrollView];
         [self setupContainerView];
-
+        [self setupSegmentViewsByTraversingItems];
+        // Add constraints
         [self setupConstraintsWithSegmentViewsToContainerView];
         
 //        [self addObserver:self forKeyPath:@"dataSource" options:NSKeyValueObservingOptionNew context:UUSegmentDefaultKVODataSourceContext];
@@ -85,17 +81,12 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     return self;
 }
 
-
 #pragma mark - Items Initialization
 
-- (void)setupSegmentViewsByTraversingSegmentItems {
-
+- (void)setupSegmentViewsByTraversingItems {
     _segmentViews = [NSMutableArray array];
-    
     UUSegmentView *segmentView;
-    
-    for (id item in _segmentItems) {
-        
+    for (id item in _items) {
         if ([item isKindOfClass:[NSString class]]) {
             segmentView = [self setupSegmentViewsWithString:(NSString *)item];
         }
@@ -113,58 +104,62 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (UUSegmentView *)setupSegmentViewsWithString:(NSString *)string {
-    
     UUSegmentView *segmentView = [UUSegmentView new];
     UULabel *label = [[UULabel alloc] initWithText:string];
     
     [segmentView addSubview:label];
     [self.labelTable addObject:label];
     
+    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
     segmentView.mappingTo = UUSegmentViewMappingTableLabel;
     segmentView.indexInTable = [_labelTable count] - 1;
+    label.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self setupConstraintsForInnerView:label inSegmentView:segmentView];
+    [_containerView addSubview:segmentView];
     
     return segmentView;
 }
 
 - (UUSegmentView *)setupSegmentViewsWithImage:(UIImage *)image {
-    
     UUSegmentView *segmentView = [UUSegmentView new];
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
     
     [segmentView addSubview:imageView];
     [self.imageTable addObject:imageView];
     
+    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
     segmentView.mappingTo = UUSegmentViewMappingTableImage;
     segmentView.indexInTable = [_imageTable count] - 1;
+    imageView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self setupConstraintsForInnerView:imageView inSegmentView:segmentView];
+    [_containerView addSubview:segmentView];
     
     return segmentView;
 }
 
 - (UUSegmentView *)setupSegmentViewsWithView:(UIView *)view {
-    
     UUSegmentView *segmentView = [UUSegmentView new];
     
     [segmentView addSubview:view];
     [self.viewTable addObject:view];
     
+    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
     segmentView.mappingTo = UUSegmentViewMappingTableView;
     segmentView.indexInTable = [_viewTable count] - 1;
+    view.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self setupConstraintsForInnerView:view inSegmentView:segmentView];
+    [_containerView addSubview:segmentView];
     
     return segmentView;
 }
-
 
 #pragma mark - Items Setting
 
 - (void)setItemWithText:(NSString *)text forSegmentAtIndex:(NSUInteger)index {
     NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
-    
     [self updateItem:text forSegmentItemsAtIndex:index];
     [self updateText:text forSegmentViewAtIndex:index];
 }
@@ -177,7 +172,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 
 - (void)setItemWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
     NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
-    
     [self updateItem:image forSegmentItemsAtIndex:index];
     [self updateImage:image forSegmentViewAtIndex:index];
 }
@@ -188,7 +182,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (void)updateItem:(id)item forSegmentItemsAtIndex:(NSUInteger)index {
-    self.segmentItems[index] = item;
+    self.items[index] = item;
 }
 
 /**
@@ -199,9 +193,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
  @param index The particular location to update.
  */
 - (void)updateText:(NSString *)newText forSegmentViewAtIndex:(NSUInteger)index {
-    
     UUSegmentView *oldSegmentView = _segmentViews[index];
-    
     switch (oldSegmentView.mappingTo) {
         case UUSegmentViewMappingTableLabel: {
             UULabel *label = _labelTable[oldSegmentView.indexInTable];
@@ -257,9 +249,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
  @param index The particular location to update.
  */
 - (void)updateImage:(UIImage *)newImage forSegmentViewAtIndex:(NSUInteger)index {
-    
     UUSegmentView *oldSegmentView = _segmentViews[index];
-    
     switch (oldSegmentView.mappingTo) {
         case UUSegmentViewMappingTableLabel: {
             [self.labelTable removeObjectAtIndex:oldSegmentView.indexInTable];
@@ -288,9 +278,7 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
  @param index The particular location to update.
  */
 - (void)updateView:(UIView *)newView forSegmentViewAtIndex:(NSUInteger)index {
-    
     UUSegmentView *oldSegmentView = _segmentViews[index];
-    
     switch (oldSegmentView.mappingTo) {
         case UUSegmentViewMappingTableLabel: {
             [self.labelTable removeObjectAtIndex:oldSegmentView.indexInTable];
@@ -322,24 +310,22 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     }
 }
 
-
 #pragma mark - Items Getting
 
 - (NSString *)textForSegmentAtIndex:(NSUInteger)index {
     NSAssert1(index < _segments, @"Parameter index should in the range of 0...%lu", _segments - 1);
-    return _segmentItems[index];
+    return _items[index];
 }
 
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index {
     NSAssert1(index < _segments, @"Parameter index should in the range of 0...%lu", _segments - 1);
-    return _segmentItems[index];
+    return _items[index];
 }
 
 - (UIView *)viewForSegmentAtIndex:(NSUInteger)index {
     NSAssert1(index < _segments, @"Parameter index should in the range of 0...%lu", _segments - 1);
-    return _segmentItems[index];
+    return _items[index];
 }
-
 
 #pragma mark - Items Insert
 
@@ -371,16 +357,14 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 
 - (void)insertItem:(id)item atIndex:(NSUInteger)index {
 
-    [self.segmentItems insertObject:item atIndex:index];
+    [self.items insertObject:item atIndex:index];
     self.segments++;
 }
 
 - (void)insertSegment:(UUSegmentView *)segmentView atIndex:(NSUInteger)index {
-    
     [self.segmentViews insertObject:segmentView atIndex:index];
     [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
 }
-
 
 #pragma mark - Items Delete
 
@@ -414,12 +398,11 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
         }
     }
     
-    [self.segmentItems removeObjectAtIndex:index];
+    [self.items removeObjectAtIndex:index];
     [self.segmentViews removeObjectAtIndex:index];
     
     [self updateConstraintsWithDeleteSegmentViewAtIndex:index];
 }
-
 
 #pragma mark - Private Methods
 
@@ -428,7 +411,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 //        [self updateAttributedTextForSegmentView];
 //    }
 //}
-
 
 #pragma mark - DataSource
 
@@ -443,7 +425,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 //- (NSAttributedString *)dataSourceRespondsSelectorUsingCurrentText:(NSString *)text atIndex:(NSUInteger)index {
 //    return [self.dataSource segmentControl:self setAttributedTextForSegmentUsingCurrentText:text];
 //}
-
 
 #pragma mark - Event
 
@@ -470,39 +451,38 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     }
 }
 
-
 #pragma mark - Views Setup
 
 - (void)setupScrollView {
-    
     _scrollView = ({
         UIScrollView *scrollView = [UIScrollView new];
         scrollView.showsVerticalScrollIndicator = NO;
         scrollView.showsHorizontalScrollIndicator = NO;
         scrollView.scrollEnabled = NO;
+        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:scrollView];
         
         scrollView;
     });
-    
     [self setupConstraintsWithScrollViewToSelf];
 }
 
 - (void)setupContainerView {
-    
     _containerView = ({
-        UIView *view = [UIView new];
-        [_scrollView addSubview:view];
+        UIView *containerView = [UIView new];
+        containerView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_scrollView addSubview:containerView];
         
-        view;
+        containerView;
     });
-    
     [self setupConstraintsWithContainerViewToScrollView];
 }
 
-
 #pragma mark - Views Update
 
+- (void)updateViewForColor:(UIColor *)color {
+    self.containerView.backgroundColor = color;
+}
 
 #pragma mark - Constraints
 
@@ -511,9 +491,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (void)setupConstraintsForInnerView:(UIView *)innerView inSegmentView:(UIView *)view {
-    
-    innerView.translatesAutoresizingMaskIntoConstraints = NO;
-    
     [NSLayoutConstraint constraintWithItem:innerView
                                  attribute:NSLayoutAttributeTop
                                  relatedBy:NSLayoutRelationEqual
@@ -557,9 +534,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     
     for (int i = 0; i < _segments; i++) {
         UIView *view = _segmentViews[i];
-        view.translatesAutoresizingMaskIntoConstraints = NO;
-        [_containerView addSubview:view];
-        
         // view's top equal to containerView
         [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeTop
@@ -630,9 +604,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (void)setupConstraintsWithScrollViewToSelf {
-
-    _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeLeading
                                  relatedBy:NSLayoutRelationEqual
@@ -671,9 +642,6 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
 }
 
 - (void)setupConstraintsWithContainerViewToScrollView {
-    
-    _containerView.translatesAutoresizingMaskIntoConstraints = NO;
-    
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeLeading
                                  relatedBy:NSLayoutRelationEqual
@@ -715,38 +683,36 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
                                  relatedBy:NSLayoutRelationEqual
                                     toItem:_containerView
                                  attribute:NSLayoutAttributeHeight
+                                multiplier:1.0
+                                  constant:0.0
+     ].active = YES;
+    
+    [NSLayoutConstraint constraintWithItem:_scrollView
+                                 attribute:NSLayoutAttributeWidth
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:_containerView
+                                 attribute:NSLayoutAttributeWidth
                                 multiplier:1.0
                                   constant:0.0
      ].active = YES;
 }
 
 - (void)updateConstraintsWithInsertSegmentView:(UUSegmentView *)segmentView atIndex:(NSUInteger)index {
-    
     if (_leadingConstraints) {
-        
         NSLayoutConstraint *oldLeading = _leadingConstraints[index];
         id item = oldLeading.firstItem;
         id toItem = oldLeading.secondItem;
         oldLeading.active = NO;
         
-        NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:segmentView
+        NSLayoutConstraint *newLeading = [NSLayoutConstraint constraintWithItem:segmentView
                                                                    attribute:NSLayoutAttributeLeading
                                                                    relatedBy:NSLayoutRelationEqual
                                                                       toItem:toItem
                                                                    attribute:NSLayoutAttributeTrailing
                                                                   multiplier:1.0
                                                                     constant:8.0];
-        leading.active = YES;
-        [self.leadingConstraints insertObject:leading atIndex:index];
-        
-        [NSLayoutConstraint constraintWithItem:segmentView
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:toItem
-                                     attribute:NSLayoutAttributeWidth
-                                    multiplier:1.0
-                                      constant:0.0
-         ].active = YES;
+        newLeading.active = YES;
+        [self.leadingConstraints insertObject:newLeading atIndex:index];
         
         [NSLayoutConstraint constraintWithItem:segmentView
                                      attribute:NSLayoutAttributeTop
@@ -777,7 +743,19 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
         self.leadingConstraints[index + 1] = oldLeading;
         
         [self layoutIfNeeded];
-        [self updateConstraintsIfNeeded];
+        
+        [NSLayoutConstraint constraintWithItem:segmentView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:toItem
+                                     attribute:NSLayoutAttributeWidth
+                                    multiplier:1.0
+                                      constant:0.0
+         ].active = YES;
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            [self layoutIfNeeded];
+        }];
     }
 }
 
@@ -785,17 +763,14 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     
 }
 
-
 #pragma mark - Setters
 
 - (void)setScrollOn:(BOOL)scrollOn {
-    
     _scrollOn = scrollOn;
     _scrollView.scrollEnabled = scrollOn;
 }
 
 - (void)setFont:(UUFont)font {
-    
     CGFloat fontSize = font.size;
     CGFloat fontWeight;
     
@@ -823,6 +798,13 @@ static void *UUSegmentDefaultKVOTextColorContext = &UUSegmentDefaultKVOTextColor
     
 }
 
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    NSAssert(backgroundColor, @"The color should not be nil.");
+    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
+        _backgroundColor = backgroundColor;
+        [self updateViewForColor:backgroundColor];
+    }
+}
 
 #pragma mark - Getters
 
