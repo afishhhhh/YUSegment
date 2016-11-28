@@ -8,6 +8,7 @@
 
 #import "UUSegment.h"
 #import "UULabel.h"
+#import "UUImageTextView.h"
 #import "UUIndicatorView.h"
 
 @interface UUSegment ()
@@ -31,9 +32,9 @@
 /// @name Segment Elements
 ///-----------------------
 
+@property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
-@property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <UIView *>         *segmentViews;
 
 ///--------------------
@@ -58,7 +59,7 @@
 }
 
 - (instancetype)initWithTitles:(NSArray<NSString *> *)titles {
-    NSAssert((titles && [titles count]), @"Titles can not be empty.");
+    NSAssert((titles && [titles count]), @"Titles can not be empty. If you are using `-initWithFrame:`, please use `-initWithTitles:`, `-initWithImages:`, `-initWithTitles:forImages:` instead.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _titles = [titles mutableCopy];
@@ -274,10 +275,11 @@
     UIView *segmentView = [UIView new];
     UULabel *label = [[UULabel alloc] initWithText:title];
     [segmentView addSubview:label];
+    
     segmentView.translatesAutoresizingMaskIntoConstraints = NO;
     label.translatesAutoresizingMaskIntoConstraints = NO;
-    
     [self setupConstraintsForInnerView:label inSegmentView:segmentView];
+    
     [_containerView addSubview:segmentView];
     
     segmentView.backgroundColor = [UIColor yellowColor];
@@ -302,6 +304,14 @@
 
 - (UIView *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
     UIView *segmentView = [UIView new];
+    UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image];
+    [segmentView addSubview:imageTextView];
+    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
+    imageTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [self setupConstraintsForInnerView:imageTextView inSegmentView:segmentView];
+    [_containerView addSubview:segmentView];
+    
     return segmentView;
 }
 
