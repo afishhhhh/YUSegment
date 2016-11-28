@@ -40,13 +40,21 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 //
 //@end
 
-@interface UUSegment : UIView
+@interface UUSegment : UIControl
 
 ///------------------------
 /// @name Managing Segments
 ///------------------------
 
+/**
+ The number of segments.
+ */
 @property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
+
+/**
+ The index of segment that selected currently. The default is 0;
+ */
+@property (nonatomic, assign)           NSUInteger currentIndex;
 
 ///------------------------
 /// @name Managing Protocol
@@ -105,6 +113,9 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 /// @name Managing Scroll View
 ///---------------------------
 
+/**
+ The Boolean value that controls whether scrolling is enabled. The default is `NO`.
+ */
 @property (nonatomic, assign, getter = isScrollOn) BOOL scrollOn;
 
 
@@ -115,46 +126,63 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 ///---------------------
 
 /**
- Initializes and returns a segmented control with segments having the given items.
+ Initializes and returns a segmented control with segments having the given titles.
 
- @param items Items showed in segment control, this array could be `NSString`, `UIImage`, custom `UIView`, also could be a mixture of the above elements.
+ @param titles An array of `NSString` objects for segment titles. This value must not be nil or empty array.
  @return The newly-created instance of `UUSegment`.
  */
-- (instancetype)initWithItems:(NSArray *)items;
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
+
+/**
+ Initializes and returns s segmented control with segments having the given images.
+
+ @param images An array of `UIImage` objects for segment images. This value must not be nil or empty array.
+ @return The newly-created instance of `UUSegment`.
+ */
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images;
+
+/**
+ Initializes and returns s segmented control with segments having the given titles and images.
+
+ @param titles An array of `NSString` objects for segment titles. This value must not be nil or empty array.
+ @param images An array of `UIImage` objects for segment images. This value must not be nil or empty array.
+ @return The newly-created instance of `UUSegment` that images are above the titles.
+ */
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
 ///---------------------------------------
 /// @name Managing Segment Content Setting
 ///---------------------------------------
 
-- (void)setItemWithText:(NSString *)text forSegmentAtIndex:(NSUInteger)index;
+- (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index;
 
 //- (void)setItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
 
-- (void)setItemWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
+- (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
-- (void)setItemWithView:(UIView *)view forSegmentAtIndex:(NSUInteger)index;
+- (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
 ///---------------------------------------
 /// @name Managing Segment Content Getting
 ///---------------------------------------
 
-- (NSString *)textForSegmentAtIndex:(NSUInteger)index;
+- (NSString *)titleForSegmentAtIndex:(NSUInteger)index;
 
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
 
-- (UIView *)viewForSegmentAtIndex:(NSUInteger)index;
+- (NSDictionary *)titleAndImageForSegmentAtIndex:(NSUInteger)index;
 
 ///-------------------------------
 /// @name Managing Segments Insert
 ///-------------------------------
 
-- (void)addItemWithText:(NSString *)text;
+- (void)addSegmentWithTitle:(NSString *)title;
 
-- (void)addItemWithImage:(UIImage *)image;
+- (void)addSegmentWithImage:(UIImage *)image;
 
-- (void)insertItemWithText:(NSString *)text atIndex:(NSUInteger)index;
+- (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index;
 
-- (void)insertItemWithImage:(UIImage *)image atIndex:(NSUInteger)index;
+- (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index;
  
 ///-------------------------------
 /// @name Managing Segments Delete
