@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 ///---------------------
 
 @property (nonatomic, strong) UIView                                *containerView;
+@property (nonatomic, strong) UIView                                *selectedContainerView;
 @property (nonatomic, strong) UIScrollView                          *scrollView;
 @property (nonatomic, strong) UUIndicatorView                       *indicatorView;
 @property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
@@ -51,6 +52,10 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 @property (nonatomic, strong) NSMutableArray <UULabel *>         *labelTable;
 @property (nonatomic, strong) NSMutableArray <UUImageView *>     *imageViewTable;
 @property (nonatomic, strong) NSMutableArray <UUImageTextView *> *mixtureTable;
+
+@property (nonatomic, strong) NSMutableArray <UULabel *>         *selectedLabelTable;
+@property (nonatomic, strong) NSMutableArray <UUImageView *>     *selectedImageViewTable;
+@property (nonatomic, strong) NSMutableArray <UUImageTextView *> *selectedMixtureTable;
 
 //@property (nonatomic, assign, getter = isDataSourceNil) BOOL dataSourceNil;
 
@@ -107,11 +112,13 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 - (void)commonInit {
     _currentIndex = 0;
     // Setup UI
-//    [self setupScrollView];
+    _style = UUSegmentStyleSlider;
     [self setupContainerView];
-    [self setupSegmentViews];
+    [self setupSegmentViewsSelected:NO];
+    [self setupSelectedContainerView];
+    [self setupSegmentViewsSelected:YES];
+    [self buildUIWithStyle:_style];
     [self setupConstraintsWithSegmentsToContainerView];
-    [self setupIndicatorView];
     // Add gesture
     [self addGesture];
 }
@@ -119,14 +126,18 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"Segment layoutSubviews");
+    
     self.indicatorView.frame = (CGRect){[self segmentWidth] * _currentIndex, 0, [self segmentWidth], CGRectGetHeight(self.frame)};
     
-    CGRect containerViewFrame = _containerView.frame;
-    CGFloat scrollViewWidth = CGRectGetWidth(_scrollView.frame);
-    if (CGRectGetWidth(containerViewFrame) < scrollViewWidth) {
-        NSLog(@"containerView.width < scrollView.width");
-        containerViewFrame.size.width = scrollViewWidth;
-    }
+    self.selectedContainerView.layer.mask = self.indicatorView.maskView.layer;
+    
+//    CGRect containerViewFrame = _containerView.frame;
+//    CGFloat scrollViewWidth = CGRectGetWidth(_scrollView.frame);
+//    if (CGRectGetWidth(containerViewFrame) < scrollViewWidth) {
+//        NSLog(@"containerView.width < scrollView.width");
+//        containerViewFrame.size.width = scrollViewWidth;
+//        _containerView.frame = containerViewFrame;
+//    }
 }
 
 #pragma mark - Items Setting
@@ -241,46 +252,65 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 #pragma mark - Views Setup
 
-- (void)setupSegmentViews {
+- (void)setupSegmentViewsSelected:(BOOL)selected {
     switch (_contentType) {
         case UUSegmentContentTypeTitle:
             for (NSString *title in _titles) {
-                [self setupSegmentViewWithTitle:title];
+                [self setupSegmentViewWithTitle:title selected:selected];
             }
             break;
         case UUSegmentContentTypeImage:
             for (UIImage *image in _images) {
-                [self setupSegmentViewWithImage:image];
+                [self setupSegmentViewWithImage:image selected:selected];
             }
             break;
         case UUSegmentContentTypeMixture:
             for (int i = 0; i < _segments; i++) {
-                [self setupSegmentViewWithTitle:_titles[i] forImage:_images[i]];
+                [self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:selected];
             }
             break;
     }
 }
 
-- (void)setupSegmentViewWithTitle:(NSString *)title {
+- (void)setupSegmentViewWithTitle:(NSString *)title selected:(BOOL)selected {
     UULabel *label = [[UULabel alloc] initWithText:title];
-    [_containerView addSubview:label];
-    [self.labelTable addObject:label];
+    if (selected) {
+        label.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
+        [_selectedContainerView addSubview:label];
+        [self.selectedLabelTable addObject:label];
+    }
+    else {
+        [_containerView addSubview:label];
+        [self.labelTable addObject:label];
+    }
     label.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
-- (void)setupSegmentViewWithImage:(UIImage *)image {
+- (void)setupSegmentViewWithImage:(UIImage *)image selected:(BOOL)selected {
     UUImageView *imageView = [[UUImageView alloc] initWithImage:image];
-    [_containerView addSubview:imageView];
-    [self.imageViewTable addObject:imageView];
+    if (selected) {
+        [_selectedContainerView addSubview:imageView];
+        [self.selectedImageViewTable addObject:imageView];
+    }
+    else {
+        [_containerView addSubview:imageView];
+        [self.imageViewTable addObject:imageView];
+    }
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
-- (void)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
+- (void)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
     UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image];
-    [_containerView addSubview:imageTextView];
+    if (selected) {
+        [_selectedContainerView addSubview:imageTextView];
+        [self.selectedMixtureTable addObject:imageTextView];
+    }
+    else {
+        [_containerView addSubview:imageTextView];
+        [self.mixtureTable addObject:imageTextView];
+    }
 //    [self.labelTable addObject:imageTextView.label];
 //    [self.imageViewTable addObject:imageTextView.imageView];
-    [self.mixtureTable addObject:imageTextView];
     imageTextView.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
@@ -296,8 +326,30 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [self setupConstraintsToSelfWithView:_containerView];
 }
 
-- (void)setupIndicatorView {
-    _indicatorView = [[UUIndicatorView alloc] initWithType:UUIndicatorViewTypeUnderline];
+- (void)setupSelectedContainerView {
+    _selectedContainerView = ({
+        UIView *containerView = [UIView new];
+        containerView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:containerView];
+        
+        containerView;
+    });
+    [self setupConstraintsToSelfWithView:_selectedContainerView];
+}
+
+- (void)setupIndicatorViewWithStyle:(UUSegmentStyle)style {
+    UUIndicatorViewType type;
+    switch (style) {
+        case UUSegmentStyleSlider: {
+            type = UUIndicatorViewTypeUnderline;
+            break;
+        }
+        case UUSegmentStyleRounded: {
+            type = UUIndicatorViewTypeRectangle;
+            break;
+        }
+    }
+    _indicatorView = [[UUIndicatorView alloc] initWithType:type];
     [_containerView addSubview:_indicatorView];
 }
 
@@ -329,6 +381,19 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     self.containerView.backgroundColor = color;
 }
 
+- (void)buildUIWithStyle:(UUSegmentStyle)style {
+    switch (style) {
+        case UUSegmentStyleSlider: {
+            [self setupIndicatorViewWithStyle:UUSegmentStyleSlider];
+            break;
+        }
+        case UUSegmentStyleRounded: {
+            [self setupIndicatorViewWithStyle:UUSegmentStyleRounded];
+            break;
+        }
+    }
+}
+
 #pragma mark - Constraints
 
 + (BOOL)requiresConstraintBasedLayout {
@@ -336,56 +401,54 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 }
 
 - (void)setupConstraintsWithSegmentsToContainerView {
-    NSArray *views;
     switch (_contentType) {
         case UUSegmentContentTypeTitle:
-            views = _labelTable;
+            [self setupConstraintsWithSegments:_labelTable toContainerView:_containerView];
+            [self setupConstraintsWithSegments:_selectedLabelTable toContainerView:_selectedContainerView];
             break;
         case UUSegmentContentTypeImage:
-            views = _imageViewTable;
+            [self setupConstraintsWithSegments:_imageViewTable toContainerView:_containerView];
+            [self setupConstraintsWithSegments:_selectedImageViewTable toContainerView:_selectedContainerView];
             break;
         case UUSegmentContentTypeMixture:
-            views = _mixtureTable;
+            [self setupConstraintsWithSegments:_mixtureTable toContainerView:_containerView];
+            [self setupConstraintsWithSegments:_selectedMixtureTable toContainerView:_selectedContainerView];
             break;
     }
+}
+
+- (void)setupConstraintsWithSegments:(NSArray *)segments toContainerView:(UIView *)containerView {
     UIView *lastView;
-    
-    for (int i = 0; i < _segments; i++) {
-        UIView *view = views[i];
-        // view's top equal to containerView
+    for (UIView *view in segments) {
         [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeTop
                                      relatedBy:NSLayoutRelationEqual
-                                        toItem:_containerView
+                                        toItem:containerView
                                      attribute:NSLayoutAttributeTop
                                     multiplier:1.0
                                       constant:0.0
          ].active = YES;
         
-        // view's bottom equal to containerView
         [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeBottom
                                      relatedBy:NSLayoutRelationEqual
-                                        toItem:_containerView
+                                        toItem:containerView
                                      attribute:NSLayoutAttributeBottom
                                     multiplier:1.0
                                       constant:0.0
          ].active = YES;
         
         if (lastView) {
-            // view's left equal to lastView offset 8
             NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:view
-                                         attribute:NSLayoutAttributeLeading
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:lastView
-                                         attribute:NSLayoutAttributeTrailing
-                                        multiplier:1.0
-                                          constant:0.0];
+                                                                       attribute:NSLayoutAttributeLeading
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:lastView
+                                                                       attribute:NSLayoutAttributeTrailing
+                                                                      multiplier:1.0
+                                                                        constant:0.0];
             leading.active = YES;
-            [self.leadingConstraints addObject:leading];
+//            [self.leadingConstraints addObject:leading];
             
-            
-            // view's width equal to lastView
             [NSLayoutConstraint constraintWithItem:view
                                          attribute:NSLayoutAttributeWidth
                                          relatedBy:NSLayoutRelationEqual
@@ -396,22 +459,20 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
              ].active = YES;
         }
         else {
-            // the first view's left equal to containerView offset 16
             NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:view
-                                         attribute:NSLayoutAttributeLeading
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:_containerView
-                                         attribute:NSLayoutAttributeLeading
-                                        multiplier:1.0
-                                          constant:0.0];
+                                                                       attribute:NSLayoutAttributeLeading
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:containerView
+                                                                       attribute:NSLayoutAttributeLeading
+                                                                      multiplier:1.0
+                                                                        constant:0.0];
             leading.active = YES;
-            [self.leadingConstraints addObject:leading];
+//            [self.leadingConstraints addObject:leading];
         }
         
         lastView = view;
     }
-    // the last view's right equal to containerView offset 16
-    [NSLayoutConstraint constraintWithItem:_containerView
+    [NSLayoutConstraint constraintWithItem:containerView
                                  attribute:NSLayoutAttributeTrailing
                                  relatedBy:NSLayoutRelationEqual
                                     toItem:lastView
@@ -421,7 +482,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
      ].active = YES;
 }
 
-- (void)setupConstraintsToSelfWithView:(UIView *)view  {
+- (void)setupConstraintsToSelfWithView:(UIView *)view {
     [NSLayoutConstraint constraintWithItem:view
                                  attribute:NSLayoutAttributeLeading
                                  relatedBy:NSLayoutRelationEqual
@@ -512,7 +573,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                  attribute:NSLayoutAttributeWidth
                                 multiplier:1.0
                                   constant:0.0
-     ].active = NO;
+     ].active = YES;
 }
 
 - (void)updateConstraintsWithInsertSegmentView:(UIView *)segmentView atIndex:(NSUInteger)index {
@@ -639,6 +700,13 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 /// @name Managing Segment Appearance
 ///----------------------------------
 
+- (void)setStyle:(UUSegmentStyle)style {
+    if (_style == style) {
+        return;
+    }
+    _style = style;
+}
+
 - (void)setCornerRadius:(CGFloat)cornerRadius {
     _cornerRadius = cornerRadius;
 //    self.containerView.layer.masksToBounds = YES;
@@ -756,12 +824,36 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     return _imageViewTable;
 }
 
-- (NSMutableArray<UUImageTextView *> *)mixtureTable {
+- (NSMutableArray <UUImageTextView *> *)mixtureTable {
     if (_mixtureTable) {
         return _mixtureTable;
     }
     _mixtureTable = [NSMutableArray array];
     return _mixtureTable;
+}
+
+- (NSMutableArray <UULabel *> *)selectedLabelTable {
+    if (_selectedLabelTable) {
+        return _selectedLabelTable;
+    }
+    _selectedLabelTable = [NSMutableArray array];
+    return _selectedLabelTable;
+}
+
+- (NSMutableArray <UUImageView *> *)selectedImageViewTable {
+    if (_selectedImageViewTable) {
+        return _selectedImageViewTable;
+    }
+    _selectedImageViewTable = [NSMutableArray array];
+    return _selectedImageViewTable;
+}
+
+- (NSMutableArray <UUImageTextView *> *)selectedMixtureTable {
+    if (_selectedMixtureTable) {
+        return _selectedMixtureTable;
+    }
+    _selectedMixtureTable = [NSMutableArray array];
+    return _selectedMixtureTable;
 }
 
 @end

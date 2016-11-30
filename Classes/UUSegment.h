@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, UUSegmentStyle) {
+    // The default style for a segment with a line-style indicator.
+    UUSegmentStyleSlider,
+    // A style for s segment with a rounded-style indicator.
+    UUSegmentStyleRounded,
+};
+
 typedef NS_ENUM(NSUInteger, UUSegmentAutosizingMode) {
     UUSegmentAutosizingModeEqualWidths,
     UUSegmentAutosizingModeProportionalToContent,
@@ -54,7 +61,7 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 /**
  The index of segment that selected currently. The default is 0;
  */
-@property (nonatomic, assign)           NSUInteger currentIndex;
+@property (nonatomic, assign) NSUInteger currentIndex;
 
 ///------------------------
 /// @name Managing Protocol
@@ -67,6 +74,11 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 ///----------------------------------
 /// @name Managing Segment Appearance
 ///----------------------------------
+
+/**
+ A constant indicating a segment style. The default is `UUSegmentStyleSlider`. See `UUSegmentStyle` for descriptions of these constants.
+ */
+@property (nonatomic, assign) UUSegmentStyle style;
 
 /**
  The background color of the segment.

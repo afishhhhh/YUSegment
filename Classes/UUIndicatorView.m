@@ -21,15 +21,17 @@
 - (instancetype)initWithType:(UUIndicatorViewType)type {
     self = [super initWithFrame:CGRectZero];
     if (self) {
+        _maskView = [UIView new];
+        _maskView.backgroundColor = [UIColor blackColor];
         switch (type) {
             case UUIndicatorViewTypeUnderline:
                 _underlineView = [UIView new];
                 [self addSubview:_underlineView];
-                _underlineView.backgroundColor = [UIColor redColor];
+                _underlineView.backgroundColor = [UIColor  colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
                 self.backgroundColor = [UIColor clearColor];
                 break;
             case UUIndicatorViewTypeRectangle:
-                
+                self.backgroundColor = [UIColor whiteColor];
                 break;
         }
     }
@@ -42,6 +44,7 @@
     if (_underlineView) {
         _underlineView.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
     }
+    _maskView.frame = self.frame;
 }
 
 #pragma mark -

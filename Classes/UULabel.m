@@ -16,9 +16,6 @@
         self.font = [UIFont systemFontOfSize:13 weight:UIFontWeightMedium];
         self.textColor = [UIColor lightGrayColor];
         self.textAlignment = NSTextAlignmentCenter;
-        self.numberOfLines = 1;
-        self.lineBreakMode = NSLineBreakByTruncatingTail;
-        
         self.text = text;
     }
     return self;

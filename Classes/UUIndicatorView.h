@@ -15,6 +15,7 @@ typedef NS_ENUM(NSUInteger, UUIndicatorViewType) {
 
 @interface UUIndicatorView : UIView
 
+@property (nonatomic, strong) UIView  *maskView;
 @property (nonatomic, assign) CGFloat cornerRadius;
 
 - (instancetype)initWithType:(UUIndicatorViewType)type;
