@@ -95,9 +95,14 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 ///-------------------------------
 
 /**
- The color of the text, it only works when the type of items is `NSString`.
+ The color of the text, it only works when the type of items is `NSString`. The default is lightGrayColor.
  */
 @property (nonatomic, strong) UIColor *textColor;
+
+/**
+ The color of the text when the segment is selected. The default is darkGrayColor.
+ */
+@property (nonatomic, strong) UIColor *selectedTextColor;
 
 /**
  The font of the text, identical to `textColor`, it only works when the type of items is `NSString`.
@@ -105,9 +110,18 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 @property (nonatomic, assign) UUFont font;
 
 /**
- The maximum number of lines to use for rendering text, it only works when the type of items is `NSString`.
+ The font of the text when the segment is selected. The default is the same as `font`.
  */
-@property (nonatomic, assign) NSUInteger numberOfLines;
+@property (nonatomic, assign) UUFont selectedFont;
+
+///--------------------------------
+/// @name Managing Image Appearance
+///--------------------------------
+
+/**
+ The color of the selected image. The default is lightGrayColor. The value is nil if the image not be selected.
+ */
+@property (nonatomic, strong) UIColor *imageColor;
 
 ///---------------------------
 /// @name Managing Scroll View
@@ -117,9 +131,6 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
  The Boolean value that controls whether scrolling is enabled. The default is `NO`.
  */
 @property (nonatomic, assign, getter = isScrollOn) BOOL scrollOn;
-
-
-@property (nonatomic, copy)     UUSegmentContentSelectedBlock       contentSelectedAction;
 
 ///---------------------
 /// @name Initialization
@@ -155,8 +166,6 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 ///---------------------------------------
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index;
-
-//- (void)setItemWithAttributedText:(NSAttributedString *)attributedText forSegmentAtIndex:(NSUInteger)index;
 
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 

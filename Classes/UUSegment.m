@@ -8,8 +8,15 @@
 
 #import "UUSegment.h"
 #import "UULabel.h"
+#import "UUImageView.h"
 #import "UUImageTextView.h"
 #import "UUIndicatorView.h"
+
+typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
+    UUSegmentContentTypeTitle,
+    UUSegmentContentTypeImage,
+    UUSegmentContentTypeMixture,
+};
 
 @interface UUSegment ()
 
@@ -19,30 +26,31 @@
 
 
 
-///------------
-/// @name Views
-///------------
+///---------------------
+/// @name Managing Views
+///---------------------
 
 @property (nonatomic, strong) UIView                                *containerView;
 @property (nonatomic, strong) UIScrollView                          *scrollView;
 @property (nonatomic, strong) UUIndicatorView                       *indicatorView;
 @property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
 
-///-----------------------
-/// @name Segment Elements
-///-----------------------
+///------------------------
+/// @name Managing Segments
+///------------------------
 
+@property (nonatomic, assign) UUSegmentContentType              contentType;
 @property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
-@property (nonatomic, strong) NSMutableArray <UIView *>         *segmentViews;
 
 ///--------------------
 /// @name Mapping Table
 ///--------------------
 
-@property (nonatomic, strong) NSMutableArray <UULabel *>                            *labelTable;
-@property (nonatomic, strong) NSMutableArray <UIImageView *>                        *imageTable;
+@property (nonatomic, strong) NSMutableArray <UULabel *>         *labelTable;
+@property (nonatomic, strong) NSMutableArray <UUImageView *>     *imageViewTable;
+@property (nonatomic, strong) NSMutableArray <UUImageTextView *> *mixtureTable;
 
 //@property (nonatomic, assign, getter = isDataSourceNil) BOOL dataSourceNil;
 
@@ -58,29 +66,31 @@
     return [self initWithTitles:nil];
 }
 
-- (instancetype)initWithTitles:(NSArray<NSString *> *)titles {
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles {
     NSAssert((titles && [titles count]), @"Titles can not be empty. If you are using `-initWithFrame:`, please use `-initWithTitles:`, `-initWithImages:`, `-initWithTitles:forImages:` instead.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _titles = [titles mutableCopy];
         _segments = [titles count];
+        _contentType = UUSegmentContentTypeTitle;
         [self commonInit];
     }
     return self;
 }
 
-- (instancetype)initWithImages:(NSArray<UIImage *> *)images {
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images {
     NSAssert((images && [images count]), @"Images can not be empty.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _images = [images mutableCopy];
         _segments = [images count];
+        _contentType = UUSegmentContentTypeImage;
         [self commonInit];
     }
     return self;
 }
 
-- (instancetype)initWithTitles:(NSArray<NSString *> *)titles forImages:(NSArray<UIImage *> *)images {
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
     NSAssert((titles && [titles count] && images && [images count]), @"Titles and images can not be empty.");
     NSAssert(([titles count] == [images count]), @"The count of titles should be equal to the count of images.");
     self = [super initWithFrame:CGRectZero];
@@ -88,6 +98,7 @@
         _titles = [titles mutableCopy];
         _images = [images mutableCopy];
         _segments = [titles count];
+        _contentType = UUSegmentContentTypeMixture;
         [self commonInit];
     }
     return self;
@@ -99,7 +110,7 @@
 //    [self setupScrollView];
     [self setupContainerView];
     [self setupSegmentViews];
-    [self setupConstraintsWithSegmentViewsToContainerView];
+    [self setupConstraintsWithSegmentsToContainerView];
     [self setupIndicatorView];
     // Add gesture
     [self addGesture];
@@ -107,8 +118,15 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    NSLog(@"Segment layoutSubviews");
+    self.indicatorView.frame = (CGRect){[self segmentWidth] * _currentIndex, 0, [self segmentWidth], CGRectGetHeight(self.frame)};
     
-    self.indicatorView.frame = (CGRect){[self segmentWidth] * _currentIndex, CGRectGetHeight(self.frame) - 4, [self segmentWidth], 4};
+    CGRect containerViewFrame = _containerView.frame;
+    CGFloat scrollViewWidth = CGRectGetWidth(_scrollView.frame);
+    if (CGRectGetWidth(containerViewFrame) < scrollViewWidth) {
+        NSLog(@"containerView.width < scrollView.width");
+        containerViewFrame.size.width = scrollViewWidth;
+    }
 }
 
 #pragma mark - Items Setting
@@ -145,35 +163,20 @@
 }
 
 - (void)updateTitle:(NSString *)title forSegmentViewAtIndex:(NSUInteger)index {
-    UIView *oldSegmentView = _segmentViews[index];
     UULabel *label = _labelTable[index];
     label.text = title;
 }
 
 - (void)updateImage:(UIImage *)image forSegmentViewAtIndex:(NSUInteger)index {
-    UIView *oldSegmentView = _segmentViews[index];
-    UIImageView *imageView = _imageTable[index];
+    UUImageView *imageView = _imageViewTable[index];
     imageView.image = image;
 }
 
 - (void)updateTitle:(NSString *)title forImage:(UIImage *)image forSegmentViewAtIndex:(NSUInteger)index {
-    UIView *oldSegmentView = _segmentViews[index];
     UULabel *label = _labelTable[index];
     label.text = title;
-    UIImageView *imageView = _imageTable[index];
+    UUImageView *imageView = _imageViewTable[index];
     imageView.image = image;
-}
-
-- (void)updateTextForFont:(UIFont *)font {
-    for (UULabel *label in _labelTable) {
-        label.font = font;
-    }
-}
-
-- (void)updateTextForColor:(UIColor *)color {
-    for (UULabel *label in _labelTable) {
-        label.textColor = color;
-    }
 }
 
 #pragma mark - Items Getting
@@ -209,9 +212,6 @@
     
     [self.titles insertObject:title atIndex:index];
     self.segments++;
-    
-    UIView *segmentView = [self setupSegmentViewWithTitle:title];
-    [self insertSegment:segmentView atIndex:index];
 }
 
 - (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index {
@@ -219,13 +219,9 @@
     
     [self.images insertObject:image atIndex:index];
     self.segments++;
-    
-    UIView *segmentView = [self setupSegmentViewWithImage:image];
-    [self insertSegment:segmentView atIndex:index];
 }
 
 - (void)insertSegment:(UIView *)segmentView atIndex:(NSUInteger)index {
-    [self.segmentViews insertObject:segmentView atIndex:index];
     [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
 }
 
@@ -246,87 +242,46 @@
 #pragma mark - Views Setup
 
 - (void)setupSegmentViews {
-    _segmentViews = [NSMutableArray array];
-    UIView *segmentView;
-    if (_titles && _images) {
-        // Segment view with title and image
-        for (int i = 0; i < _segments; i++) {
-            segmentView = [self setupSegmentViewWithTitle:_titles[i] forImage:_images[i]];
-            [_segmentViews addObject:segmentView];
-        }
-    }
-    else if (_titles) {
-        // Segment view with title
-        for (NSString *title in _titles) {
-            segmentView = [self setupSegmentViewWithTitle:title];
-            [_segmentViews addObject:segmentView];
-        }
-    }
-    else {
-        // Segment view with image
-        for (UIImage *image in _images) {
-            segmentView = [self setupSegmentViewWithImage:image];
-            [_segmentViews addObject:segmentView];
-        }
+    switch (_contentType) {
+        case UUSegmentContentTypeTitle:
+            for (NSString *title in _titles) {
+                [self setupSegmentViewWithTitle:title];
+            }
+            break;
+        case UUSegmentContentTypeImage:
+            for (UIImage *image in _images) {
+                [self setupSegmentViewWithImage:image];
+            }
+            break;
+        case UUSegmentContentTypeMixture:
+            for (int i = 0; i < _segments; i++) {
+                [self setupSegmentViewWithTitle:_titles[i] forImage:_images[i]];
+            }
+            break;
     }
 }
 
-- (UIView *)setupSegmentViewWithTitle:(NSString *)title {
-    UIView *segmentView = [UIView new];
+- (void)setupSegmentViewWithTitle:(NSString *)title {
     UULabel *label = [[UULabel alloc] initWithText:title];
-    [segmentView addSubview:label];
-    
-    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_containerView addSubview:label];
+    [self.labelTable addObject:label];
     label.translatesAutoresizingMaskIntoConstraints = NO;
-    [self setupConstraintsForInnerView:label inSegmentView:segmentView];
-    
-    [_containerView addSubview:segmentView];
-    
-    segmentView.backgroundColor = [UIColor yellowColor];
-    
-    return segmentView;
 }
 
-- (UIView *)setupSegmentViewWithImage:(UIImage *)image {
-    UIView *segmentView = [UIView new];
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    [segmentView addSubview:imageView];
-    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)setupSegmentViewWithImage:(UIImage *)image {
+    UUImageView *imageView = [[UUImageView alloc] initWithImage:image];
+    [_containerView addSubview:imageView];
+    [self.imageViewTable addObject:imageView];
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self setupConstraintsForInnerView:imageView inSegmentView:segmentView];
-    [_containerView addSubview:segmentView];
-    
-    segmentView.backgroundColor = [UIColor yellowColor];
-    
-    return segmentView;
 }
 
-- (UIView *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
-    UIView *segmentView = [UIView new];
+- (void)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
     UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image];
-    [segmentView addSubview:imageTextView];
-    segmentView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_containerView addSubview:imageTextView];
+//    [self.labelTable addObject:imageTextView.label];
+//    [self.imageViewTable addObject:imageTextView.imageView];
+    [self.mixtureTable addObject:imageTextView];
     imageTextView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self setupConstraintsForInnerView:imageTextView inSegmentView:segmentView];
-    [_containerView addSubview:segmentView];
-    
-    return segmentView;
-}
-
-- (void)setupScrollView {
-    _scrollView = ({
-        UIScrollView *scrollView = [UIScrollView new];
-        scrollView.showsVerticalScrollIndicator = NO;
-        scrollView.showsHorizontalScrollIndicator = NO;
-        scrollView.scrollEnabled = NO;
-        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:scrollView];
-        
-        scrollView;
-    });
-    [self setupConstraintsToSelfWithView:_scrollView];
 }
 
 - (void)setupContainerView {
@@ -334,6 +289,7 @@
         UIView *containerView = [UIView new];
         containerView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:containerView];
+        containerView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
         
         containerView;
     });
@@ -341,11 +297,33 @@
 }
 
 - (void)setupIndicatorView {
-    _indicatorView = [UUIndicatorView new];
+    _indicatorView = [[UUIndicatorView alloc] initWithType:UUIndicatorViewTypeUnderline];
     [_containerView addSubview:_indicatorView];
 }
 
 #pragma mark - Views Update
+
+- (void)updateTextForFont:(UIFont *)font {
+    for (UULabel *label in _labelTable) {
+        label.font = font;
+    }
+}
+
+- (void)updateTextForColor:(UIColor *)color {
+    for (UULabel *label in _labelTable) {
+        label.textColor = color;
+    }
+}
+
+- (void)updateImageForColor:(UIColor *)color {
+    for (UUImageView *imageView in _imageViewTable) {
+        imageView.tintColor = color;
+    }
+}
+
+- (void)updateBorderOfSegmentForColor:(UIColor *)color {
+    self.containerView.layer.borderColor = color.CGColor;
+}
 
 - (void)updateViewForColor:(UIColor *)color {
     self.containerView.backgroundColor = color;
@@ -357,50 +335,23 @@
     return YES;
 }
 
-- (void)setupConstraintsForInnerView:(UIView *)innerView inSegmentView:(UIView *)view {
-    [NSLayoutConstraint constraintWithItem:innerView
-                                 attribute:NSLayoutAttributeTop
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:view
-                                 attribute:NSLayoutAttributeTop
-                                multiplier:1.0
-                                  constant:0.0
-     ].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:innerView
-                                 attribute:NSLayoutAttributeBottom
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:view
-                                 attribute:NSLayoutAttributeBottom
-                                multiplier:1.0
-                                  constant:0.0
-     ].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:innerView
-                                 attribute:NSLayoutAttributeLeading
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:view
-                                 attribute:NSLayoutAttributeLeading
-                                multiplier:1.0
-                                  constant:0.0
-     ].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:innerView
-                                 attribute:NSLayoutAttributeTrailing
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:view
-                                 attribute:NSLayoutAttributeTrailing
-                                multiplier:1.0
-                                  constant:0.0
-     ].active = YES;
-}
-
-- (void)setupConstraintsWithSegmentViewsToContainerView {
-    
+- (void)setupConstraintsWithSegmentsToContainerView {
+    NSArray *views;
+    switch (_contentType) {
+        case UUSegmentContentTypeTitle:
+            views = _labelTable;
+            break;
+        case UUSegmentContentTypeImage:
+            views = _imageViewTable;
+            break;
+        case UUSegmentContentTypeMixture:
+            views = _mixtureTable;
+            break;
+    }
     UIView *lastView;
     
     for (int i = 0; i < _segments; i++) {
-        UIView *view = _segmentViews[i];
+        UIView *view = views[i];
         // view's top equal to containerView
         [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeTop
@@ -561,7 +512,7 @@
                                  attribute:NSLayoutAttributeWidth
                                 multiplier:1.0
                                   constant:0.0
-     ].active = YES;
+     ].active = NO;
 }
 
 - (void)updateConstraintsWithInsertSegmentView:(UIView *)segmentView atIndex:(NSUInteger)index {
@@ -635,7 +586,6 @@
     
 }
 
-
 #pragma mark - Event Response
 
 - (void)addGesture {
@@ -648,7 +598,7 @@
     NSUInteger oldIndex = self.currentIndex;
     self.currentIndex = [self nearestIndexOfSegmentAtPoint:location];
     if (oldIndex != self.currentIndex) {
-        [self moveIndicatorViewToIndex:self.currentIndex animated:YES];
+        [self moveIndicatorViewFromIndex:oldIndex ToIndex:self.currentIndex animated:YES];
     }
 }
 
@@ -657,10 +607,14 @@
     return index;
 }
 
-- (void)moveIndicatorViewToIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)moveIndicatorViewFromIndex:(NSUInteger)previousIndex ToIndex:(NSUInteger)currentIndex animated:(BOOL)animated {
+    UUImageView *previousImageView = _imageViewTable[previousIndex];
+    UUImageView *selectedImageView = _imageViewTable[currentIndex];
     if (animated) {
-        [UIView animateWithDuration:0.25 animations:^{
-            [self.indicatorView setX:[self segmentWidth] * index];
+        [UIView animateWithDuration:1.0 animations:^{
+            previousImageView.tintColor = self.imageColor;
+            selectedImageView.tintColor = nil;
+            [self.indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
         } completion:^(BOOL finished) {
             if (finished) {
                 [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -668,7 +622,7 @@
         }];
     }
     else {
-        [self.indicatorView setX:[self segmentWidth] * index];
+        [self.indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
@@ -681,9 +635,47 @@
 
 #pragma mark - Setters
 
+///----------------------------------
+/// @name Managing Segment Appearance
+///----------------------------------
+
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    _cornerRadius = cornerRadius;
+//    self.containerView.layer.masksToBounds = YES;
+    self.containerView.layer.cornerRadius = cornerRadius;
+//    self.indicatorView.cornerRadius = 
+}
+
+- (void)setBorderWidth:(CGFloat)borderWidth {
+    _borderWidth = borderWidth;
+    self.containerView.layer.borderWidth = borderWidth;
+}
+
+- (void)setBorderColor:(UIColor *)borderColor {
+    NSAssert(borderColor, @"The color should not be nil.");
+    if (borderColor != _borderColor && ![borderColor isEqual:_borderColor]) {
+        _borderColor = borderColor;
+        [self updateBorderOfSegmentForColor:borderColor];
+    }
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    NSAssert(backgroundColor, @"The color should not be nil.");
+    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
+        _backgroundColor = backgroundColor;
+        [self updateViewForColor:backgroundColor];
+    }
+}
+
+///---------------------------
+/// @name Managing Scroll View
+///---------------------------
+
 - (void)setScrollOn:(BOOL)scrollOn {
     _scrollOn = scrollOn;
-    _scrollView.scrollEnabled = scrollOn;
+    [_containerView removeFromSuperview];
+    [self.scrollView addSubview:_containerView];
+    [self setupConstraintsWithContainerViewToScrollView];
 }
 
 - (void)setTextColor:(UIColor *)textColor {
@@ -691,6 +683,14 @@
     if (textColor != _textColor && ![textColor isEqual:_textColor]) {
         _textColor = textColor;
         [self updateTextForColor:textColor];
+    }
+}
+
+- (void)setImageColor:(UIColor *)imageColor {
+    NSAssert(imageColor, @"The color should not be nil.");
+    if (imageColor != _imageColor && ![imageColor isEqual:_imageColor]) {
+        _imageColor = imageColor;
+        [self updateImageForColor:imageColor];
     }
 }
 
@@ -712,24 +712,25 @@
     [self updateTextForFont:[UIFont systemFontOfSize:fontSize weight:fontWeight]];
 }
 
-- (void)setBorderWidth:(CGFloat)borderWidth {
-    _borderWidth = borderWidth;
-    self.layer.borderWidth = borderWidth;
-}
-
-- (void)setBorderColor:(UIColor *)borderColor {
-    
-}
-
-- (void)setBackgroundColor:(UIColor *)backgroundColor {
-    NSAssert(backgroundColor, @"The color should not be nil.");
-    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
-        _backgroundColor = backgroundColor;
-        [self updateViewForColor:backgroundColor];
-    }
-}
-
 #pragma mark - Getters
+
+- (UIScrollView *)scrollView {
+    if (_scrollView) {
+        return _scrollView;
+    }
+    _scrollView = ({
+        UIScrollView *scrollView = [UIScrollView new];
+        scrollView.showsVerticalScrollIndicator = NO;
+        scrollView.showsHorizontalScrollIndicator = NO;
+        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:scrollView];
+        
+        scrollView;
+    });
+    [self setupConstraintsToSelfWithView:_scrollView];
+    
+    return _scrollView;
+}
 
 - (NSMutableArray <NSLayoutConstraint *> *)leadingConstraints {
     if (_leadingConstraints) {
@@ -747,12 +748,20 @@
     return _labelTable;
 }
 
-- (NSMutableArray <UIImageView *> *)imageTable {
-    if (_imageTable) {
-        return _imageTable;
+- (NSMutableArray <UUImageView *> *)imageViewTable {
+    if (_imageViewTable) {
+        return _imageViewTable;
     }
-    _imageTable = [NSMutableArray array];
-    return _imageTable;
+    _imageViewTable = [NSMutableArray array];
+    return _imageViewTable;
+}
+
+- (NSMutableArray<UUImageTextView *> *)mixtureTable {
+    if (_mixtureTable) {
+        return _mixtureTable;
+    }
+    _mixtureTable = [NSMutableArray array];
+    return _mixtureTable;
 }
 
 @end

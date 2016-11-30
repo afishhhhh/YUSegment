@@ -8,10 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+@class UULabel, UUImageView;
+
 @interface UUImageTextView : UIView
 
 - (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image;
 - (void)setTitle:(NSString *)title;
 - (void)setImage:(UIImage *)image;
+
+- (UULabel *)label;
+- (UUImageView *)imageView;
 
 @end

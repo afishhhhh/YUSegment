@@ -8,11 +8,12 @@
 
 #import "UUImageTextView.h"
 #import "UULabel.h"
+#import "UUImageView.h"
 
 @interface UUImageTextView ()
 
 @property (nonatomic, strong) UULabel     *label;
-@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UUImageView *imageView;
 
 @end
 
@@ -24,11 +25,18 @@
     self = [super init];
     if (self) {
         _label = [[UULabel alloc] initWithText:title];
-        _imageView = [[UIImageView alloc] initWithImage:image];
+        _imageView = [[UUImageView alloc] initWithImage:image];
         [self addSubview:_label];
         [self addSubview:_imageView];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    NSLog(@"ImageTextView layoutSubviews");
+    _imageView.frame = (CGRect){0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) * 0.7};
+    _label.frame = (CGRect){0, CGRectGetMaxY(_imageView.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) * 0.3};
 }
 
 #pragma mark -
@@ -39,6 +47,14 @@
 
 - (void)setImage:(UIImage *)image {
     self.imageView.image = image;
+}
+
+- (UULabel *)label {
+    return _label;
+}
+
+- (UUImageView *)imageView {
+    return _imageView;
 }
 
 @end

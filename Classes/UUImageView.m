@@ -10,6 +10,14 @@
 
 @implementation UUImageView
 
-
+- (instancetype)initWithImage:(UIImage *)image {
+    self = [super initWithImage:image];
+    if (self) {
+        self.contentMode = UIViewContentModeScaleAspectFit;
+//        self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAutomatic];
+//        self.tintColor = [UIColor lightGrayColor];
+    }
+    return self;
+}
 
 @end

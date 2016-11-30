@@ -8,8 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, UUIndicatorViewType) {
+    UUIndicatorViewTypeRectangle,
+    UUIndicatorViewTypeUnderline,
+};
+
 @interface UUIndicatorView : UIView
 
-- (void)setX:(CGFloat)x;
+@property (nonatomic, assign) CGFloat cornerRadius;
+
+- (instancetype)initWithType:(UUIndicatorViewType)type;
+
+- (void)setCenterX:(CGFloat)centerX;
 
 @end
