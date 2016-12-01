@@ -10,11 +10,16 @@
 
 @implementation UULabel
 
-- (instancetype)initWithText:(NSString *)text {
+- (instancetype)initWithText:(NSString *)text selected:(BOOL)selected {
     self = [super init];
     if (self) {
-        self.font = [UIFont systemFontOfSize:13 weight:UIFontWeightMedium];
-        self.textColor = [UIColor lightGrayColor];
+        if (selected) {
+            self.font = [UIFont systemFontOfSize:24.0 weight:UIFontWeightMedium];
+            self.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
+        } else {
+            self.font = [UIFont systemFontOfSize:18.0 weight:UIFontWeightThin];
+            self.textColor = [UIColor lightGrayColor];
+        }
         self.textAlignment = NSTextAlignmentCenter;
         self.text = text;
     }

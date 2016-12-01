@@ -10,6 +10,6 @@
 
 @interface UULabel : UILabel
 
-- (instancetype)initWithText:(NSString *)text;
+- (instancetype)initWithText:(NSString *)text selected:(BOOL)selected;
 
 @end

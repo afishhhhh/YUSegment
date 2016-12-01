@@ -33,8 +33,6 @@ typedef struct UUFont {
 
 @class UUSegment;
 
-typedef void(^UUSegmentContentSelectedBlock)(void);
-
 @protocol UUSegmentDelegate <NSObject>
 
 - (void)segmentControl:(UUSegment *)segmentControl didSelectedAtIndex:(NSUInteger)index;
@@ -59,7 +57,7 @@ typedef void(^UUSegmentContentSelectedBlock)(void);
 @property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
 
 /**
- The index of segment that selected currently. The default is 0;
+ The index of segment which selected currently. The default is 0;
  */
 @property (nonatomic, assign) NSUInteger currentIndex;
 

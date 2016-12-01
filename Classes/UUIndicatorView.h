@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, UUIndicatorViewType) {
-    UUIndicatorViewTypeRectangle,
-    UUIndicatorViewTypeUnderline,
+    UUIndicatorViewTypeRounded,
+    UUIndicatorViewTypeSlider,
 };
 
 @interface UUIndicatorView : UIView
@@ -21,5 +21,6 @@ typedef NS_ENUM(NSUInteger, UUIndicatorViewType) {
 - (instancetype)initWithType:(UUIndicatorViewType)type;
 
 - (void)setCenterX:(CGFloat)centerX;
+- (CGFloat)getCenterX;
 
 @end

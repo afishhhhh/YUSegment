@@ -24,7 +24,7 @@
 - (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image {
     self = [super init];
     if (self) {
-        _label = [[UULabel alloc] initWithText:title];
+        _label = [[UULabel alloc] initWithText:title selected:NO];
         _imageView = [[UUImageView alloc] initWithImage:image];
         [self addSubview:_label];
         [self addSubview:_imageView];
@@ -49,11 +49,11 @@
     self.imageView.image = image;
 }
 
-- (UULabel *)label {
+- (UULabel *)getLabel {
     return _label;
 }
 
-- (UUImageView *)imageView {
+- (UUImageView *)getImageView {
     return _imageView;
 }
 

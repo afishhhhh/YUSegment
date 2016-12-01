@@ -16,7 +16,7 @@
 - (void)setTitle:(NSString *)title;
 - (void)setImage:(UIImage *)image;
 
-- (UULabel *)label;
-- (UUImageView *)imageView;
+- (UULabel *)getLabel;
+- (UUImageView *)getImageView;
 
 @end

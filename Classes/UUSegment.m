@@ -45,17 +45,22 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 @property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
 
+///---------------------------------
+/// @name Managing Indicator Gesture
+///---------------------------------
+
+@property (nonatomic, strong) UITapGestureRecognizer *tap;
+@property (nonatomic, strong) UIPanGestureRecognizer *pan;
+@property (nonatomic, assign) CGFloat                panCorrection;
+
 ///--------------------
 /// @name Mapping Table
 ///--------------------
 
 @property (nonatomic, strong) NSMutableArray <UULabel *>         *labelTable;
 @property (nonatomic, strong) NSMutableArray <UUImageView *>     *imageViewTable;
-@property (nonatomic, strong) NSMutableArray <UUImageTextView *> *mixtureTable;
-
 @property (nonatomic, strong) NSMutableArray <UULabel *>         *selectedLabelTable;
 @property (nonatomic, strong) NSMutableArray <UUImageView *>     *selectedImageViewTable;
-@property (nonatomic, strong) NSMutableArray <UUImageTextView *> *selectedMixtureTable;
 
 //@property (nonatomic, assign, getter = isDataSourceNil) BOOL dataSourceNil;
 
@@ -64,6 +69,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 @implementation UUSegment
 
 @dynamic font;
+@dynamic selectedFont;
 
 #pragma mark - Initialization
 
@@ -112,13 +118,13 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 - (void)commonInit {
     _currentIndex = 0;
     // Setup UI
-    _style = UUSegmentStyleSlider;
+//    _style = UUSegmentStyleSlider;
+    _style = UUSegmentStyleRounded;
     [self setupContainerView];
     [self setupSegmentViewsSelected:NO];
     [self setupSelectedContainerView];
     [self setupSegmentViewsSelected:YES];
     [self buildUIWithStyle:_style];
-    [self setupConstraintsWithSegmentsToContainerView];
     // Add gesture
     [self addGesture];
 }
@@ -128,8 +134,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     NSLog(@"Segment layoutSubviews");
     
     self.indicatorView.frame = (CGRect){[self segmentWidth] * _currentIndex, 0, [self segmentWidth], CGRectGetHeight(self.frame)};
-    
-    self.selectedContainerView.layer.mask = self.indicatorView.maskView.layer;
     
 //    CGRect containerViewFrame = _containerView.frame;
 //    CGFloat scrollViewWidth = CGRectGetWidth(_scrollView.frame);
@@ -254,28 +258,46 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (void)setupSegmentViewsSelected:(BOOL)selected {
     switch (_contentType) {
-        case UUSegmentContentTypeTitle:
+        case UUSegmentContentTypeTitle: {
             for (NSString *title in _titles) {
                 [self setupSegmentViewWithTitle:title selected:selected];
             }
+            if (selected) {
+                [self setupConstraintsWithSegments:_selectedLabelTable toContainerView:_selectedContainerView];
+            } else {
+                [self setupConstraintsWithSegments:_labelTable toContainerView:_containerView];
+            }
             break;
-        case UUSegmentContentTypeImage:
+        }
+        case UUSegmentContentTypeImage: {
             for (UIImage *image in _images) {
                 [self setupSegmentViewWithImage:image selected:selected];
             }
-            break;
-        case UUSegmentContentTypeMixture:
-            for (int i = 0; i < _segments; i++) {
-                [self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:selected];
+            if (selected) {
+                [self setupConstraintsWithSegments:_selectedImageViewTable toContainerView:_selectedContainerView];
+            } else {
+                [self setupConstraintsWithSegments:_imageViewTable toContainerView:_containerView];
             }
             break;
+        }
+        case UUSegmentContentTypeMixture: {
+            NSMutableArray *imageTextViews = [NSMutableArray array];
+            for (int i = 0; i < _segments; i++) {
+                [imageTextViews addObject:[self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:selected]];
+            }
+            if (selected) {
+                [self setupConstraintsWithSegments:imageTextViews toContainerView:_selectedContainerView];
+            } else {
+                [self setupConstraintsWithSegments:imageTextViews toContainerView:_containerView];
+            }
+            break;
+        }
     }
 }
 
 - (void)setupSegmentViewWithTitle:(NSString *)title selected:(BOOL)selected {
-    UULabel *label = [[UULabel alloc] initWithText:title];
+    UULabel *label = [[UULabel alloc] initWithText:title selected:selected];
     if (selected) {
-        label.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
         [_selectedContainerView addSubview:label];
         [self.selectedLabelTable addObject:label];
     }
@@ -299,19 +321,21 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
-- (void)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
+- (UUImageTextView *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
     UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image];
     if (selected) {
         [_selectedContainerView addSubview:imageTextView];
-        [self.selectedMixtureTable addObject:imageTextView];
+        [self.selectedLabelTable addObject:[imageTextView getLabel]];
+        [self.selectedImageViewTable addObject:[imageTextView getImageView]];
     }
     else {
         [_containerView addSubview:imageTextView];
-        [self.mixtureTable addObject:imageTextView];
+        [self.labelTable addObject:[imageTextView getLabel]];
+        [self.imageViewTable addObject:[imageTextView getImageView]];
     }
-//    [self.labelTable addObject:imageTextView.label];
-//    [self.imageViewTable addObject:imageTextView.imageView];
     imageTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    return imageTextView;
 }
 
 - (void)setupContainerView {
@@ -341,29 +365,32 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     UUIndicatorViewType type;
     switch (style) {
         case UUSegmentStyleSlider: {
-            type = UUIndicatorViewTypeUnderline;
+            type = UUIndicatorViewTypeSlider;
             break;
         }
         case UUSegmentStyleRounded: {
-            type = UUIndicatorViewTypeRectangle;
+            type = UUIndicatorViewTypeRounded;
             break;
         }
     }
     _indicatorView = [[UUIndicatorView alloc] initWithType:type];
     [_containerView addSubview:_indicatorView];
+    _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
 }
 
 #pragma mark - Views Update
 
-- (void)updateTextForFont:(UIFont *)font {
-    for (UULabel *label in _labelTable) {
-        label.font = font;
+- (void)updateTitleAppearanceWithColor:(UIColor *)color selected:(BOOL)selected {
+    NSArray *labels = selected ? _selectedLabelTable : _labelTable;
+    for (UULabel *label in labels) {
+        label.textColor = color;
     }
 }
 
-- (void)updateTextForColor:(UIColor *)color {
-    for (UULabel *label in _labelTable) {
-        label.textColor = color;
+- (void)updateTitleAppearanceWithFont:(UIFont *)font selected:(BOOL)selected {
+    NSArray *labels = selected ? _selectedLabelTable : _labelTable;
+    for (UULabel *label in labels) {
+        label.font = font;
     }
 }
 
@@ -398,23 +425,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 + (BOOL)requiresConstraintBasedLayout {
     return YES;
-}
-
-- (void)setupConstraintsWithSegmentsToContainerView {
-    switch (_contentType) {
-        case UUSegmentContentTypeTitle:
-            [self setupConstraintsWithSegments:_labelTable toContainerView:_containerView];
-            [self setupConstraintsWithSegments:_selectedLabelTable toContainerView:_selectedContainerView];
-            break;
-        case UUSegmentContentTypeImage:
-            [self setupConstraintsWithSegments:_imageViewTable toContainerView:_containerView];
-            [self setupConstraintsWithSegments:_selectedImageViewTable toContainerView:_selectedContainerView];
-            break;
-        case UUSegmentContentTypeMixture:
-            [self setupConstraintsWithSegments:_mixtureTable toContainerView:_containerView];
-            [self setupConstraintsWithSegments:_selectedMixtureTable toContainerView:_selectedContainerView];
-            break;
-    }
 }
 
 - (void)setupConstraintsWithSegments:(NSArray *)segments toContainerView:(UIView *)containerView {
@@ -650,32 +660,55 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 #pragma mark - Event Response
 
 - (void)addGesture {
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:tap];
+    if (_style == UUSegmentStyleRounded) {
+        _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+        [self addGestureRecognizer:_pan];
+    }
+    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self addGestureRecognizer:_tap];
 }
 
-- (void)tap:(UITapGestureRecognizer *)tapGesture {
-    CGPoint location = [tapGesture locationInView:self];
+- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:self];
     NSUInteger oldIndex = self.currentIndex;
-    self.currentIndex = [self nearestIndexOfSegmentAtPoint:location];
+    self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
     if (oldIndex != self.currentIndex) {
-        [self moveIndicatorViewFromIndex:oldIndex ToIndex:self.currentIndex animated:YES];
+        [self moveIndicatorViewToIndex:_currentIndex animated:YES];
     }
 }
 
-- (NSUInteger)nearestIndexOfSegmentAtPoint:(CGPoint)point {
-    NSUInteger index = point.x / [self segmentWidth];
+- (void)pan:(UIPanGestureRecognizer *)gestureRecognizer {
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            _panCorrection = [gestureRecognizer locationInView:_indicatorView].x - CGRectGetWidth(_indicatorView.frame) / 2;
+            break;
+        }
+        case UIGestureRecognizerStateChanged: {
+            CGPoint panLocation = [gestureRecognizer locationInView:self];
+            [self.indicatorView setCenterX:(panLocation.x - _panCorrection)];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateFailed:
+        case UIGestureRecognizerStateCancelled: {
+            CGFloat indicatorCenterX = [_indicatorView getCenterX];
+            self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
+            [self moveIndicatorViewToIndex:_currentIndex animated:YES];
+        }
+        default:
+            break;
+    }
+}
+
+- (NSUInteger)nearestIndexOfSegmentAtXCoordinate:(CGFloat)x {
+    NSUInteger index = x / [self segmentWidth];
     return index;
 }
 
-- (void)moveIndicatorViewFromIndex:(NSUInteger)previousIndex ToIndex:(NSUInteger)currentIndex animated:(BOOL)animated {
-    UUImageView *previousImageView = _imageViewTable[previousIndex];
-    UUImageView *selectedImageView = _imageViewTable[currentIndex];
+- (void)moveIndicatorViewToIndex:(NSUInteger)currentIndex animated:(BOOL)animated {
     if (animated) {
-        [UIView animateWithDuration:1.0 animations:^{
-            previousImageView.tintColor = self.imageColor;
-            selectedImageView.tintColor = nil;
-            [self.indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
+        [UIView animateWithDuration:2.0 animations:^{
+            [_indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
         } completion:^(BOOL finished) {
             if (finished) {
                 [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -683,7 +716,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         }];
     }
     else {
-        [self.indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
+        [_indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
@@ -692,6 +725,23 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (CGFloat)segmentWidth {
     return CGRectGetWidth(self.bounds) / _segments;
+}
+
+- (UIFont *)convertFont:(UUFont)font {
+    CGFloat fontSize = font.size;
+    CGFloat fontWeight;
+    switch (font.weight) {
+        case UUFontWeightThin:
+            fontWeight = UIFontWeightThin;
+            break;
+        case UUFontWeightMedium:
+            fontWeight = UIFontWeightMedium;
+            break;
+        case UUFontWeightBold:
+            fontWeight = UIFontWeightBold;
+            break;
+    }
+    return [UIFont systemFontOfSize:fontSize weight:fontWeight];
 }
 
 #pragma mark - Setters
@@ -711,7 +761,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     _cornerRadius = cornerRadius;
 //    self.containerView.layer.masksToBounds = YES;
     self.containerView.layer.cornerRadius = cornerRadius;
-//    self.indicatorView.cornerRadius = 
+    self.indicatorView.cornerRadius = cornerRadius;
 }
 
 - (void)setBorderWidth:(CGFloat)borderWidth {
@@ -746,13 +796,37 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [self setupConstraintsWithContainerViewToScrollView];
 }
 
+///-------------------------------
+/// @name Managing Text Appearance
+///-------------------------------
+
 - (void)setTextColor:(UIColor *)textColor {
     NSAssert(textColor, @"The color should not be nil.");
     if (textColor != _textColor && ![textColor isEqual:_textColor]) {
         _textColor = textColor;
-        [self updateTextForColor:textColor];
+        [self updateTitleAppearanceWithColor:textColor selected:NO];
     }
 }
+
+- (void)setSelectedTextColor:(UIColor *)selectedTextColor {
+    NSAssert(selectedTextColor, @"The color should not be nil.");
+    if (selectedTextColor != _selectedTextColor && ![selectedTextColor isEqual:_selectedTextColor]) {
+        _selectedTextColor = selectedTextColor;
+        [self updateTitleAppearanceWithColor:selectedTextColor selected:YES];
+    }
+}
+
+- (void)setFont:(UUFont)font {
+    [self updateTitleAppearanceWithFont:[self convertFont:font] selected:NO];
+}
+
+- (void)setSelectedFont:(UUFont)selectedFont {
+    [self updateTitleAppearanceWithFont:[self convertFont:selectedFont] selected:YES];
+}
+
+///--------------------------------
+/// @name Managing Image Appearance
+///--------------------------------
 
 - (void)setImageColor:(UIColor *)imageColor {
     NSAssert(imageColor, @"The color should not be nil.");
@@ -760,24 +834,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         _imageColor = imageColor;
         [self updateImageForColor:imageColor];
     }
-}
-
-- (void)setFont:(UUFont)font {
-    CGFloat fontSize = font.size;
-    CGFloat fontWeight;
-    
-    switch (font.weight) {
-        case UUFontWeightThin:
-            fontWeight = UIFontWeightThin;
-            break;
-        case UUFontWeightMedium:
-            fontWeight = UIFontWeightMedium;
-            break;
-        case UUFontWeightBold:
-            fontWeight = UIFontWeightBold;
-            break;
-    }
-    [self updateTextForFont:[UIFont systemFontOfSize:fontSize weight:fontWeight]];
 }
 
 #pragma mark - Getters
@@ -824,14 +880,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     return _imageViewTable;
 }
 
-- (NSMutableArray <UUImageTextView *> *)mixtureTable {
-    if (_mixtureTable) {
-        return _mixtureTable;
-    }
-    _mixtureTable = [NSMutableArray array];
-    return _mixtureTable;
-}
-
 - (NSMutableArray <UULabel *> *)selectedLabelTable {
     if (_selectedLabelTable) {
         return _selectedLabelTable;
@@ -846,14 +894,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     }
     _selectedImageViewTable = [NSMutableArray array];
     return _selectedImageViewTable;
-}
-
-- (NSMutableArray <UUImageTextView *> *)selectedMixtureTable {
-    if (_selectedMixtureTable) {
-        return _selectedMixtureTable;
-    }
-    _selectedMixtureTable = [NSMutableArray array];
-    return _selectedMixtureTable;
 }
 
 @end
