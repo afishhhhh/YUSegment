@@ -158,25 +158,25 @@ typedef struct UUFont {
 /**
  Initializes and returns a segmented control with segments having the given titles.
 
- @param titles An array of `NSString` objects for segment titles. This value must not be nil or empty array.
- @return The newly-created instance of `UUSegment`.
+ @param titles An array of `NSString` objects. The value must not be nil or empty array.
+ @return The newly-created instance of the `UUSegment`.
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
 
 /**
  Initializes and returns s segmented control with segments having the given images.
 
- @param images An array of `UIImage` objects for segment images. This value must not be nil or empty array.
- @return The newly-created instance of `UUSegment`.
+ @param images An array of `UIImage` objects. The value must not be nil or empty array.
+ @return The newly-created instance of the `UUSegment`.
  */
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images;
 
 /**
- Initializes and returns s segmented control with segments having the given titles and images.
+ Initializes and returns s segmented control with segments having the given titles and images. The image is at the top of the title.
 
- @param titles An array of `NSString` objects for segment titles. This value must not be nil or empty array.
- @param images An array of `UIImage` objects for segment images. This value must not be nil or empty array.
- @return The newly-created instance of `UUSegment` that images are above the titles.
+ @param titles An array of `NSString` objects. This value must not be nil or empty array.
+ @param images An array of `UIImage` objects. This value must not be nil or empty array.
+ @return The newly-created instance of the `UUSegment`.
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
@@ -184,10 +184,29 @@ typedef struct UUFont {
 /// @name Managing Segment Content Setting
 ///---------------------------------------
 
+/**
+ Set the content of a segment to a given title.
+
+ @param title A new title display in the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index;
 
+/**
+ Set the content of a segment to a given image.
+
+ @param image A new image display in the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
+/**
+ Set the content of a segment to given title and image. You could just use `-setTitle:forSegmentAtIndex:` or `-setImage:forSegmentAtIndex:` to modify title or image only.
+
+ @param title A new title display in the segment.
+ @param image A new image display in the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
 ///---------------------------------------

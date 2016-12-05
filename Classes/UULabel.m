@@ -18,7 +18,7 @@
 //            self.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
             self.textColor = [UIColor blackColor];
         } else {
-            self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightThin];
+            self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
             self.textColor = [UIColor lightGrayColor];
         }
         self.textAlignment = NSTextAlignmentCenter;

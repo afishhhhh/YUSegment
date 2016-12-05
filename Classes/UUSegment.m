@@ -29,7 +29,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 @property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
 
 @property (nonatomic, assign) UUSegmentContentType              contentType;
-@property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
 
@@ -62,7 +61,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _titles = [titles mutableCopy];
-        _segments = [titles count];
+        _numberOfSegments = [titles count];
         _contentType = UUSegmentContentTypeTitle;
         [self commonInit];
     }
@@ -74,7 +73,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _images = [images mutableCopy];
-        _segments = [images count];
+        _numberOfSegments = [images count];
         _contentType = UUSegmentContentTypeImage;
         [self commonInit];
     }
@@ -88,7 +87,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     if (self) {
         _titles = [titles mutableCopy];
         _images = [images mutableCopy];
-        _segments = [titles count];
+        _numberOfSegments = [titles count];
         _contentType = UUSegmentContentTypeMixture;
         [self commonInit];
     }
@@ -98,8 +97,8 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 - (void)commonInit {
     _currentIndex = 0;
     // Setup UI
-    _style = UUSegmentStyleSlider;
-//    _style = UUSegmentStyleRounded;
+//    _style = UUSegmentStyleSlider;
+    _style = UUSegmentStyleRounded;
     [self setupContainerView];
     [self setupSegmentViewsSelected:NO];
     [self setupSelectedContainerView];
@@ -141,67 +140,56 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 #pragma mark - Items Setting
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
-    [self update:title forTitlesAtIndex:index];
+    NSAssert(_contentType != UUSegmentContentTypeImage, @"You should use this method when the content of segment is `NSString` object.");
+    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
+    self.titles[index] = title;
     [self updateTitle:title forSegmentViewAtIndex:index];
 }
 
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
-    [self update:image forImagesAtIndex:index];
+    NSAssert(_contentType != UUSegmentContentTypeTitle, @"You should use this method when the content of segment is `UImage` object.");
+    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
+    self.images[index] = image;
     [self updateImage:image forSegmentViewAtIndex:index];
 }
 
 - (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
-    [self update:title forImage:image forTitlesAndImagesAtIndex:index];
-    [self updateTitle:title forImage:image forSegmentViewAtIndex:index];
-}
-
-- (void)update:(NSString *)title forTitlesAtIndex:(NSUInteger)index {
+    NSAssert(_contentType == UUSegmentContentTypeMixture, @"You should use this method when the content of segment includes title and image.");
+    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
     self.titles[index] = title;
-}
-
-- (void)update:(UIImage *)image forImagesAtIndex:(NSUInteger)index {
+    [self updateTitle:title forSegmentViewAtIndex:index];
     self.images[index] = image;
-}
-
-- (void)update:(NSString *)title forImage:(UIImage *)image forTitlesAndImagesAtIndex:(NSUInteger)index {
-    self.titles[index] = title;
-    self.images[index] = image;
+    [self updateImage:image forSegmentViewAtIndex:index];
 }
 
 - (void)updateTitle:(NSString *)title forSegmentViewAtIndex:(NSUInteger)index {
     UULabel *label = _labelTable[index];
     label.text = title;
+    UULabel *selectedLabel = _selectedLabelTable[index];
+    selectedLabel.text = title;
 }
 
 - (void)updateImage:(UIImage *)image forSegmentViewAtIndex:(NSUInteger)index {
     UUImageView *imageView = _imageViewTable[index];
-    imageView.image = image;
-}
-
-- (void)updateTitle:(NSString *)title forImage:(UIImage *)image forSegmentViewAtIndex:(NSUInteger)index {
-    UULabel *label = _labelTable[index];
-    label.text = title;
-    UUImageView *imageView = _imageViewTable[index];
-    imageView.image = image;
+    imageView.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UUImageView *selectedImage = _selectedImageViewTable[index];
+    selectedImage.image = image;
 }
 
 #pragma mark - Items Getting
 
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
+    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
     return _titles[index];
 }
 
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
+    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
     return _images[index];
 }
 
 - (NSDictionary *)titleAndImageForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Index should in the range of 0...%lu", _segments - 1);
+    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
     NSDictionary *dic = @{@"title" : _titles[index], @"image" : _images[index]};
     return dic;
 }
@@ -209,25 +197,25 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 #pragma mark - Items Insert
 
 - (void)addSegmentWithTitle:(NSString *)title {
-    [self insertSegmentWithTitle:title atIndex:_segments];
+    [self insertSegmentWithTitle:title atIndex:_numberOfSegments];
 }
 
 - (void)addSegmentWithImage:(UIImage *)image {
-    [self insertSegmentWithImage:image atIndex:_segments];
+    [self insertSegmentWithImage:image atIndex:_numberOfSegments];
 }
 
 - (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index {
-    NSAssert1(index <= _segments, @"Index should in the range of 0...%lu", _segments);
+    NSAssert1(index <= _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments);
     
     [self.titles insertObject:title atIndex:index];
-    self.segments++;
+    _numberOfSegments++;
 }
 
 - (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-    NSAssert1(index <= _segments, @"Index should in the range of 0...%lu", _segments);
+    NSAssert1(index <= _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments);
     
     [self.images insertObject:image atIndex:index];
-    self.segments++;
+    _numberOfSegments++;
 }
 
 - (void)insertSegment:(UIView *)segmentView atIndex:(NSUInteger)index {
@@ -241,11 +229,11 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 }
 
 - (void)removeLastItem {
-    [self removeItemAtIndex:_segments - 1];
+    [self removeItemAtIndex:_numberOfSegments - 1];
 }
 
 - (void)removeItemAtIndex:(NSUInteger)index {
-    NSAssert1(index < _segments, @"Parameter index should in the range of 0...%lu", _segments - 1);
+    NSAssert1(index < _numberOfSegments, @"Parameter index should in the range of 0...%lu", _numberOfSegments - 1);
 }
 
 #pragma mark - Views Setup
@@ -276,7 +264,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         }
         case UUSegmentContentTypeMixture: {
             NSMutableArray *imageTextViews = [NSMutableArray array];
-            for (int i = 0; i < _segments; i++) {
+            for (int i = 0; i < _numberOfSegments; i++) {
                 [imageTextViews addObject:[self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:selected]];
             }
             if (selected) {
@@ -378,7 +366,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
             break;
         }
         case UUSegmentStyleRounded: {
-            _containerView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+            _containerView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
             _containerView.layer.cornerRadius = 5.0;
             _indicatorMargin = 2.0;
             [_indicatorView setIndicatorWithCornerRadius:5.0];
@@ -484,7 +472,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (NSUInteger)nearestIndexOfSegmentAtXCoordinate:(CGFloat)x {
     NSUInteger index = x / [self segmentWidth];
-    return index < _segments ? index : _segments - 1;
+    return index < _numberOfSegments ? index : _numberOfSegments - 1;
 }
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex animated:(BOOL)animated {
@@ -547,7 +535,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 }
 
 - (CGFloat)segmentWidth {
-    return CGRectGetWidth(self.bounds) / _segments;
+    return CGRectGetWidth(self.bounds) / _numberOfSegments;
 }
 
 - (UIFont *)convertFont:(UUFont)font {
