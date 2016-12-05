@@ -93,6 +93,11 @@ typedef struct UUFont {
  */
 @property (nonatomic, strong) UIColor *borderColor;
 
+/**
+ The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
+ */
+@property (nonatomic, assign) CGFloat widthOfSegment;
+
 @property (nonatomic, assign) UUSegmentAutosizingMode autosizingMode;
 
 ///-------------------------
@@ -146,10 +151,6 @@ typedef struct UUFont {
 /// @name Managing Scroll View
 ///---------------------------
 
-/**
- The Boolean value that controls whether scrolling is enabled. The default is `NO`.
- */
-@property (nonatomic, assign, getter = isScrollOn) BOOL scrollOn;
 
 ///---------------------
 /// @name Initialization
@@ -213,11 +214,21 @@ typedef struct UUFont {
 /// @name Managing Segment Content Getting
 ///---------------------------------------
 
+/**
+ Returns the title for a specific segment.
+
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @return The title for a specific segment.
+ */
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index;
 
-- (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
+/**
+ Returns the image for a specific segment.
 
-- (NSDictionary *)titleAndImageForSegmentAtIndex:(NSUInteger)index;
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @return The image for a specific segment.
+ */
+- (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
 
 ///-------------------------------
 /// @name Managing Segments Insert
@@ -246,7 +257,7 @@ typedef struct UUFont {
 ///----------------------------------
 
 /**
- Set up the radius of rounded corners for the segment's background.
+ Set the radius of rounded corners for the segment's background.
  
  @param cornerRadius The radius to use when drawing rounded corners for the segment's background.
  */

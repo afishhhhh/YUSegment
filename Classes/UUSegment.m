@@ -22,24 +22,33 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 @interface UUSegment ()
 
+/// @name Views
+
 @property (nonatomic, strong) UIView                                *containerView;
 @property (nonatomic, strong) UIView                                *selectedContainerView;
 @property (nonatomic, strong) UIScrollView                          *scrollView;
 @property (nonatomic, strong) UUIndicatorView                       *indicatorView;
+
+/// @name Constraints
+
+@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *widthConstraints;
 @property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
 
-@property (nonatomic, assign) UUSegmentContentType              contentType;
-@property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
-@property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
+/// @name Contents
+
+@property (nonatomic, assign) UUSegmentContentType           contentType;
+@property (nonatomic, strong) NSMutableArray <NSString *>    *titles;
+@property (nonatomic, strong) NSMutableArray <UIImage *>     *images;
+@property (nonatomic, strong) NSMutableArray <UULabel *>     *labelTable;
+@property (nonatomic, strong) NSMutableArray <UUImageView *> *imageViewTable;
+@property (nonatomic, strong) NSMutableArray <UULabel *>     *selectedLabelTable;
+@property (nonatomic, strong) NSMutableArray <UUImageView *> *selectedImageViewTable;
+
+/// @name Gesture
 
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @property (nonatomic, strong) UIPanGestureRecognizer *pan;
 @property (nonatomic, assign) CGFloat                panCorrection;
-
-@property (nonatomic, strong) NSMutableArray <UULabel *>         *labelTable;
-@property (nonatomic, strong) NSMutableArray <UUImageView *>     *imageViewTable;
-@property (nonatomic, strong) NSMutableArray <UULabel *>         *selectedLabelTable;
-@property (nonatomic, strong) NSMutableArray <UUImageView *>     *selectedImageViewTable;
 
 //@property (nonatomic, assign, getter = isDataSourceNil) BOOL dataSourceNil;
 
@@ -101,9 +110,9 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     _style = UUSegmentStyleRounded;
     [self setupContainerView];
     [self setupSegmentViewsSelected:NO];
+    [self setupIndicatorView];
     [self setupSelectedContainerView];
     [self setupSegmentViewsSelected:YES];
-    [self setupIndicatorView];
     [self buildUI];
     // Add gesture
     [self addGesture];
@@ -141,21 +150,27 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
     NSAssert(_contentType != UUSegmentContentTypeImage, @"You should use this method when the content of segment is `NSString` object.");
-    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
     self.titles[index] = title;
     [self updateTitle:title forSegmentViewAtIndex:index];
 }
 
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
     NSAssert(_contentType != UUSegmentContentTypeTitle, @"You should use this method when the content of segment is `UImage` object.");
-    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
     self.images[index] = image;
     [self updateImage:image forSegmentViewAtIndex:index];
 }
 
 - (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
     NSAssert(_contentType == UUSegmentContentTypeMixture, @"You should use this method when the content of segment includes title and image.");
-    index = (index < _numberOfSegments) ? index : _numberOfSegments - 1;
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
     self.titles[index] = title;
     [self updateTitle:title forSegmentViewAtIndex:index];
     self.images[index] = image;
@@ -179,12 +194,18 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 #pragma mark - Items Getting
 
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
+    NSAssert(_contentType != UUSegmentContentTypeImage, @"You should use this method when the content of segment is `NSString` object.");
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
     return _titles[index];
 }
 
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
+    NSAssert(_contentType != UUSegmentContentTypeTitle, @"You should use this method when the content of segment is `UImage` object.");
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
     return _images[index];
 }
 
@@ -340,6 +361,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         containerView;
     });
     [self setupConstraintsToSelfWithView:_selectedContainerView];
+    _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
 }
 
 - (void)setupIndicatorView {
@@ -355,8 +377,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         }
     }
     _indicatorView = [[UUIndicatorView alloc] initWithStyle:style];
-    [_containerView addSubview:_indicatorView];
-    _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
+    [self addSubview:_indicatorView];
 }
 
 - (void)buildUI {
@@ -424,6 +445,15 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (CGFloat)getCornerRadius {
     return _containerView.layer.cornerRadius;
+}
+
+- (void)updateViewHierarchy {
+    [_containerView removeFromSuperview];
+    [self.scrollView addSubview:_containerView];
+    [self setupConstraintsToScrollViewWithView:_containerView];
+    [_selectedContainerView removeFromSuperview];
+    [_scrollView addSubview:_selectedContainerView];
+    [self setupConstraintsToScrollViewWithView:_selectedContainerView];
 }
 
 #pragma mark - Event Response
@@ -601,6 +631,14 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     }
 }
 
+- (void)setWidthOfSegment:(CGFloat)widthOfSegment {
+    if (widthOfSegment < 1.0 || _widthOfSegment == widthOfSegment) {
+        return;
+    }
+    _widthOfSegment = widthOfSegment;
+    [self updateViewHierarchy];
+}
+
 ///-------------------------
 /// @name Managing Indicator
 ///-------------------------
@@ -617,12 +655,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 /// @name Managing Scroll View
 ///---------------------------
 
-- (void)setScrollOn:(BOOL)scrollOn {
-    _scrollOn = scrollOn;
-    [_containerView removeFromSuperview];
-    [self.scrollView addSubview:_containerView];
-    [self setupConstraintsWithContainerViewToScrollView];
-}
+
 
 ///-------------------------------
 /// @name Managing Text Appearance
@@ -690,6 +723,14 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     }
     _leadingConstraints = [NSMutableArray array];
     return _leadingConstraints;
+}
+
+- (NSMutableArray <NSLayoutConstraint *> *)widthConstraints {
+    if (_widthConstraints) {
+        return _widthConstraints;
+    }
+    _widthConstraints = [NSMutableArray array];
+    return _widthConstraints;
 }
 
 - (NSMutableArray <UULabel *> *)labelTable {
@@ -760,16 +801,18 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                                                       multiplier:1.0
                                                                         constant:0.0];
             leading.active = YES;
-            //            [self.leadingConstraints addObject:leading];
+//            [self.leadingConstraints addObject:leading];
             
-            [NSLayoutConstraint constraintWithItem:view
+            NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:view
                                          attribute:NSLayoutAttributeWidth
                                          relatedBy:NSLayoutRelationEqual
                                             toItem:lastView
                                          attribute:NSLayoutAttributeWidth
                                         multiplier:1.0
                                           constant:0.0
-             ].active = YES;
+             ];
+            width.active = YES;
+            [self.widthConstraints addObject:width];
         }
         else {
             NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:view
@@ -780,7 +823,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                                                       multiplier:1.0
                                                                         constant:0.0];
             leading.active = YES;
-            //            [self.leadingConstraints addObject:leading];
+//            [self.leadingConstraints addObject:leading];
         }
         
         lastView = view;
@@ -833,11 +876,11 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
      ].active = YES;
 }
 
-- (void)setupConstraintsWithContainerViewToScrollView {
+- (void)setupConstraintsToScrollViewWithView:(UIView *)view {
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeLeading
                                  relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
+                                    toItem:view
                                  attribute:NSLayoutAttributeLeading
                                 multiplier:1.0
                                   constant:0.0
@@ -846,7 +889,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeTrailing
                                  relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
+                                    toItem:view
                                  attribute:NSLayoutAttributeTrailing
                                 multiplier:1.0
                                   constant:0.0
@@ -855,7 +898,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeTop
                                  relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
+                                    toItem:view
                                  attribute:NSLayoutAttributeTop
                                 multiplier:1.0
                                   constant:0.0
@@ -864,7 +907,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeBottom
                                  relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
+                                    toItem:view
                                  attribute:NSLayoutAttributeBottom
                                 multiplier:1.0
                                   constant:0.0
@@ -873,20 +916,31 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [NSLayoutConstraint constraintWithItem:_scrollView
                                  attribute:NSLayoutAttributeHeight
                                  relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
+                                    toItem:view
                                  attribute:NSLayoutAttributeHeight
                                 multiplier:1.0
                                   constant:0.0
      ].active = YES;
     
-    [NSLayoutConstraint constraintWithItem:_scrollView
-                                 attribute:NSLayoutAttributeWidth
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:_containerView
-                                 attribute:NSLayoutAttributeWidth
-                                multiplier:1.0
-                                  constant:0.0
-     ].active = YES;
+//    [NSLayoutConstraint constraintWithItem:_scrollView
+//                                 attribute:NSLayoutAttributeWidth
+//                                 relatedBy:NSLayoutRelationEqual
+//                                    toItem:_containerView
+//                                 attribute:NSLayoutAttributeWidth
+//                                multiplier:1.0
+//                                  constant:0.0
+//     ].active = YES;
+}
+
+- (void)updateWidthConstraintsForSegments {
+    for (NSLayoutConstraint *width in _widthConstraints) {
+        width.active = NO;
+    }
+    for (UIView *view in _containerView.subviews) {
+        NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_widthOfSegment];
+        width.active = YES;
+        [self.widthConstraints addObject:width];
+    }
 }
 
 - (void)updateConstraintsWithInsertSegmentView:(UIView *)segmentView atIndex:(NSUInteger)index {
