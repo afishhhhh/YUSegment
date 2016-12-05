@@ -84,11 +84,6 @@ typedef struct UUFont {
 @property (nonatomic, strong) UIColor *backgroundColor;
 
 /**
- The radius to use when drawing rounded corners of the segement' background.
- */
-@property (nonatomic, assign) CGFloat cornerRadius;
-
-/**
  The width of the segment's border.
  */
 @property (nonatomic, assign) CGFloat borderWidth;
@@ -99,6 +94,20 @@ typedef struct UUFont {
 @property (nonatomic, strong) UIColor *borderColor;
 
 @property (nonatomic, assign) UUSegmentAutosizingMode autosizingMode;
+
+///-------------------------
+/// @name Managing Indicator
+///-------------------------
+
+/**
+ The spacing of the indicator to its superview. Only works with `UUSegmentRounded` style. The default is 2.
+ */
+@property (nonatomic, assign) CGFloat indicatorMargin;
+
+/**
+ The color of the indicator.
+ */
+@property (nonatomic, strong) UIColor *indicatorColor;
 
 ///-------------------------------
 /// @name Managing Text Appearance
@@ -212,5 +221,16 @@ typedef struct UUFont {
 - (void)removeLastItem;
 
 - (void)removeItemAtIndex:(NSUInteger)index;
+
+///----------------------------------
+/// @name Managing Segment Appearance
+///----------------------------------
+
+/**
+ Set up the radius of rounded corners for the segment's background.
+ 
+ @param cornerRadius The radius to use when drawing rounded corners for the segment's background.
+ */
+- (void)setSegmentWithCornerRadius:(CGFloat)cornerRadius;
 
 @end

@@ -21,11 +21,11 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image {
+- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
     self = [super init];
     if (self) {
-        _label = [[UULabel alloc] initWithText:title selected:NO];
-        _imageView = [[UUImageView alloc] initWithImage:image];
+        _label = [[UULabel alloc] initWithText:title selected:selected];
+        _imageView = [[UUImageView alloc] initWithImage:image selected:selected];
         [self addSubview:_label];
         [self addSubview:_imageView];
     }
@@ -35,8 +35,10 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"ImageTextView layoutSubviews");
-    _imageView.frame = (CGRect){0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) * 0.7};
-    _label.frame = (CGRect){0, CGRectGetMaxY(_imageView.frame), CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) * 0.3};
+    CGFloat width = CGRectGetWidth(self.frame);
+    CGFloat height = CGRectGetHeight(self.frame);
+    _imageView.frame = (CGRect){0, 0, width, (height - 8) * 0.7};
+    _label.frame = (CGRect){0, CGRectGetMaxY(_imageView.frame) + 8, width, (height - 8) * 0.3};
 }
 
 #pragma mark -

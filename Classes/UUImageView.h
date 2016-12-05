@@ -10,4 +10,6 @@
 
 @interface UUImageView : UIImageView
 
+- (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected;
+
 @end

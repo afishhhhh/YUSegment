@@ -10,7 +10,9 @@
 
 @interface UUIndicatorView ()
 
-@property (nonatomic, strong) UIView *underlineView;
+@property (nonatomic, assign) UUIndicatorViewStyle style;
+@property (nonatomic, strong) UIColor              *color;
+@property (nonatomic, strong) UIView               *line;
 
 @end
 
@@ -18,24 +20,14 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithType:(UUIndicatorViewType)type {
+- (instancetype)initWithStyle:(UUIndicatorViewStyle)style {
     self = [super initWithFrame:CGRectZero];
     if (self) {
+        _style = style;
         _maskView = [UIView new];
         _maskView.backgroundColor = [UIColor blackColor];
-        switch (type) {
-            case UUIndicatorViewTypeSlider: {
-                _underlineView = [UIView new];
-                [self addSubview:_underlineView];
-                _underlineView.backgroundColor = [UIColor  colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
-                self.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
-                break;
-            }
-            case UUIndicatorViewTypeRounded: {
-                self.backgroundColor = [UIColor whiteColor];
-                break;
-            }
-        }
+        self.backgroundColor = [UIColor whiteColor];
+        self.layer.masksToBounds = YES;
     }
     return self;
 }
@@ -43,13 +35,37 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"IndicatorView layoutSubviews");
-    if (_underlineView) {
-        _underlineView.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
+    if (_style == UUIndicatorViewStyleSlider) {
+        self.line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 5, CGRectGetWidth(self.frame), 4};
     }
     _maskView.frame = self.frame;
 }
 
 #pragma mark -
+
+- (void)setIndicatorWithCornerRadius:(CGFloat)cornerRadius {
+    if (_style == UUIndicatorViewStyleSlider) {
+        self.line.layer.cornerRadius = 2.0;
+    } else {
+        self.layer.cornerRadius = cornerRadius;
+    }
+}
+
+- (void)setIndicatorWithColor:(UIColor *)color {
+    switch (_style) {
+        case UUIndicatorViewStyleSlider:
+            self.line.backgroundColor = color;
+            break;
+        case UUIndicatorViewStyleRounded: {
+            if ([color isEqual:[UIColor clearColor]]) {
+                self.backgroundColor = [UIColor whiteColor];
+            } else {
+                self.backgroundColor = color;
+            }
+            break;
+        }
+    }
+}
 
 - (void)setCenterX:(CGFloat)centerX {
     CGPoint center = self.center;
@@ -58,22 +74,17 @@
     _maskView.frame = self.frame;
 }
 
-#pragma mark - Setters
-
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    NSLog(@"IndicatorView setFrame");
-    self.layer.bounds = CGRectInset(self.frame, 4, 4);
-}
-
-- (void)setCornerRadius:(CGFloat)cornerRadius {
-//    if (_underlineView) {
-//        _underlineView.layer.cornerRadius = 2;
-//    }
-    self.layer.cornerRadius = cornerRadius;
-}
-
 #pragma mark - Getters
+
+- (UIView *)line {
+    if (_line) {
+        return _line;
+    }
+    _line = [UIView new];
+    [self addSubview:_line];
+    _line.backgroundColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
+    return _line;
+}
 
 - (CGFloat)getCenterX {
     return self.center.x;

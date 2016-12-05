@@ -12,6 +12,8 @@
 #import "UUImageTextView.h"
 #import "UUIndicatorView.h"
 
+//static void *UUSegmentKVOCornerRadiusContext = &UUSegmentKVOCornerRadiusContext;
+
 typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     UUSegmentContentTypeTitle,
     UUSegmentContentTypeImage,
@@ -20,42 +22,20 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 @interface UUSegment ()
 
-///-----------------
-/// @name Appearence
-///-----------------
-
-
-
-///---------------------
-/// @name Managing Views
-///---------------------
-
 @property (nonatomic, strong) UIView                                *containerView;
 @property (nonatomic, strong) UIView                                *selectedContainerView;
 @property (nonatomic, strong) UIScrollView                          *scrollView;
 @property (nonatomic, strong) UUIndicatorView                       *indicatorView;
 @property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraints;
 
-///------------------------
-/// @name Managing Segments
-///------------------------
-
 @property (nonatomic, assign) UUSegmentContentType              contentType;
 @property (nonatomic, assign) NSUInteger                        segments;
 @property (nonatomic, strong) NSMutableArray <NSString *>       *titles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *images;
 
-///---------------------------------
-/// @name Managing Indicator Gesture
-///---------------------------------
-
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @property (nonatomic, strong) UIPanGestureRecognizer *pan;
 @property (nonatomic, assign) CGFloat                panCorrection;
-
-///--------------------
-/// @name Mapping Table
-///--------------------
 
 @property (nonatomic, strong) NSMutableArray <UULabel *>         *labelTable;
 @property (nonatomic, strong) NSMutableArray <UUImageView *>     *imageViewTable;
@@ -118,23 +98,37 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 - (void)commonInit {
     _currentIndex = 0;
     // Setup UI
-//    _style = UUSegmentStyleSlider;
-    _style = UUSegmentStyleRounded;
+    _style = UUSegmentStyleSlider;
+//    _style = UUSegmentStyleRounded;
     [self setupContainerView];
     [self setupSegmentViewsSelected:NO];
     [self setupSelectedContainerView];
     [self setupSegmentViewsSelected:YES];
-    [self buildUIWithStyle:_style];
+    [self setupIndicatorView];
+    [self buildUI];
     // Add gesture
     [self addGesture];
+    
+//    [self addObserver:self forKeyPath:@"layer.cornerRadius" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:UUSegmentKVOCornerRadiusContext];
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"Segment layoutSubviews");
-    
-    self.indicatorView.frame = (CGRect){[self segmentWidth] * _currentIndex, 0, [self segmentWidth], CGRectGetHeight(self.frame)};
-    
+    switch (_style) {
+        case UUSegmentStyleSlider: {
+            CGFloat intrinsicWidth = [self getMaxIntrinsicContentWidth] + 32.0;
+            CGFloat x = [self segmentWidth] * _currentIndex + ([self segmentWidth] - intrinsicWidth) / 2.0;
+            CGRect indicatorFrame = (CGRect){x, 0, intrinsicWidth, CGRectGetHeight(self.frame)};
+            _indicatorView.frame = indicatorFrame;
+            break;
+        }
+        case UUSegmentStyleRounded: {
+            CGRect indicatorFrame = (CGRect){[self segmentWidth] * _currentIndex, 0, [self segmentWidth], CGRectGetHeight(self.frame)};
+            _indicatorView.frame = CGRectInset(indicatorFrame, _indicatorMargin, _indicatorMargin);
+            break;
+        }
+    }
 //    CGRect containerViewFrame = _containerView.frame;
 //    CGFloat scrollViewWidth = CGRectGetWidth(_scrollView.frame);
 //    if (CGRectGetWidth(containerViewFrame) < scrollViewWidth) {
@@ -309,7 +303,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 }
 
 - (void)setupSegmentViewWithImage:(UIImage *)image selected:(BOOL)selected {
-    UUImageView *imageView = [[UUImageView alloc] initWithImage:image];
+    UUImageView *imageView = [[UUImageView alloc] initWithImage:image selected:selected];
     if (selected) {
         [_selectedContainerView addSubview:imageView];
         [self.selectedImageViewTable addObject:imageView];
@@ -322,7 +316,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 }
 
 - (UUImageTextView *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
-    UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image];
+    UUImageTextView *imageTextView = [[UUImageTextView alloc] initWithTitle:title forImage:image selected:selected];
     if (selected) {
         [_selectedContainerView addSubview:imageTextView];
         [self.selectedLabelTable addObject:[imageTextView getLabel]];
@@ -343,7 +337,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         UIView *containerView = [UIView new];
         containerView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:containerView];
-        containerView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
         
         containerView;
     });
@@ -361,24 +354,56 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     [self setupConstraintsToSelfWithView:_selectedContainerView];
 }
 
-- (void)setupIndicatorViewWithStyle:(UUSegmentStyle)style {
-    UUIndicatorViewType type;
-    switch (style) {
+- (void)setupIndicatorView {
+    UUIndicatorViewStyle style;
+    switch (_style) {
         case UUSegmentStyleSlider: {
-            type = UUIndicatorViewTypeSlider;
+            style = UUIndicatorViewStyleSlider;
             break;
         }
         case UUSegmentStyleRounded: {
-            type = UUIndicatorViewTypeRounded;
+            style = UUIndicatorViewStyleRounded;
             break;
         }
     }
-    _indicatorView = [[UUIndicatorView alloc] initWithType:type];
+    _indicatorView = [[UUIndicatorView alloc] initWithStyle:style];
     [_containerView addSubview:_indicatorView];
     _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
 }
 
+- (void)buildUI {
+    switch (_style) {
+        case UUSegmentStyleSlider: {
+            _containerView.backgroundColor = [UIColor whiteColor];
+            break;
+        }
+        case UUSegmentStyleRounded: {
+            _containerView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+            _containerView.layer.cornerRadius = 5.0;
+            _indicatorMargin = 2.0;
+            [_indicatorView setIndicatorWithCornerRadius:5.0];
+            break;
+        }
+    }
+}
+
 #pragma mark - Views Update
+
+- (void)rebuildUI {
+    switch (_style) {
+        case UUSegmentStyleSlider: {
+            _containerView.backgroundColor = self.backgroundColor ?: [UIColor whiteColor];
+            break;
+        }
+        case UUSegmentStyleRounded: {
+            _containerView.backgroundColor = self.backgroundColor ?: [UIColor colorWithWhite:0.9 alpha:1.0];
+            _containerView.layer.cornerRadius = [self getCornerRadius] ?: 5.0;
+            _indicatorMargin = self.indicatorMargin ?: 2.0;
+            [_indicatorView setIndicatorWithCornerRadius:[self getCornerRadius] ?: 5.0];
+            break;
+        }
+    }
+}
 
 - (void)updateTitleAppearanceWithColor:(UIColor *)color selected:(BOOL)selected {
     NSArray *labels = selected ? _selectedLabelTable : _labelTable;
@@ -404,21 +429,311 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
     self.containerView.layer.borderColor = color.CGColor;
 }
 
-- (void)updateViewForColor:(UIColor *)color {
-    self.containerView.backgroundColor = color;
+- (void)setSegmentWithCornerRadius:(CGFloat)cornerRadius {
+    _containerView.layer.cornerRadius = cornerRadius;
+    [_indicatorView setIndicatorWithCornerRadius:cornerRadius];
 }
 
-- (void)buildUIWithStyle:(UUSegmentStyle)style {
-    switch (style) {
-        case UUSegmentStyleSlider: {
-            [self setupIndicatorViewWithStyle:UUSegmentStyleSlider];
+- (CGFloat)getCornerRadius {
+    return _containerView.layer.cornerRadius;
+}
+
+#pragma mark - Event Response
+
+- (void)addGesture {
+    if (_style == UUSegmentStyleRounded) {
+        _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+        [self addGestureRecognizer:_pan];
+    }
+    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self addGestureRecognizer:_tap];
+}
+
+- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:self];
+    NSUInteger fromIndex = self.currentIndex;
+    self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
+    if (fromIndex != self.currentIndex) {
+        [self moveIndicatorFromIndex:fromIndex toIndex:_currentIndex animated:YES];
+    }
+}
+
+- (void)pan:(UIPanGestureRecognizer *)gestureRecognizer {
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            _panCorrection = [gestureRecognizer locationInView:_indicatorView].x - CGRectGetWidth(_indicatorView.frame) / 2;
             break;
         }
-        case UUSegmentStyleRounded: {
-            [self setupIndicatorViewWithStyle:UUSegmentStyleRounded];
+        case UIGestureRecognizerStateChanged: {
+            CGPoint panLocation = [gestureRecognizer locationInView:self];
+            [self.indicatorView setCenterX:(panLocation.x - _panCorrection)];
             break;
+        }
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateFailed:
+        case UIGestureRecognizerStateCancelled: {
+            CGFloat indicatorCenterX = [_indicatorView getCenterX];
+            NSUInteger fromIndex = self.currentIndex;
+            self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
+            [self moveIndicatorFromIndex:fromIndex toIndex:_currentIndex animated:YES];
+        }
+        default:
+            break;
+    }
+}
+
+- (NSUInteger)nearestIndexOfSegmentAtXCoordinate:(CGFloat)x {
+    NSUInteger index = x / [self segmentWidth];
+    return index < _segments ? index : _segments - 1;
+}
+
+- (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex animated:(BOOL)animated {
+    if (animated) {
+        [UIView animateWithDuration:0.5 animations:^{
+            [_indicatorView setCenterX:[self segmentWidth] * (0.5 + toIndex)];
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [self sendActionsForControlEvents:UIControlEventValueChanged];
+            }
+        }];
+    }
+    else {
+        [_indicatorView setCenterX:[self segmentWidth] * (0.5 + toIndex)];
+        [self sendActionsForControlEvents:UIControlEventValueChanged];
+    }
+}
+
+#pragma mark -
+
+//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+//    if (context == UUSegmentKVOCornerRadiusContext) {
+//        
+//    } else {
+//        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+//    }
+//}
+
+- (CGFloat)getMaxIntrinsicContentWidth {
+    CGFloat maxWidth = 0.0;
+    CGFloat width;
+    switch (_contentType) {
+        case UUSegmentContentTypeTitle: {
+            for (UULabel *label in _selectedLabelTable) {
+                width = label.intrinsicContentSize.width;
+                if (width > maxWidth) {
+                    maxWidth = width;
+                }
+            }
+            break;
+        }
+        case UUSegmentContentTypeImage: {
+            maxWidth = _selectedImageViewTable[0].intrinsicContentSize.width;
+            break;
+        }
+        case UUSegmentContentTypeMixture: {
+            maxWidth = _selectedImageViewTable[0].intrinsicContentSize.width;
+            for (UULabel *label in _selectedLabelTable) {
+                width = label.intrinsicContentSize.width;
+                if (width > maxWidth) {
+                    maxWidth = width;
+                }
+            }
         }
     }
+    if (maxWidth > [self segmentWidth]) {
+        maxWidth = [self segmentWidth];
+    }
+    return maxWidth;
+}
+
+- (CGFloat)segmentWidth {
+    return CGRectGetWidth(self.bounds) / _segments;
+}
+
+- (UIFont *)convertFont:(UUFont)font {
+    CGFloat fontSize = font.size;
+    CGFloat fontWeight;
+    switch (font.weight) {
+        case UUFontWeightThin:
+            fontWeight = UIFontWeightThin;
+            break;
+        case UUFontWeightMedium:
+            fontWeight = UIFontWeightMedium;
+            break;
+        case UUFontWeightBold:
+            fontWeight = UIFontWeightBold;
+            break;
+    }
+    return [UIFont systemFontOfSize:fontSize weight:fontWeight];
+}
+
+#pragma mark - Setters
+
+///----------------------------------
+/// @name Managing Segment Appearance
+///----------------------------------
+
+- (void)setStyle:(UUSegmentStyle)style {
+    if (_style == style) {
+        return;
+    }
+    _style = style;
+    [self.indicatorView removeFromSuperview];
+    [self setupIndicatorView];
+    [self rebuildUI];
+}
+
+- (void)setBorderWidth:(CGFloat)borderWidth {
+    _borderWidth = borderWidth;
+    self.containerView.layer.borderWidth = borderWidth;
+}
+
+- (void)setBorderColor:(UIColor *)borderColor {
+    NSAssert(borderColor, @"The color should not be nil.");
+    if (borderColor != _borderColor && ![borderColor isEqual:_borderColor]) {
+        _borderColor = borderColor;
+        [self updateBorderOfSegmentForColor:borderColor];
+    }
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    NSAssert(backgroundColor, @"The color should not be nil.");
+    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
+        _backgroundColor = backgroundColor;
+        // Update container view's background color
+        _containerView.backgroundColor = backgroundColor;
+        // Update indicator's background color
+        if (_style == UUSegmentStyleSlider) {
+            if ([backgroundColor isEqual:[UIColor clearColor]]) {
+                _indicatorView.backgroundColor = [UIColor whiteColor];
+            } else {
+                _indicatorView.backgroundColor = backgroundColor;
+            }
+        }
+    }
+}
+
+///-------------------------
+/// @name Managing Indicator
+///-------------------------
+
+- (void)setIndicatorColor:(UIColor *)indicatorColor {
+    NSAssert(indicatorColor, @"The should not be nil.");
+    if (indicatorColor != _indicatorColor && ![indicatorColor isEqual:_indicatorColor]) {
+        _indicatorColor = indicatorColor;
+        [_indicatorView setIndicatorWithColor:indicatorColor];
+    }
+}
+
+///---------------------------
+/// @name Managing Scroll View
+///---------------------------
+
+- (void)setScrollOn:(BOOL)scrollOn {
+    _scrollOn = scrollOn;
+    [_containerView removeFromSuperview];
+    [self.scrollView addSubview:_containerView];
+    [self setupConstraintsWithContainerViewToScrollView];
+}
+
+///-------------------------------
+/// @name Managing Text Appearance
+///-------------------------------
+
+- (void)setTextColor:(UIColor *)textColor {
+    NSAssert(textColor, @"The color should not be nil.");
+    if (textColor != _textColor && ![textColor isEqual:_textColor]) {
+        _textColor = textColor;
+        [self updateTitleAppearanceWithColor:textColor selected:NO];
+    }
+}
+
+- (void)setSelectedTextColor:(UIColor *)selectedTextColor {
+    NSAssert(selectedTextColor, @"The color should not be nil.");
+    if (selectedTextColor != _selectedTextColor && ![selectedTextColor isEqual:_selectedTextColor]) {
+        _selectedTextColor = selectedTextColor;
+        [self updateTitleAppearanceWithColor:selectedTextColor selected:YES];
+    }
+}
+
+- (void)setFont:(UUFont)font {
+    [self updateTitleAppearanceWithFont:[self convertFont:font] selected:NO];
+}
+
+- (void)setSelectedFont:(UUFont)selectedFont {
+    [self updateTitleAppearanceWithFont:[self convertFont:selectedFont] selected:YES];
+}
+
+///--------------------------------
+/// @name Managing Image Appearance
+///--------------------------------
+
+- (void)setImageColor:(UIColor *)imageColor {
+    NSAssert(imageColor, @"The color should not be nil.");
+    if (imageColor != _imageColor && ![imageColor isEqual:_imageColor]) {
+        _imageColor = imageColor;
+        [self updateImageForColor:imageColor];
+    }
+}
+
+#pragma mark - Getters
+
+- (UIScrollView *)scrollView {
+    if (_scrollView) {
+        return _scrollView;
+    }
+    _scrollView = ({
+        UIScrollView *scrollView = [UIScrollView new];
+        scrollView.showsVerticalScrollIndicator = NO;
+        scrollView.showsHorizontalScrollIndicator = NO;
+        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:scrollView];
+        
+        scrollView;
+    });
+    [self setupConstraintsToSelfWithView:_scrollView];
+    
+    return _scrollView;
+}
+
+- (NSMutableArray <NSLayoutConstraint *> *)leadingConstraints {
+    if (_leadingConstraints) {
+        return _leadingConstraints;
+    }
+    _leadingConstraints = [NSMutableArray array];
+    return _leadingConstraints;
+}
+
+- (NSMutableArray <UULabel *> *)labelTable {
+    if (_labelTable) {
+        return _labelTable;
+    }
+    _labelTable = [NSMutableArray array];
+    return _labelTable;
+}
+
+- (NSMutableArray <UUImageView *> *)imageViewTable {
+    if (_imageViewTable) {
+        return _imageViewTable;
+    }
+    _imageViewTable = [NSMutableArray array];
+    return _imageViewTable;
+}
+
+- (NSMutableArray <UULabel *> *)selectedLabelTable {
+    if (_selectedLabelTable) {
+        return _selectedLabelTable;
+    }
+    _selectedLabelTable = [NSMutableArray array];
+    return _selectedLabelTable;
+}
+
+- (NSMutableArray <UUImageView *> *)selectedImageViewTable {
+    if (_selectedImageViewTable) {
+        return _selectedImageViewTable;
+    }
+    _selectedImageViewTable = [NSMutableArray array];
+    return _selectedImageViewTable;
 }
 
 #pragma mark - Constraints
@@ -436,7 +751,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                         toItem:containerView
                                      attribute:NSLayoutAttributeTop
                                     multiplier:1.0
-                                      constant:0.0
+                                      constant:8.0
          ].active = YES;
         
         [NSLayoutConstraint constraintWithItem:view
@@ -445,7 +760,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                         toItem:containerView
                                      attribute:NSLayoutAttributeBottom
                                     multiplier:1.0
-                                      constant:0.0
+                                      constant:-8.0
          ].active = YES;
         
         if (lastView) {
@@ -457,7 +772,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                                                       multiplier:1.0
                                                                         constant:0.0];
             leading.active = YES;
-//            [self.leadingConstraints addObject:leading];
+            //            [self.leadingConstraints addObject:leading];
             
             [NSLayoutConstraint constraintWithItem:view
                                          attribute:NSLayoutAttributeWidth
@@ -477,7 +792,7 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
                                                                       multiplier:1.0
                                                                         constant:0.0];
             leading.active = YES;
-//            [self.leadingConstraints addObject:leading];
+            //            [self.leadingConstraints addObject:leading];
         }
         
         lastView = view;
@@ -594,12 +909,12 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         oldLeading.active = NO;
         
         NSLayoutConstraint *newLeading = [NSLayoutConstraint constraintWithItem:segmentView
-                                                                   attribute:NSLayoutAttributeLeading
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:toItem
-                                                                   attribute:NSLayoutAttributeTrailing
-                                                                  multiplier:1.0
-                                                                    constant:8.0];
+                                                                      attribute:NSLayoutAttributeLeading
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:toItem
+                                                                      attribute:NSLayoutAttributeTrailing
+                                                                     multiplier:1.0
+                                                                       constant:8.0];
         newLeading.active = YES;
         [self.leadingConstraints insertObject:newLeading atIndex:index];
         
@@ -638,13 +953,13 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
         
         widthConstraint.active = NO;
         widthConstraint = [NSLayoutConstraint constraintWithItem:segmentView
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:toItem
-                                     attribute:NSLayoutAttributeWidth
-                                    multiplier:1.0
-                                      constant:0.0
-         ];
+                                                       attribute:NSLayoutAttributeWidth
+                                                       relatedBy:NSLayoutRelationEqual
+                                                          toItem:toItem
+                                                       attribute:NSLayoutAttributeWidth
+                                                      multiplier:1.0
+                                                        constant:0.0
+                           ];
         widthConstraint.active = YES;
         
         [UIView animateWithDuration:3 animations:^{
@@ -655,245 +970,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentContentType) {
 
 - (void)updateConstraintsWithDeleteSegmentViewAtIndex:(NSUInteger)index {
     
-}
-
-#pragma mark - Event Response
-
-- (void)addGesture {
-    if (_style == UUSegmentStyleRounded) {
-        _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
-        [self addGestureRecognizer:_pan];
-    }
-    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:_tap];
-}
-
-- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
-    CGPoint location = [gestureRecognizer locationInView:self];
-    NSUInteger oldIndex = self.currentIndex;
-    self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
-    if (oldIndex != self.currentIndex) {
-        [self moveIndicatorViewToIndex:_currentIndex animated:YES];
-    }
-}
-
-- (void)pan:(UIPanGestureRecognizer *)gestureRecognizer {
-    switch (gestureRecognizer.state) {
-        case UIGestureRecognizerStateBegan: {
-            _panCorrection = [gestureRecognizer locationInView:_indicatorView].x - CGRectGetWidth(_indicatorView.frame) / 2;
-            break;
-        }
-        case UIGestureRecognizerStateChanged: {
-            CGPoint panLocation = [gestureRecognizer locationInView:self];
-            [self.indicatorView setCenterX:(panLocation.x - _panCorrection)];
-            break;
-        }
-        case UIGestureRecognizerStateEnded:
-        case UIGestureRecognizerStateFailed:
-        case UIGestureRecognizerStateCancelled: {
-            CGFloat indicatorCenterX = [_indicatorView getCenterX];
-            self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
-            [self moveIndicatorViewToIndex:_currentIndex animated:YES];
-        }
-        default:
-            break;
-    }
-}
-
-- (NSUInteger)nearestIndexOfSegmentAtXCoordinate:(CGFloat)x {
-    NSUInteger index = x / [self segmentWidth];
-    return index;
-}
-
-- (void)moveIndicatorViewToIndex:(NSUInteger)currentIndex animated:(BOOL)animated {
-    if (animated) {
-        [UIView animateWithDuration:2.0 animations:^{
-            [_indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
-        } completion:^(BOOL finished) {
-            if (finished) {
-                [self sendActionsForControlEvents:UIControlEventValueChanged];
-            }
-        }];
-    }
-    else {
-        [_indicatorView setCenterX:[self segmentWidth] * (0.5 + currentIndex)];
-        [self sendActionsForControlEvents:UIControlEventValueChanged];
-    }
-}
-
-#pragma mark -
-
-- (CGFloat)segmentWidth {
-    return CGRectGetWidth(self.bounds) / _segments;
-}
-
-- (UIFont *)convertFont:(UUFont)font {
-    CGFloat fontSize = font.size;
-    CGFloat fontWeight;
-    switch (font.weight) {
-        case UUFontWeightThin:
-            fontWeight = UIFontWeightThin;
-            break;
-        case UUFontWeightMedium:
-            fontWeight = UIFontWeightMedium;
-            break;
-        case UUFontWeightBold:
-            fontWeight = UIFontWeightBold;
-            break;
-    }
-    return [UIFont systemFontOfSize:fontSize weight:fontWeight];
-}
-
-#pragma mark - Setters
-
-///----------------------------------
-/// @name Managing Segment Appearance
-///----------------------------------
-
-- (void)setStyle:(UUSegmentStyle)style {
-    if (_style == style) {
-        return;
-    }
-    _style = style;
-}
-
-- (void)setCornerRadius:(CGFloat)cornerRadius {
-    _cornerRadius = cornerRadius;
-//    self.containerView.layer.masksToBounds = YES;
-    self.containerView.layer.cornerRadius = cornerRadius;
-    self.indicatorView.cornerRadius = cornerRadius;
-}
-
-- (void)setBorderWidth:(CGFloat)borderWidth {
-    _borderWidth = borderWidth;
-    self.containerView.layer.borderWidth = borderWidth;
-}
-
-- (void)setBorderColor:(UIColor *)borderColor {
-    NSAssert(borderColor, @"The color should not be nil.");
-    if (borderColor != _borderColor && ![borderColor isEqual:_borderColor]) {
-        _borderColor = borderColor;
-        [self updateBorderOfSegmentForColor:borderColor];
-    }
-}
-
-- (void)setBackgroundColor:(UIColor *)backgroundColor {
-    NSAssert(backgroundColor, @"The color should not be nil.");
-    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
-        _backgroundColor = backgroundColor;
-        [self updateViewForColor:backgroundColor];
-    }
-}
-
-///---------------------------
-/// @name Managing Scroll View
-///---------------------------
-
-- (void)setScrollOn:(BOOL)scrollOn {
-    _scrollOn = scrollOn;
-    [_containerView removeFromSuperview];
-    [self.scrollView addSubview:_containerView];
-    [self setupConstraintsWithContainerViewToScrollView];
-}
-
-///-------------------------------
-/// @name Managing Text Appearance
-///-------------------------------
-
-- (void)setTextColor:(UIColor *)textColor {
-    NSAssert(textColor, @"The color should not be nil.");
-    if (textColor != _textColor && ![textColor isEqual:_textColor]) {
-        _textColor = textColor;
-        [self updateTitleAppearanceWithColor:textColor selected:NO];
-    }
-}
-
-- (void)setSelectedTextColor:(UIColor *)selectedTextColor {
-    NSAssert(selectedTextColor, @"The color should not be nil.");
-    if (selectedTextColor != _selectedTextColor && ![selectedTextColor isEqual:_selectedTextColor]) {
-        _selectedTextColor = selectedTextColor;
-        [self updateTitleAppearanceWithColor:selectedTextColor selected:YES];
-    }
-}
-
-- (void)setFont:(UUFont)font {
-    [self updateTitleAppearanceWithFont:[self convertFont:font] selected:NO];
-}
-
-- (void)setSelectedFont:(UUFont)selectedFont {
-    [self updateTitleAppearanceWithFont:[self convertFont:selectedFont] selected:YES];
-}
-
-///--------------------------------
-/// @name Managing Image Appearance
-///--------------------------------
-
-- (void)setImageColor:(UIColor *)imageColor {
-    NSAssert(imageColor, @"The color should not be nil.");
-    if (imageColor != _imageColor && ![imageColor isEqual:_imageColor]) {
-        _imageColor = imageColor;
-        [self updateImageForColor:imageColor];
-    }
-}
-
-#pragma mark - Getters
-
-- (UIScrollView *)scrollView {
-    if (_scrollView) {
-        return _scrollView;
-    }
-    _scrollView = ({
-        UIScrollView *scrollView = [UIScrollView new];
-        scrollView.showsVerticalScrollIndicator = NO;
-        scrollView.showsHorizontalScrollIndicator = NO;
-        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:scrollView];
-        
-        scrollView;
-    });
-    [self setupConstraintsToSelfWithView:_scrollView];
-    
-    return _scrollView;
-}
-
-- (NSMutableArray <NSLayoutConstraint *> *)leadingConstraints {
-    if (_leadingConstraints) {
-        return _leadingConstraints;
-    }
-    _leadingConstraints = [NSMutableArray array];
-    return _leadingConstraints;
-}
-
-- (NSMutableArray <UULabel *> *)labelTable {
-    if (_labelTable) {
-        return _labelTable;
-    }
-    _labelTable = [NSMutableArray array];
-    return _labelTable;
-}
-
-- (NSMutableArray <UUImageView *> *)imageViewTable {
-    if (_imageViewTable) {
-        return _imageViewTable;
-    }
-    _imageViewTable = [NSMutableArray array];
-    return _imageViewTable;
-}
-
-- (NSMutableArray <UULabel *> *)selectedLabelTable {
-    if (_selectedLabelTable) {
-        return _selectedLabelTable;
-    }
-    _selectedLabelTable = [NSMutableArray array];
-    return _selectedLabelTable;
-}
-
-- (NSMutableArray <UUImageView *> *)selectedImageViewTable {
-    if (_selectedImageViewTable) {
-        return _selectedImageViewTable;
-    }
-    _selectedImageViewTable = [NSMutableArray array];
-    return _selectedImageViewTable;
 }
 
 @end

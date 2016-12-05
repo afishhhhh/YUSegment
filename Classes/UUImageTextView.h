@@ -12,7 +12,7 @@
 
 @interface UUImageTextView : UIView
 
-- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image;
+- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected;
 - (void)setTitle:(NSString *)title;
 - (void)setImage:(UIImage *)image;
 

@@ -10,12 +10,16 @@
 
 @implementation UUImageView
 
-- (instancetype)initWithImage:(UIImage *)image {
+- (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected {
     self = [super initWithImage:image];
     if (self) {
         self.contentMode = UIViewContentModeScaleAspectFit;
-//        self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAutomatic];
-//        self.tintColor = [UIColor lightGrayColor];
+        if (selected) {
+            // ...
+        } else {
+            self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            self.tintColor = [UIColor lightGrayColor];
+        }
     }
     return self;
 }
