@@ -96,7 +96,7 @@ typedef struct UUFont {
 /**
  The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
  */
-@property (nonatomic, assign) CGFloat widthOfSegment;
+@property (nonatomic, assign) CGFloat segmentWidth;
 
 @property (nonatomic, assign) UUSegmentAutosizingMode autosizingMode;
 
@@ -256,11 +256,6 @@ typedef struct UUFont {
 /// @name Managing Segment Appearance
 ///----------------------------------
 
-/**
- Set the radius of rounded corners for the segment's background.
- 
- @param cornerRadius The radius to use when drawing rounded corners for the segment's background.
- */
-- (void)setSegmentWithCornerRadius:(CGFloat)cornerRadius;
+
 
 @end

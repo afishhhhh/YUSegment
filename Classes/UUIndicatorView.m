@@ -36,7 +36,7 @@
     [super layoutSubviews];
     NSLog(@"IndicatorView layoutSubviews");
     if (_style == UUIndicatorViewStyleSlider) {
-        self.line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 5, CGRectGetWidth(self.frame), 4};
+        self.line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
     }
     _maskView.frame = self.frame;
 }
