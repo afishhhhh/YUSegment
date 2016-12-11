@@ -15,11 +15,6 @@ typedef NS_ENUM(NSUInteger, UUSegmentStyle) {
     UUSegmentStyleRounded,
 };
 
-typedef NS_ENUM(NSUInteger, UUSegmentAutosizingMode) {
-    UUSegmentAutosizingModeEqualWidths,
-    UUSegmentAutosizingModeProportionalToContent,
-};
-
 typedef NS_ENUM(NSUInteger, UUFontWeight) {
     UUFontWeightThin,
     UUFontWeightMedium,
@@ -31,19 +26,11 @@ typedef struct UUFont {
     UUFontWeight weight;
 }UUFont;
 
-@class UUSegment;
+//@class UUSegment;
 
-@protocol UUSegmentDelegate <NSObject>
+//IB_DESIGNABLE
 
-- (void)segmentControl:(UUSegment *)segmentControl didSelectedAtIndex:(NSUInteger)index;
-
-@end
-
-//@protocol UUSegmentDataSource <NSObject>
-//
-//- (NSAttributedString *)segmentControl:(UUSegment *)segmentControl setAttributedTextForSegmentUsingCurrentText:(NSString *)text;
-//
-//@end
+NS_ASSUME_NONNULL_BEGIN
 
 @interface UUSegment : UIControl
 
@@ -51,54 +38,59 @@ typedef struct UUFont {
 /// @name Managing Segments
 ///------------------------
 
+#if TARGET_INTERFACE_BUILDER
+
+/**
+ The number of segments. This property will work only in interface builder.
+ */
+@property (nonatomic, assign, setter = setSegments:) IBInspectable NSUInteger segments;
+#else
+
 /**
  The number of segments.
  */
 @property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
+#endif
 
 /**
  The index of segment which selected currently. The default is 0;
  */
-@property (nonatomic, assign) NSUInteger currentIndex;
+@property (nonatomic, assign) IBInspectable NSUInteger currentIndex;
 
-///------------------------
-/// @name Managing Protocol
-///------------------------
-
-//@property (nonatomic, weak) id<UUSegmentDataSource> dataSource;
-
-@property (nonatomic, weak) id<UUSegmentDelegate> delegate;
+//@property (nonatomic, copy) IBInspectable NSArray <NSString *> *titles;
 
 ///----------------------------------
 /// @name Managing Segment Appearance
 ///----------------------------------
 
+#if TARGET_INTERFACE_BUILDER
+
+/**
+ A boolean value indicating a segment style. The default is false. This property will work only in interface builder.
+ */
+@property (nonatomic, assign, setter = setRoundedStyle:) IBInspectable BOOL roundedStyle;
+#else
+
 /**
  A constant indicating a segment style. The default is `UUSegmentStyleSlider`. See `UUSegmentStyle` for descriptions of these constants.
  */
 @property (nonatomic, assign) UUSegmentStyle style;
-
-/**
- The background color of the segment.
- */
-@property (nonatomic, strong) UIColor *backgroundColor;
+#endif
 
 /**
  The width of the segment's border.
  */
-@property (nonatomic, assign) CGFloat borderWidth;
+@property (nonatomic, assign) IBInspectable CGFloat borderWidth;
 
 /**
  The color of the segment's border.
  */
-@property (nonatomic, strong) UIColor *borderColor;
+@property (nonatomic, strong) IBInspectable UIColor *borderColor;
 
 /**
  The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
  */
-@property (nonatomic, assign) CGFloat segmentWidth;
-
-@property (nonatomic, assign) UUSegmentAutosizingMode autosizingMode;
+@property (nonatomic, assign) IBInspectable CGFloat segmentWidth;
 
 ///-------------------------
 /// @name Managing Indicator
@@ -107,12 +99,12 @@ typedef struct UUFont {
 /**
  The spacing of the indicator to its superview. Only works with `UUSegmentRounded` style. The default is 2.
  */
-@property (nonatomic, assign) CGFloat indicatorMargin;
+@property (nonatomic, assign) IBInspectable CGFloat indicatorMargin;
 
 /**
  The color of the indicator.
  */
-@property (nonatomic, strong) UIColor *indicatorColor;
+@property (nonatomic, strong) IBInspectable UIColor *indicatorColor;
 
 ///-------------------------------
 /// @name Managing Text Appearance
@@ -185,6 +177,12 @@ typedef struct UUFont {
 /// @name Managing Segment Content Setting
 ///---------------------------------------
 
+- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles;
+
+- (void)setSegmentsWithImages:(NSArray <UIImage *> *)images;
+
+- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
+
 /**
  Set the content of a segment to a given title.
 
@@ -234,22 +232,72 @@ typedef struct UUFont {
 /// @name Managing Segments Insert
 ///-------------------------------
 
+/**
+ Inserts a segment at the end and gives it a title as content.
+
+ @param title A `NSString` object to use as the content of the segment.
+ */
 - (void)addSegmentWithTitle:(NSString *)title;
 
+/**
+ Inserts a segment at the end and gives it an image as content.
+
+ @param image A `UIImage` object to use as the content of the segment.
+ */
 - (void)addSegmentWithImage:(UIImage *)image;
 
+/**
+ Inserts a segment at the end and gives it a title and an image as content.
+
+ @param title A `NSString` object to use as the content of the segment.
+ @param image A `UIImage` object to use as the content of the segment.
+ */
+- (void)addSegmentWithTitle:(NSString *)title forImage:(UIImage *)image;
+
+/**
+ Inserts a segment at a specificed position in the receiver and gives it a title as content.
+
+ @param title A `NSString` object to use as the content of the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index;
 
+/**
+ Inserts a segment at a specificed position in the receiver and gives it an image as content.
+
+ @param image A `UIImage` object to use as the content of the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index;
+
+/**
+ Inserts a segment at a speecified position in the receiver and gives it a title and an image as content.
+
+ @param title A `NSString` object to use as the content of the segment.
+ @param image A `UIImage` object to use as the content of the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
+- (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index;
  
 ///-------------------------------
 /// @name Managing Segments Delete
 ///-------------------------------
 
+/**
+ Removes all segments of the receiver.
+ */
 - (void)removeAllItems;
 
+/**
+ Removes the first segment of the receiver.
+ */
 - (void)removeLastItem;
 
+/**
+ Removes the specified segment of the receiver.
+
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)removeItemAtIndex:(NSUInteger)index;
 
 ///----------------------------------
@@ -259,3 +307,5 @@ typedef struct UUFont {
 
 
 @end
+
+NS_ASSUME_NONNULL_END

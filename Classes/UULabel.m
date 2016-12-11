@@ -14,11 +14,11 @@
     self = [super init];
     if (self) {
         if (selected) {
-            self.font = [UIFont systemFontOfSize:18.0 weight:UIFontWeightMedium];
+            self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
 //            self.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
             self.textColor = [UIColor blackColor];
         } else {
-            self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+            self.font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
             self.textColor = [UIColor lightGrayColor];
         }
         self.textAlignment = NSTextAlignmentCenter;

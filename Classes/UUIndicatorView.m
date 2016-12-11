@@ -11,7 +11,6 @@
 @interface UUIndicatorView ()
 
 @property (nonatomic, assign) UUIndicatorViewStyle style;
-@property (nonatomic, strong) UIColor              *color;
 @property (nonatomic, strong) UIView               *line;
 
 @end
@@ -43,15 +42,7 @@
 
 #pragma mark -
 
-- (void)setIndicatorWithCornerRadius:(CGFloat)cornerRadius {
-    if (_style == UUIndicatorViewStyleSlider) {
-        self.line.layer.cornerRadius = 2.0;
-    } else {
-        self.layer.cornerRadius = cornerRadius;
-    }
-}
-
-- (void)setIndicatorWithColor:(UIColor *)color {
+- (void)updateIndicatorWithColor:(UIColor *)color {
     switch (_style) {
         case UUIndicatorViewStyleSlider:
             self.line.backgroundColor = color;
@@ -72,6 +63,20 @@
     center.x = centerX;
     self.center = center;
     _maskView.frame = self.frame;
+}
+
+#pragma mark - Setters
+
+- (void)setCornerRadius:(CGFloat)cornerRadius {
+    if (cornerRadius == _cornerRadius) {
+        return;
+    }
+    _cornerRadius = cornerRadius;
+    if (_style == UUIndicatorViewStyleSlider) {
+        self.line.layer.cornerRadius = 2.0;
+    } else {
+        self.layer.cornerRadius = cornerRadius;
+    }
 }
 
 #pragma mark - Getters

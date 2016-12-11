@@ -19,9 +19,8 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     UUSegmentContentTypeImage = 1 << 1,
 };
 
-@interface UUSegment () {
-    CGFloat _segmentWidth;
-}
+@interface UUSegment ()
+<UIScrollViewDelegate>
 
 /// @name Views
 
@@ -51,43 +50,57 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 
 @end
 
-@implementation UUSegment
+@implementation UUSegment {
+    CGFloat _segmentWidth;
+}
 
 @dynamic segmentWidth, font, selectedFont;
 
+- (void)updateConstraints {
+    [super updateConstraints];
+    NSLog(@"update constraints");
+}
+
 #pragma mark - Initialization
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame {
-    return [self initWithTitles:nil];
+    return [self initWithTitles:@[@"Left", @"Medium", @"Right"]];
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles {
-    NSAssert((titles && [titles count]), @"Titles can not be empty. If you are using `-initWithFrame:`, please use `-initWithTitles:`, `-initWithImages:`, `-initWithTitles:forImages:` instead.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _titles = [titles mutableCopy];
         _numberOfSegments = [titles count];
         _contentType = UUSegmentContentTypeTitle;
         [self commonInit];
+        [self setupSegmentViewsWithTitles];
     }
     return self;
 }
 
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images {
-    NSAssert((images && [images count]), @"Images can not be empty.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _images = [images mutableCopy];
         _numberOfSegments = [images count];
         _contentType = UUSegmentContentTypeImage;
         [self commonInit];
+        [self setupSegmentViewsWithImages];
     }
     return self;
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
-    NSAssert((titles && [titles count] && images && [images count]), @"Titles and images can not be empty.");
-    NSAssert(([titles count] == [images count]), @"The count of titles should be equal to the count of images.");
+    NSAssert([titles count] == [images count], @"The count of titles should be equal to the count of images.");
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _titles = [titles mutableCopy];
@@ -95,28 +108,19 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
         _numberOfSegments = [titles count];
         _contentType = UUSegmentContentTypeImage | UUSegmentContentTypeTitle;
         [self commonInit];
+        [self setupSegmentViewsWithTitlesAndImages];
     }
     return self;
 }
 
 - (void)commonInit {
+    self.translatesAutoresizingMaskIntoConstraints = NO;
     _currentIndex = 0;
-    
-    // Setup style of segment
     _style = UUSegmentStyleSlider;
-    
-    // Setup containers and segments
     [self setupContainerView];
-    [self setupSegmentViewsSelected:NO];
     [self setupSelectedContainerView];
-    [self setupSegmentViewsSelected:YES];
-    
-    // Setup indicator
     [self setupIndicatorView];
-    
-    // build default UI
     [self buildUI];
-    // Add gesture
     [self addGesture];
     
     [self addObserver:self forKeyPath:@"layer.cornerRadius" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:UUSegmentKVOCornerRadiusContext];
@@ -144,6 +148,29 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 }
 
 #pragma mark - Content Setting
+
+- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles {
+    _contentType = UUSegmentContentTypeTitle;
+    _numberOfSegments = [titles count];
+    _titles = [titles mutableCopy];
+    [self setupSegmentViewsWithTitles];
+}
+
+- (void)setSegmentsWithImages:(NSArray <UIImage *> *)images {
+    _contentType = UUSegmentContentTypeImage;
+    _numberOfSegments = [images count];
+    _images = [images mutableCopy];
+    [self setupSegmentViewsWithImages];
+}
+
+- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
+    NSAssert([titles count] == [images count], @"The count of titles should be equal to the count of images.");
+    _contentType = UUSegmentContentTypeTitle | UUSegmentContentTypeImage;
+    _numberOfSegments = [titles count];
+    _titles = [titles mutableCopy];
+    _images = [images mutableCopy];
+    [self setupSegmentViewsWithTitlesAndImages];
+}
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
     NSAssert(_contentType & UUSegmentContentTypeTitle, @"You should use this method when the content of segment is `NSString` object.");
@@ -222,22 +249,52 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     [self insertSegmentWithImage:image atIndex:_numberOfSegments];
 }
 
+- (void)addSegmentWithTitle:(NSString *)title forImage:(UIImage *)image {
+    [self insertSegmentWithTitle:title forImage:image atIndex:_numberOfSegments];
+}
+
 - (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index {
-    NSAssert1(index <= _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments);
-    
+    NSAssert(_contentType & UUSegmentContentTypeTitle, @"You should use this method when the content of segment is `NSString` objcet.");
+    if (index > _numberOfSegments) {
+        index = _numberOfSegments;
+    }
     [self.titles insertObject:title atIndex:index];
     _numberOfSegments++;
 }
 
 - (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-    NSAssert1(index <= _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments);
-    
+    if (index > _numberOfSegments) {
+        index = _numberOfSegments;
+    }
+    NSAssert(_contentType & UUSegmentContentTypeImage, @"You should use this method when the content of segment is `UIImage` objcet.");
     [self.images insertObject:image atIndex:index];
     _numberOfSegments++;
 }
 
-- (void)insertSegment:(UIView *)segmentView atIndex:(NSUInteger)index {
-    [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
+- (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
+    if (index > _numberOfSegments) {
+        index = _numberOfSegments;
+    }
+    NSAssert((_contentType & UUSegmentContentTypeTitle) && (_contentType & UUSegmentContentTypeImage), @"You should use this method when the content of the segment including `NSString` object and `UIImage` object.");
+    [self.titles insertObject:title atIndex:index];
+    [self.images insertObject:image atIndex:index];
+    _numberOfSegments++;
+}
+
+- (void)insertViewWithTitle:(NSString *)title atIndex:(NSUInteger)index {
+    // setup view
+    [self setupSegmentViewWithTitle:title selected:NO];
+    [self setupSegmentViewWithTitle:title selected:YES];
+    // update c
+//    [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
+}
+
+- (void)insertViewWithImage:(UIImage *)image atIndex:(NSUInteger)index {
+    
+}
+
+- (void)insertViewWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
+    
 }
 
 #pragma mark - Content Delete
@@ -256,38 +313,33 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 
 #pragma mark - Views Setup
 
-- (void)setupSegmentViewsSelected:(BOOL)selected {
-    if ((_contentType & UUSegmentContentTypeTitle) && (_contentType & UUSegmentContentTypeImage)) {
-        NSMutableArray *imageTextViews = [NSMutableArray array];
-        for (int i = 0; i < _numberOfSegments; i++) {
-            [imageTextViews addObject:[self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:selected]];
-        }
-        if (selected) {
-            [self setupConstraintsWithSegments:imageTextViews toContainerView:_selectedContainerView];
-        } else {
-            [self setupConstraintsWithSegments:imageTextViews toContainerView:_containerView];
-        }
+- (void)setupSegmentViewsWithTitles {
+    for (int i = 0; i < _numberOfSegments; i++) {
+        [self setupSegmentViewWithTitle:_titles[i] selected:YES];
+        [self setupSegmentViewWithTitle:_titles[i] selected:NO];
     }
-    else if (_contentType & UUSegmentContentTypeImage) {
-        for (UIImage *image in _images) {
-            [self setupSegmentViewWithImage:image selected:selected];
-        }
-        if (selected) {
-            [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
-        } else {
-            [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
-        }
+    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
+    [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
+}
+
+- (void)setupSegmentViewsWithImages {
+    for (int i = 0; i < _numberOfSegments; i++) {
+        [self setupSegmentViewWithImage:_images[i] selected:YES];
+        [self setupSegmentViewWithImage:_images[i] selected:NO];
     }
-    else {
-        for (NSString *title in _titles) {
-            [self setupSegmentViewWithTitle:title selected:selected];
-        }
-        if (selected) {
-            [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
-        } else {
-            [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
-        }
+    [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
+    [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
+}
+
+- (void)setupSegmentViewsWithTitlesAndImages {
+    NSMutableArray *imageTextViews = [NSMutableArray array];
+    NSMutableArray *selectedImageTextViews = [NSMutableArray array];
+    for (int i = 0; i < _numberOfSegments; i++) {
+        [imageTextViews addObject:[self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:YES]];
+        [selectedImageTextViews addObject:[self setupSegmentViewWithTitle:_titles[i] forImage:_images[i] selected:NO]];
     }
+    [self setupConstraintsWithSegments:imageTextViews toContainerView:_selectedContainerView];
+    [self setupConstraintsWithSegments:imageTextViews toContainerView:_containerView];
 }
 
 - (void)setupSegmentViewWithTitle:(NSString *)title selected:(BOOL)selected {
@@ -375,14 +427,18 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 - (void)buildUI {
     switch (_style) {
         case UUSegmentStyleSlider: {
-            self.backgroundColor = [UIColor whiteColor];
+            if (!self.backgroundColor) {
+                self.backgroundColor = [UIColor whiteColor];
+            }
             break;
         }
         case UUSegmentStyleRounded: {
-            self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+            if (!self.backgroundColor) {
+                self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+            }
             self.layer.cornerRadius = 5.0;
-            _indicatorMargin = 2.0;
-            [_indicatorView setIndicatorWithCornerRadius:5.0];
+            _indicatorMargin = 3.0;
+            _indicatorView.cornerRadius = 5.0;
             break;
         }
     }
@@ -400,7 +456,7 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
             _containerView.backgroundColor = self.backgroundColor ?: [UIColor colorWithWhite:0.9 alpha:1.0];
             _containerView.layer.cornerRadius = [self getCornerRadius] ?: 5.0;
             _indicatorMargin = self.indicatorMargin ?: 2.0;
-            [_indicatorView setIndicatorWithCornerRadius:[self getCornerRadius] ?: 5.0];
+            _indicatorView.cornerRadius = [self getCornerRadius] ?: 5.0;
             break;
         }
     }
@@ -426,14 +482,6 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     }
 }
 
-- (void)updateBorderOfSegmentForColor:(UIColor *)color {
-    self.containerView.layer.borderColor = color.CGColor;
-}
-
-- (void)updateIndicatorWithCornerRadius {
-    [_indicatorView setIndicatorWithCornerRadius:self.layer.cornerRadius];
-}
-
 - (CGFloat)getCornerRadius {
     return self.layer.cornerRadius;
 }
@@ -453,6 +501,22 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     [self setupConstraintsToScrollViewWithView:_containerView];
     [self setupConstraintsToScrollViewWithView:_selectedContainerView];
     [self updateWidthConstraintsForSegments];
+}
+
+- (void)makeCurrentSegmentCenterInSelf {
+    CGFloat finalOffset = self.segmentWidth * (_currentIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
+    CGFloat maxOffset = _scrollView.contentSize.width - CGRectGetWidth(self.frame);
+    CGPoint contentOffset = _scrollView.contentOffset;
+    if (finalOffset <= 0) {
+        contentOffset.x = 0;
+    }
+    else if (finalOffset >= maxOffset) {
+        contentOffset.x = maxOffset;
+    }
+    else {
+        contentOffset.x = finalOffset;
+    }
+    _scrollView.contentOffset = contentOffset;
 }
 
 #pragma mark - Event Response
@@ -511,12 +575,14 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
         } completion:^(BOOL finished) {
             if (finished) {
                 [self sendActionsForControlEvents:UIControlEventValueChanged];
+                [self makeCurrentSegmentCenterInSelf];
             }
         }];
     }
     else {
         [_indicatorView setCenterX:self.segmentWidth * (0.5 + toIndex)];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
+        [self makeCurrentSegmentCenterInSelf];
     }
 }
 
@@ -524,9 +590,7 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == UUSegmentKVOCornerRadiusContext) {
-        if ([change[NSKeyValueChangeOldKey] doubleValue] != [change[NSKeyValueChangeNewKey] doubleValue]) {
-            [self updateIndicatorWithCornerRadius];
-        }
+        _indicatorView.cornerRadius = [self getCornerRadius];
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
@@ -580,11 +644,35 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     return [UIFont systemFontOfSize:fontSize weight:fontWeight];
 }
 
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    NSLog(@"%@", NSStringFromCGPoint(scrollView.contentOffset));
+}
+
 #pragma mark - Setters
+
+///-----------------------
+/// @name Managing Segment
+///-----------------------
+
+- (void)setSegments:(NSUInteger)segments {
+    _numberOfSegments = segments;
+}
+
+
 
 ///----------------------------------
 /// @name Managing Segment Appearance
 ///----------------------------------
+
+- (void)setRoundedStyle:(BOOL)roundedStyle {
+    if (roundedStyle) {
+        [self setStyle:UUSegmentStyleRounded];
+    } else {
+        [self setStyle:UUSegmentStyleSlider];
+    }
+}
 
 - (void)setStyle:(UUSegmentStyle)style {
     if (_style == style) {
@@ -598,30 +686,24 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
 
 - (void)setBorderWidth:(CGFloat)borderWidth {
     _borderWidth = borderWidth;
-    self.containerView.layer.borderWidth = borderWidth;
+    self.layer.borderWidth = borderWidth;
 }
 
 - (void)setBorderColor:(UIColor *)borderColor {
     NSAssert(borderColor, @"The color should not be nil.");
     if (borderColor != _borderColor && ![borderColor isEqual:_borderColor]) {
         _borderColor = borderColor;
-        [self updateBorderOfSegmentForColor:borderColor];
+        self.layer.borderColor = borderColor.CGColor;
     }
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
-    NSAssert(backgroundColor, @"The color should not be nil.");
-    if (backgroundColor != _backgroundColor && ![backgroundColor isEqual:_backgroundColor]) {
-        _backgroundColor = backgroundColor;
-        // Update self background color
-        [super setBackgroundColor:backgroundColor];
-        // Update indicator's background color
-        if (_style == UUSegmentStyleSlider) {
-            if ([backgroundColor isEqual:[UIColor clearColor]]) {
-                _indicatorView.backgroundColor = [UIColor whiteColor];
-            } else {
-                _indicatorView.backgroundColor = backgroundColor;
-            }
+    [super setBackgroundColor:backgroundColor];
+    if (_style == UUSegmentStyleSlider) {
+        if ([backgroundColor isEqual:[UIColor clearColor]]) {
+            _indicatorView.backgroundColor = [UIColor whiteColor];
+        } else {
+            _indicatorView.backgroundColor = backgroundColor;
         }
     }
 }
@@ -642,7 +724,7 @@ typedef NS_OPTIONS(NSUInteger, UUSegmentContentType) {
     NSAssert(indicatorColor, @"The should not be nil.");
     if (indicatorColor != _indicatorColor && ![indicatorColor isEqual:_indicatorColor]) {
         _indicatorColor = indicatorColor;
-        [_indicatorView setIndicatorWithColor:indicatorColor];
+        [_indicatorView updateIndicatorWithColor:indicatorColor];
     }
 }
 

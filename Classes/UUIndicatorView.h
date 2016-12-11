@@ -15,11 +15,12 @@ typedef NS_ENUM(NSUInteger, UUIndicatorViewStyle) {
 
 @interface UUIndicatorView : UIView
 
-@property (nonatomic, strong) UIView *maskView;
+@property (nonatomic, strong, readonly) UIView *maskView;
+@property (nonatomic, assign)           CGFloat cornerRadius;
 
 - (instancetype)initWithStyle:(UUIndicatorViewStyle)type;
-- (void)setIndicatorWithCornerRadius:(CGFloat)cornerRadius;
-- (void)setIndicatorWithColor:(UIColor *)color;
+
+- (void)updateIndicatorWithColor:(UIColor *)color;
 - (void)setCenterX:(CGFloat)centerX;
 - (CGFloat)getCenterX;
 
