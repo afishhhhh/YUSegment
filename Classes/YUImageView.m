@@ -6,9 +6,9 @@
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
-#import "UUImageView.h"
+#import "YUImageView.h"
 
-@implementation UUImageView
+@implementation YUImageView
 
 - (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected {
     self = [super initWithImage:image];

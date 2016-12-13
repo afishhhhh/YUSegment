@@ -6,25 +6,26 @@
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
-#import "UUIndicatorView.h"
+#import "YUIndicatorView.h"
 
-@interface UUIndicatorView ()
+@interface YUIndicatorView ()
 
-@property (nonatomic, assign) UUIndicatorViewStyle style;
+@property (nonatomic, assign) YUIndicatorViewStyle style;
 @property (nonatomic, strong) UIView               *line;
 
 @end
 
-@implementation UUIndicatorView
+@implementation YUIndicatorView
 
 #pragma mark - Initialization
 
-- (instancetype)initWithStyle:(UUIndicatorViewStyle)style {
-    self = [super initWithFrame:CGRectZero];
+- (instancetype)init {
+    self = [super init];
     if (self) {
-        _style = style;
+        _style = YUIndicatorViewStyleSlider;
         _maskView = [UIView new];
         _maskView.backgroundColor = [UIColor blackColor];
+        [self addSubview:self.line];
         self.backgroundColor = [UIColor whiteColor];
         self.layer.masksToBounds = YES;
     }
@@ -34,20 +35,32 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"IndicatorView layoutSubviews");
-    if (_style == UUIndicatorViewStyleSlider) {
-        self.line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
-    }
+    _line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
     _maskView.frame = self.frame;
 }
 
 #pragma mark -
 
+- (void)updateIndicatorStyle:(YUIndicatorViewStyle)style {
+    if (_style == style) {
+        return;
+    }
+    _style = style;
+    if (style == YUIndicatorViewStyleSlider) {
+        [self addSubview:self.line];
+    } else {
+        [_line removeFromSuperview];
+        self.line = nil;
+    }
+    [self setNeedsLayout];
+}
+
 - (void)updateIndicatorWithColor:(UIColor *)color {
     switch (_style) {
-        case UUIndicatorViewStyleSlider:
+        case YUIndicatorViewStyleSlider:
             self.line.backgroundColor = color;
             break;
-        case UUIndicatorViewStyleRounded: {
+        case YUIndicatorViewStyleRounded: {
             if ([color isEqual:[UIColor clearColor]]) {
                 self.backgroundColor = [UIColor whiteColor];
             } else {
@@ -72,7 +85,7 @@
         return;
     }
     _cornerRadius = cornerRadius;
-    if (_style == UUIndicatorViewStyleSlider) {
+    if (_style == YUIndicatorViewStyleSlider) {
         self.line.layer.cornerRadius = 2.0;
     } else {
         self.layer.cornerRadius = cornerRadius;
@@ -86,7 +99,6 @@
         return _line;
     }
     _line = [UIView new];
-    [self addSubview:_line];
     _line.backgroundColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
     return _line;
 }

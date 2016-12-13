@@ -8,15 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@class UULabel, UUImageView;
+@class YULabel, YUImageView;
 
-@interface UUImageTextView : UIView
+@interface YUImageTextView : UIView
 
 - (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected;
 - (void)setTitle:(NSString *)title;
 - (void)setImage:(UIImage *)image;
 
-- (UULabel *)getLabel;
-- (UUImageView *)getImageView;
+- (YULabel *)getLabel;
+- (YUImageView *)getImageView;
 
 @end

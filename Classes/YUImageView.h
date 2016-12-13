@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UUImageView : UIImageView
+@interface YUImageView : UIImageView
 
 - (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected;
 

@@ -6,26 +6,26 @@
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
-#import "UUImageTextView.h"
-#import "UULabel.h"
-#import "UUImageView.h"
+#import "YUImageTextView.h"
+#import "YULabel.h"
+#import "YUImageView.h"
 
-@interface UUImageTextView ()
+@interface YUImageTextView ()
 
-@property (nonatomic, strong) UULabel     *label;
-@property (nonatomic, strong) UUImageView *imageView;
+@property (nonatomic, strong) YULabel     *label;
+@property (nonatomic, strong) YUImageView *imageView;
 
 @end
 
-@implementation UUImageTextView
+@implementation YUImageTextView
 
 #pragma mark - Initialization
 
 - (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
     self = [super init];
     if (self) {
-        _label = [[UULabel alloc] initWithText:title selected:selected];
-        _imageView = [[UUImageView alloc] initWithImage:image selected:selected];
+        _label = [[YULabel alloc] initWithText:title selected:selected];
+        _imageView = [[YUImageView alloc] initWithImage:image selected:selected];
         [self addSubview:_label];
         [self addSubview:_imageView];
     }
@@ -51,11 +51,11 @@
     self.imageView.image = image;
 }
 
-- (UULabel *)getLabel {
+- (YULabel *)getLabel {
     return _label;
 }
 
-- (UUImageView *)getImageView {
+- (YUImageView *)getImageView {
     return _imageView;
 }
 

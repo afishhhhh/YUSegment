@@ -8,18 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSUInteger, UUIndicatorViewStyle) {
-    UUIndicatorViewStyleRounded,
-    UUIndicatorViewStyleSlider,
+typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
+    YUIndicatorViewStyleSlider,
+    YUIndicatorViewStyleRounded,
 };
 
-@interface UUIndicatorView : UIView
+@interface YUIndicatorView : UIView
 
 @property (nonatomic, strong, readonly) UIView *maskView;
 @property (nonatomic, assign)           CGFloat cornerRadius;
 
-- (instancetype)initWithStyle:(UUIndicatorViewStyle)type;
-
+- (void)updateIndicatorStyle:(YUIndicatorViewStyle)style;
 - (void)updateIndicatorWithColor:(UIColor *)color;
 - (void)setCenterX:(CGFloat)centerX;
 - (CGFloat)getCenterX;

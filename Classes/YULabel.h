@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UULabel : UILabel
+@interface YULabel : UILabel
 
 - (instancetype)initWithText:(NSString *)text selected:(BOOL)selected;
 

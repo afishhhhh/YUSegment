@@ -8,56 +8,30 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSUInteger, UUSegmentStyle) {
+typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
     // The default style for a segment with a line-style indicator.
-    UUSegmentStyleSlider,
+    YUSegmentStyleSlider,
     // A style for s segment with a rounded-style indicator.
-    UUSegmentStyleRounded,
+    YUSegmentStyleRounded,
 };
-
-typedef NS_ENUM(NSUInteger, UUFontWeight) {
-    UUFontWeightThin,
-    UUFontWeightMedium,
-    UUFontWeightBold,
-};
-
-typedef struct UUFont {
-    CGFloat      size;
-    UUFontWeight weight;
-}UUFont;
-
-//@class UUSegment;
-
-//IB_DESIGNABLE
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UUSegment : UIControl
+@interface YUSegment : UIControl
 
 ///------------------------
 /// @name Managing Segments
 ///------------------------
 
-#if TARGET_INTERFACE_BUILDER
-
-/**
- The number of segments. This property will work only in interface builder.
- */
-@property (nonatomic, assign, setter = setSegments:) IBInspectable NSUInteger segments;
-#else
-
 /**
  The number of segments.
  */
 @property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
-#endif
 
 /**
  The index of segment which selected currently. The default is 0;
  */
 @property (nonatomic, assign) IBInspectable NSUInteger currentIndex;
-
-//@property (nonatomic, copy) IBInspectable NSArray <NSString *> *titles;
 
 ///----------------------------------
 /// @name Managing Segment Appearance
@@ -68,14 +42,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A boolean value indicating a segment style. The default is false. This property will work only in interface builder.
  */
-@property (nonatomic, assign, setter = setRoundedStyle:) IBInspectable BOOL roundedStyle;
+@property (nonatomic, assign) IBInspectable BOOL roundedStyle;
 #else
 
 /**
- A constant indicating a segment style. The default is `UUSegmentStyleSlider`. See `UUSegmentStyle` for descriptions of these constants.
+ A constant indicating a segment style. The default is `YUSegmentStyleSlider`. See `YUSegmentStyle` for descriptions of these constants.
  */
-@property (nonatomic, assign) UUSegmentStyle style;
+@property (nonatomic, assign) YUSegmentStyle style;
 #endif
+
+#if TARGET_INTERFACE_BUILDER
 
 /**
  The width of the segment's border.
@@ -88,6 +64,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;
 
 /**
+ The radius to use when drawing rounded corners for the layer’s background.
+ */
+@property (nonatomic, assign) IBInspectable CGFloat cornerRadius;
+#endif
+
+/**
  The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
  */
 @property (nonatomic, assign) IBInspectable CGFloat segmentWidth;
@@ -97,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------
 
 /**
- The spacing of the indicator to its superview. Only works with `UUSegmentRounded` style. The default is 2.
+ The spacing of the indicator to its superview. Only works with `YUSegmentRounded` style. The default is 2.
  */
 @property (nonatomic, assign) IBInspectable CGFloat indicatorMargin;
 
@@ -113,36 +95,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The color of the text, it only works when the type of items is `NSString`. The default is lightGrayColor.
  */
-@property (nonatomic, strong) UIColor *textColor;
+@property (nonatomic, strong) IBInspectable UIColor *textColor;
 
 /**
  The color of the text when the segment is selected. The default is darkGrayColor.
  */
-@property (nonatomic, strong) UIColor *selectedTextColor;
+@property (nonatomic, strong) IBInspectable UIColor *selectedTextColor;
 
 /**
  The font of the text, identical to `textColor`, it only works when the type of items is `NSString`.
  */
-@property (nonatomic, assign) UUFont font;
+@property (nonatomic, strong) UIFont *font;
 
 /**
  The font of the text when the segment is selected. The default is the same as `font`.
  */
-@property (nonatomic, assign) UUFont selectedFont;
-
-///--------------------------------
-/// @name Managing Image Appearance
-///--------------------------------
-
-/**
- The color of the selected image. The default is lightGrayColor. The value is nil if the image not be selected.
- */
-@property (nonatomic, strong) UIColor *imageColor;
-
-///---------------------------
-/// @name Managing Scroll View
-///---------------------------
-
+@property (nonatomic, strong) UIFont *selectedFont;
 
 ///---------------------
 /// @name Initialization
@@ -152,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
  Initializes and returns a segmented control with segments having the given titles.
 
  @param titles An array of `NSString` objects. The value must not be nil or empty array.
- @return The newly-created instance of the `UUSegment`.
+ @return The newly-created instance of the `YUSegment`.
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
 
@@ -160,7 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
  Initializes and returns s segmented control with segments having the given images.
 
  @param images An array of `UIImage` objects. The value must not be nil or empty array.
- @return The newly-created instance of the `UUSegment`.
+ @return The newly-created instance of the `YUSegment`.
  */
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images;
 
@@ -169,7 +137,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param titles An array of `NSString` objects. This value must not be nil or empty array.
  @param images An array of `UIImage` objects. This value must not be nil or empty array.
- @return The newly-created instance of the `UUSegment`.
+ @return The newly-created instance of the `YUSegment`.
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
@@ -177,11 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Managing Segment Content Setting
 ///---------------------------------------
 
-- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles;
-
-- (void)setSegmentsWithImages:(NSArray <UIImage *> *)images;
-
-- (void)setSegmentsWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
+- (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images;
 
 /**
  Set the content of a segment to a given title.
@@ -300,11 +264,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeItemAtIndex:(NSUInteger)index;
 
-///----------------------------------
-/// @name Managing Segment Appearance
-///----------------------------------
+@end
 
+@interface YUSegment (Deprecated)
 
+- (NSArray<NSString *> *)titles __attribute__((deprecated("Use -titleForSegmentAtIndex: instead.")));
+- (NSArray<UIImage *> *)images __attribute__((deprecated("Use -imageForSegmentAtIndex: instead.")));
 
 @end
 

@@ -6,9 +6,9 @@
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
-#import "UULabel.h"
+#import "YULabel.h"
 
-@implementation UULabel
+@implementation YULabel
 
 - (instancetype)initWithText:(NSString *)text selected:(BOOL)selected {
     self = [super init];
