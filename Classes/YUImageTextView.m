@@ -21,11 +21,12 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
+- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image style:(YUImageTextViewStyle)style {
     self = [super init];
     if (self) {
-        _label = [[YULabel alloc] initWithText:title selected:selected];
-        _imageView = [[YUImageView alloc] initWithImage:image selected:selected];
+        _label = [[YULabel alloc] initWithText:title style:YULabelStyleBasic];
+        _imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleBasic];
+        self.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:_label];
         [self addSubview:_imageView];
     }

@@ -10,12 +10,11 @@
 
 @implementation YULabel
 
-- (instancetype)initWithText:(NSString *)text selected:(BOOL)selected {
+- (instancetype)initWithText:(NSString *)text style:(YULabelStyle)style {
     self = [super init];
     if (self) {
-        if (selected) {
+        if (style == YULabelStyleSelected) {
             self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
-//            self.textColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
             self.textColor = [UIColor blackColor];
         } else {
             self.font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
@@ -23,6 +22,15 @@
         }
         self.textAlignment = NSTextAlignmentCenter;
         self.text = text;
+        self.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return self;
+}
+
+- (instancetype)initWithText:(NSString *)text attributes:(NSDictionary *)attributes {
+    self = [super init];
+    if (self) {
+        
     }
     return self;
 }

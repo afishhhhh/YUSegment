@@ -8,11 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, YUImageTextViewStyle) {
+    YUImageTextViewStyleCustom,
+    YUImageTextViewStyleBasic,
+    YUImageTextViewStyleSelected,
+};
+
 @class YULabel, YUImageView;
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface YUImageTextView : UIView
 
-- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected;
+- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image style:(YUImageTextViewStyle)style;
 - (void)setTitle:(NSString *)title;
 - (void)setImage:(UIImage *)image;
 
@@ -20,3 +28,5 @@
 - (YUImageView *)getImageView;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -8,8 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, YUImageViewStyle) {
+    YUImageViewStyleCustom,
+    YUImageViewStyleBasic,
+    YUImageViewStyleSelected,
+};
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface YUImageView : UIImageView
 
-- (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected;
+- (instancetype)initWithImage:(UIImage *)image style:(YUImageViewStyle)style;
 
 @end
+
+NS_ASSUME_NONNULL_END

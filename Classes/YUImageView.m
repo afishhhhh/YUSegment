@@ -10,11 +10,12 @@
 
 @implementation YUImageView
 
-- (instancetype)initWithImage:(UIImage *)image selected:(BOOL)selected {
+- (instancetype)initWithImage:(UIImage *)image style:(YUImageViewStyle)style {
     self = [super initWithImage:image];
     if (self) {
         self.contentMode = UIViewContentModeScaleAspectFit;
-        if (selected) {
+        self.translatesAutoresizingMaskIntoConstraints = NO;
+        if (style == YUImageViewStyleSelected) {
             // ...
         } else {
             self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];

@@ -249,8 +249,8 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)insertViewWithTitle:(NSString *)title atIndex:(NSUInteger)index {
     // setup view
-    [self setupSegmentViewWithTitle:title selected:NO];
-    [self setupSegmentViewWithTitle:title selected:YES];
+//    [self setupSegmentViewWithTitle:title selected:NO];
+//    [self setupSegmentViewWithTitle:title selected:YES];
     // update c
 //    [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
 }
@@ -281,8 +281,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)setupSegmentViewsWithTitles {
     for (int i = 0; i < _numberOfSegments; i++) {
-        [self setupSegmentViewWithTitle:_internalTitles[i] selected:YES];
-        [self setupSegmentViewWithTitle:_internalTitles[i] selected:NO];
+        [self setupSegmentViewWithTitle:_internalTitles[i]];
     }
     [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
@@ -290,8 +289,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)setupSegmentViewsWithImages {
     for (int i = 0; i < _numberOfSegments; i++) {
-        [self setupSegmentViewWithImage:_internalImages[i] selected:YES];
-        [self setupSegmentViewWithImage:_internalImages[i] selected:NO];
+        [self setupSegmentViewWithImage:_internalImages[i]];
     }
     [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
@@ -301,54 +299,43 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     NSMutableArray *imageTextViews = [NSMutableArray array];
     NSMutableArray *selectedImageTextViews = [NSMutableArray array];
     for (int i = 0; i < _numberOfSegments; i++) {
-        [imageTextViews addObject:[self setupSegmentViewWithTitle:_internalTitles[i] forImage:_internalImages[i] selected:YES]];
-        [selectedImageTextViews addObject:[self setupSegmentViewWithTitle:_internalTitles[i] forImage:_internalImages[i] selected:NO]];
+        NSArray *views = [self setupSegmentViewWithTitle:_internalTitles[i] forImage:_internalImages[i]];
+        [imageTextViews addObject:views[0]];
+        [selectedImageTextViews addObject:views[1]];
     }
     [self setupConstraintsWithSegments:imageTextViews toContainerView:_containerView];
     [self setupConstraintsWithSegments:selectedImageTextViews toContainerView:_selectedContainerView];
 }
 
-- (void)setupSegmentViewWithTitle:(NSString *)title selected:(BOOL)selected {
-    YULabel *label = [[YULabel alloc] initWithText:title selected:selected];
-    if (selected) {
-        [_selectedContainerView addSubview:label];
-        [self.selectedLabels addObject:label];
-    }
-    else {
-        [_containerView addSubview:label];
-        [self.labels addObject:label];
-    }
-    label.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)setupSegmentViewWithTitle:(NSString *)title {
+    YULabel *label = [[YULabel alloc] initWithText:title style:YULabelStyleBasic];
+    [_containerView addSubview:label];
+    [self.labels addObject:label];
+    label = [[YULabel alloc] initWithText:title style:YULabelStyleSelected];
+    [_selectedContainerView addSubview:label];
+    [self.selectedLabels addObject:label];
 }
 
-- (void)setupSegmentViewWithImage:(UIImage *)image selected:(BOOL)selected {
-    YUImageView *imageView = [[YUImageView alloc] initWithImage:image selected:selected];
-    if (selected) {
-        [_selectedContainerView addSubview:imageView];
-        [self.selectedImageViews addObject:imageView];
-    }
-    else {
-        [_containerView addSubview:imageView];
-        [self.imageViews addObject:imageView];
-    }
-    imageView.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)setupSegmentViewWithImage:(UIImage *)image {
+    YUImageView *imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleBasic];
+    [_containerView addSubview:imageView];
+    [self.imageViews addObject:imageView];
+    imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleSelected];
+    [_selectedContainerView addSubview:imageView];
+    [self.selectedImageViews addObject:imageView];
 }
 
-- (YUImageTextView *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image selected:(BOOL)selected {
-    YUImageTextView *imageTextView = [[YUImageTextView alloc] initWithTitle:title forImage:image selected:selected];
-    if (selected) {
-        [_selectedContainerView addSubview:imageTextView];
-        [self.selectedLabels addObject:[imageTextView getLabel]];
-        [self.selectedImageViews addObject:[imageTextView getImageView]];
-    }
-    else {
-        [_containerView addSubview:imageTextView];
-        [self.labels addObject:[imageTextView getLabel]];
-        [self.imageViews addObject:[imageTextView getImageView]];
-    }
-    imageTextView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    return imageTextView;
+- (NSArray <YUImageTextView *> *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
+    YUImageTextView *imageTextView1 = [[YUImageTextView alloc] initWithTitle:title forImage:image style:YUImageTextViewStyleBasic];
+    [_containerView addSubview:imageTextView1];
+    [self.labels addObject:[imageTextView1 getLabel]];
+    [self.imageViews addObject:[imageTextView1 getImageView]];
+    YUImageTextView *imageTextView2 = [[YUImageTextView alloc] initWithTitle:title forImage:image style:YUImageTextViewStyleSelected];
+    [_selectedContainerView addSubview:imageTextView2];
+    [self.selectedLabels addObject:[imageTextView2 getLabel]];
+    [self.selectedImageViews addObject:[imageTextView2 getImageView]];
+
+    return @[imageTextView1, imageTextView2];
 }
 
 - (void)setupContainerViewSelected:(BOOL)selected {
@@ -370,7 +357,6 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)buildUI {
-    // background color 合并到 setup indicator
     switch (_style) {
         case YUSegmentStyleSlider: {
             if (self.backgroundColor) {
@@ -602,44 +588,31 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 #pragma mark - Setters
 
 - (void)setTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
-    if (titles && images) {
+    if (titles) {
         self.internalTitles = [titles mutableCopy];
-        self.internalImages = [images mutableCopy];
         _numberOfSegments = [titles count];
-        [self setupSegmentViewsWithTitlesAndImages];
+        if (images) {
+            self.internalImages = [images mutableCopy];
+            [self setupSegmentViewsWithTitlesAndImages];
+        } else {
+            [self setupSegmentViewsWithTitles];
+        }
         if (_needsUpdateAppearance) {
             if (_textColor) {
                 [self updateTitleWithColor:_textColor];
             }
-            if (_selectedTextColor) {
-                [self updateTitleWithSelectedColor:_selectedTextColor];
-            }
             if (_font) {
                 [self updateTitleWithFont:_font];
-            }
-            if (_selectedFont) {
-                [self updateTitleWithSelectedFont:_selectedFont];
-            }
-        }
-    } else if (titles) {
-        self.internalTitles = [titles mutableCopy];
-        _numberOfSegments = [titles count];
-        [self setupSegmentViewsWithTitles];
-        if (_needsUpdateAppearance) {
-            if (_textColor) {
-                [self updateTitleWithColor:_textColor];
             }
             if (_selectedTextColor) {
                 [self updateTitleWithSelectedColor:_selectedTextColor];
             }
-            if (_font) {
-                [self updateTitleWithFont:_font];
-            }
             if (_selectedFont) {
-                [self updateTitleWithSelectedFont:_selectedFont];
+                [self updateTitleWithSelectedFont:_font];
             }
         }
-    } else {
+    }
+    else if (images) {
         self.internalImages = [images mutableCopy];
         _numberOfSegments = [images count];
         [self setupSegmentViewsWithImages];
