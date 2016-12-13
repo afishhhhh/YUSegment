@@ -103,7 +103,8 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     NSLog(@"invoke commonInit");
 //    self.translatesAutoresizingMaskIntoConstraints = NO;
     _needsUpdateAppearance = NO;
-    _currentIndex = 0;
+    _selectedIndex = 0;
+    _indicatorMargin = 3.0;
     _style = YUSegmentStyleSlider;
     [self setupContainerViewSelected:NO];
     [self setupContainerViewSelected:YES];
@@ -122,13 +123,13 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     switch (_style) {
         case YUSegmentStyleSlider: {
             CGFloat indicatorWidth = [self calculateIndicatorWidthPlusConstant];
-            CGFloat x = segmentWidth * _currentIndex + (segmentWidth - indicatorWidth) / 2.0;
+            CGFloat x = segmentWidth * _selectedIndex + (segmentWidth - indicatorWidth) / 2.0;
             CGRect indicatorFrame = (CGRect){x, 0, indicatorWidth, CGRectGetHeight(self.frame)};
             _indicatorView.frame = indicatorFrame;
             break;
         }
         case YUSegmentStyleRounded: {
-            CGRect indicatorFrame = (CGRect){segmentWidth * _currentIndex, 0, segmentWidth, CGRectGetHeight(self.frame)};
+            CGRect indicatorFrame = (CGRect){segmentWidth * _selectedIndex, 0, segmentWidth, CGRectGetHeight(self.frame)};
             _indicatorView.frame = CGRectInset(indicatorFrame, _indicatorMargin, _indicatorMargin);
             break;
         }
@@ -369,22 +370,32 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)buildUI {
+    // background color 合并到 setup indicator
     switch (_style) {
         case YUSegmentStyleSlider: {
-            if (!self.backgroundColor) {
+            if (self.backgroundColor) {
+                [self configureIndicatorWithBackgroundColor:self.backgroundColor];
+            } else {
                 self.backgroundColor = [UIColor whiteColor];
             }
             break;
         }
         case YUSegmentStyleRounded: {
-            if (!self.backgroundColor) {
-                self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
-            }
+//            if (!self.backgroundColor) {
+//                self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+//            }
             self.layer.cornerRadius = 5.0;
-            _indicatorMargin = 3.0;
             _indicatorView.cornerRadius = 5.0;
             break;
         }
+    }
+}
+
+- (void)configureIndicatorWithBackgroundColor:(UIColor *)color {
+    if (![color isEqual:[UIColor clearColor]]) {
+        _indicatorView.backgroundColor = color;
+    } else {
+        _indicatorView.backgroundColor = [UIColor whiteColor];
     }
 }
 
@@ -464,7 +475,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)makeCurrentSegmentCenterInSelf {
-    CGFloat finalOffset = self.segmentWidth * (_currentIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
+    CGFloat finalOffset = self.segmentWidth * (_selectedIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
     CGFloat maxOffset = _scrollView.contentSize.width - CGRectGetWidth(self.frame);
     CGPoint contentOffset = _scrollView.contentOffset;
     if (finalOffset <= 0) {
@@ -492,10 +503,10 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:_containerView];
-    NSUInteger fromIndex = self.currentIndex;
-    self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
-    if (fromIndex != self.currentIndex) {
-        [self moveIndicatorFromIndex:fromIndex toIndex:_currentIndex animated:YES];
+    NSUInteger fromIndex = self.selectedIndex;
+    self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
+    if (fromIndex != self.selectedIndex) {
+        [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
     }
 }
 
@@ -514,9 +525,9 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateCancelled: {
             CGFloat indicatorCenterX = [_indicatorView getCenterX];
-            NSUInteger fromIndex = self.currentIndex;
-            self.currentIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
-            [self moveIndicatorFromIndex:fromIndex toIndex:_currentIndex animated:YES];
+            NSUInteger fromIndex = self.selectedIndex;
+            self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
+            [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
         }
         default:
             break;
@@ -636,11 +647,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)setRoundedStyle:(BOOL)roundedStyle {
-    if (roundedStyle) {
-        [self setStyle:YUSegmentStyleRounded];
-    } else {
-        [self setStyle:YUSegmentStyleSlider];
-    }
+    roundedStyle ? [self setStyle:YUSegmentStyleRounded] : [self setStyle:YUSegmentStyleSlider];
 }
 
 - (void)setStyle:(YUSegmentStyle)style {
@@ -649,7 +656,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     }
     _style = style;
     [_indicatorView updateIndicatorStyle:(YUIndicatorViewStyle)style];
-//    [self rebuildUI];
+    [self buildUI];
 }
 
 - (void)setCornerRadius:(CGFloat)cornerRadius {
@@ -665,13 +672,10 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
+    NSAssert(backgroundColor, @"The color should not be nil.");
     [super setBackgroundColor:backgroundColor];
-    if (_style == YUSegmentStyleSlider) {
-        if ([backgroundColor isEqual:[UIColor clearColor]]) {
-            _indicatorView.backgroundColor = [UIColor whiteColor];
-        } else {
-            _indicatorView.backgroundColor = backgroundColor;
-        }
+    if (_indicatorView) {
+        [self configureIndicatorWithBackgroundColor:backgroundColor];
     }
 }
 
@@ -684,10 +688,10 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)setIndicatorColor:(UIColor *)indicatorColor {
-    NSAssert(indicatorColor, @"The should not be nil.");
+    NSAssert(indicatorColor, @"The color should not be nil.");
     if (indicatorColor != _indicatorColor && ![indicatorColor isEqual:_indicatorColor]) {
         _indicatorColor = indicatorColor;
-        [_indicatorView updateIndicatorWithColor:indicatorColor];
+        _indicatorView.indicatorColor = indicatorColor;
     }
 }
 

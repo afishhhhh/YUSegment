@@ -23,10 +23,10 @@
     self = [super init];
     if (self) {
         _style = YUIndicatorViewStyleSlider;
+        _indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
         _maskView = [UIView new];
         _maskView.backgroundColor = [UIColor blackColor];
         [self addSubview:self.line];
-        self.backgroundColor = [UIColor whiteColor];
         self.layer.masksToBounds = YES;
     }
     return self;
@@ -51,24 +51,9 @@
     } else {
         [_line removeFromSuperview];
         self.line = nil;
+        self.backgroundColor = _indicatorColor;
     }
     [self setNeedsLayout];
-}
-
-- (void)updateIndicatorWithColor:(UIColor *)color {
-    switch (_style) {
-        case YUIndicatorViewStyleSlider:
-            self.line.backgroundColor = color;
-            break;
-        case YUIndicatorViewStyleRounded: {
-            if ([color isEqual:[UIColor clearColor]]) {
-                self.backgroundColor = [UIColor whiteColor];
-            } else {
-                self.backgroundColor = color;
-            }
-            break;
-        }
-    }
 }
 
 - (void)setCenterX:(CGFloat)centerX {
@@ -79,6 +64,22 @@
 }
 
 #pragma mark - Setters
+
+- (void)setIndicatorColor:(UIColor *)indicatorColor {
+    _indicatorColor = indicatorColor;
+    if ([indicatorColor isEqual:[UIColor clearColor]]) {
+        indicatorColor = [UIColor whiteColor];
+    }
+    switch (_style) {
+        case YUIndicatorViewStyleSlider:
+            self.line.backgroundColor = indicatorColor;
+            break;
+        case YUIndicatorViewStyleRounded: {
+            self.backgroundColor = indicatorColor;
+            break;
+        }
+    }
+}
 
 - (void)setCornerRadius:(CGFloat)cornerRadius {
     if (cornerRadius == _cornerRadius) {
@@ -99,7 +100,7 @@
         return _line;
     }
     _line = [UIView new];
-    _line.backgroundColor = [UIColor colorWithRed:238.0 / 255 green:143.0 / 255 blue:102.0 / 255 alpha:1.0];
+    _line.backgroundColor = _indicatorColor;
     return _line;
 }
 

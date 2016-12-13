@@ -13,14 +13,18 @@ typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
     YUIndicatorViewStyleRounded,
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface YUIndicatorView : UIView
 
-@property (nonatomic, strong, readonly) UIView *maskView;
+@property (nonatomic, strong, readonly) UIView  *maskView;
 @property (nonatomic, assign)           CGFloat cornerRadius;
+@property (nonatomic, strong)           UIColor *indicatorColor;
 
 - (void)updateIndicatorStyle:(YUIndicatorViewStyle)style;
-- (void)updateIndicatorWithColor:(UIColor *)color;
 - (void)setCenterX:(CGFloat)centerX;
 - (CGFloat)getCenterX;
 
 @end
+
+NS_ASSUME_NONNULL_END

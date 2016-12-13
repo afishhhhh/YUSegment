@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
+    // 添加一个 default
     // The default style for a segment with a line-style indicator.
     YUSegmentStyleSlider,
     // A style for s segment with a rounded-style indicator.
@@ -24,14 +25,14 @@ NS_ASSUME_NONNULL_BEGIN
 ///------------------------
 
 /**
- The number of segments.
+ The number of segments the receiver has.
  */
 @property (nonatomic, assign, readonly) NSUInteger numberOfSegments;
 
 /**
- The index of segment which selected currently. The default is 0;
+ The index number identifying the selected segment. The default is 0;
  */
-@property (nonatomic, assign) IBInspectable NSUInteger currentIndex;
+@property (nonatomic, assign) IBInspectable NSUInteger selectedIndex;
 
 ///----------------------------------
 /// @name Managing Segment Appearance
