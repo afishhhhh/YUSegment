@@ -7,13 +7,11 @@
 //
 
 #import "YUImageTextView.h"
-#import "YULabel.h"
-#import "YUImageView.h"
 
 @interface YUImageTextView ()
 
-@property (nonatomic, strong) YULabel     *label;
-@property (nonatomic, strong) YUImageView *imageView;
+@property (nonatomic, strong) UILabel     *label;
+@property (nonatomic, strong) UIImageView *imageView;
 
 @end
 
@@ -21,11 +19,11 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image style:(YUImageTextViewStyle)style {
+- (instancetype)initWithLabel:(UILabel *)label imageView:(UIImageView *)imageView {
     self = [super init];
     if (self) {
-        _label = [[YULabel alloc] initWithText:title];
-        _imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleBasic];
+        _label = label;
+        _imageView = imageView;
         self.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:_label];
         [self addSubview:_imageView];
@@ -50,14 +48,6 @@
 
 - (void)setImage:(UIImage *)image {
     self.imageView.image = image;
-}
-
-- (YULabel *)getLabel {
-    return _label;
-}
-
-- (YUImageView *)getImageView {
-    return _imageView;
 }
 
 @end

@@ -10,20 +10,12 @@
 
 @implementation YULabel
 
-- (instancetype)initWithText:(NSString *)text {
+- (instancetype)initWithAttributedText:(NSAttributedString *)attributedText {
     self = [super init];
     if (self) {
         self.textAlignment = NSTextAlignmentCenter;
-        self.text = text;
+        self.attributedText = attributedText;
         self.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-    return self;
-}
-
-- (instancetype)initWithText:(NSString *)text attributes:(NSDictionary *)attributes {
-    self = [super init];
-    if (self) {
-        
     }
     return self;
 }

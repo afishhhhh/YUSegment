@@ -84,7 +84,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         _numberOfSegments = [titles count];
         _style = style;
         [self commonInit];
-        [self setupSegmentViewsWithTitles];
+        [self configureLabels];
     }
     return self;
 }
@@ -96,7 +96,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         _numberOfSegments = [images count];
         _style = style;
         [self commonInit];
-        [self setupSegmentViewsWithImages];
+        [self configureImages];
     }
     return self;
 }
@@ -109,7 +109,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         _numberOfSegments = [titles count];
         _style = style;
         [self commonInit];
-        [self setupSegmentViewsWithTitlesAndImages];
+        [self configureMixtureViews];
     }
     return self;
 }
@@ -286,111 +286,86 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 #pragma mark - Views Setup
 
-- (void)setupSegmentViewsWithTitles {
-    NSAttributedString *string = [NSAttributedString str]
-    for (int i = 0; i < _numberOfSegments; i++) {
-        [self setupSegmentViewWithTitle:_internalTitles[i]];
-    }
+- (void)configureLabels {
+    NSDictionary *attributes1, *attributes2;
     if (_needsUpdateAppearance) {
-        
+        attributes1 = [self getAttributes1];
+        attributes2 = [self getAttributes2];
     } else {
-        [self configureTextAppearance];
+        if (_style == YUSegmentStyleSlider) {
+            attributes1 = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor lightGrayColor]};
+            attributes2 = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor blackColor]};
+        } else {
+            attributes1 = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor blackColor]};
+            attributes2 = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor whiteColor]};
+        }
+    }
+    YULabel *label;
+    NSString *title;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        title = _internalTitles[i];
+        label = [[YULabel alloc] initWithAttributedText:[[NSAttributedString alloc] initWithString:title attributes:attributes1]];
+        [self.labels addObject:label];
+        label = [[YULabel alloc] initWithAttributedText:[[NSAttributedString alloc] initWithString:title attributes:attributes2]];
+        [self.selectedLabels addObject:label];
+    }
+    
+    [self setupSegmentViewsWithLabels];
+}
+
+- (void)configureImages {
+    YUImageView *imageView;
+    UIImage *image;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        image = _internalImages[i];
+        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+        [self.selectedImageViews addObject:imageView];
+        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+        [self.imageViews addObject:imageView];
+    }
+    
+    [self setupSegmentViewsWithImageViews];
+}
+
+- (void)configureMixtureViews {
+    [self configureLabels];
+    [self configureImages];
+    NSMutableArray *array1 = [NSMutableArray array];
+    NSMutableArray *array2 = [NSMutableArray array];
+    YUImageTextView *view;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        view = [[YUImageTextView alloc] initWithLabel:_labels[i] imageView:_imageViews[i]];
+        [array1 addObject:view];
+        [_containerView addSubview:view];
+        view = [[YUImageTextView alloc] initWithLabel:_selectedLabels[i] imageView:_selectedImageViews[i]];
+        [array2 addObject:view];
+        [_selectedContainerView addSubview:view];
+    }
+    
+    [self setupConstraintsWithSegments:array1 toContainerView:_containerView];
+    [self setupConstraintsWithSegments:array2 toContainerView:_selectedContainerView];
+}
+
+- (void)setupSegmentViewsWithLabels {
+    for (int i = 0; i < _numberOfSegments; i++) {
+        [_containerView addSubview:_labels[i]];
+        [_selectedContainerView addSubview:_selectedLabels[i]];
     }
     [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
 }
 
-- (void)configureTextAppearance {
-    if (_style == YUSegmentStyleSlider) {
-        for (int i = 0; i < _numberOfSegments; i++) {
-            _labels[i].textColor = [UIColor lightGrayColor];
-            _labels[i].font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
-            _selectedLabels[i].textColor = [UIColor blackColor];
-            _selectedLabels[i].font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
-        }
-    } else {
-        for (int i = 0; i < _numberOfSegments; i++) {
-            _labels[i].textColor = [UIColor blackColor];
-            _labels[i].font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
-            _selectedLabels[i].textColor = [UIColor whiteColor];
-            _selectedLabels[i].font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
-        }
-    }
-}
-
-- (void)updateTextAppearance {
-    UIColor *textColor;
-    if (_textColor) {
-        textColor = _textColor;
-    } else {
-        textColor = (_style == YUSegmentStyleSlider ? [UIColor lightGrayColor] : [UIColor blackColor]);
-    }
-    UIColor *selectedTextColor;
-    if (_selectedTextColor) {
-        selectedTextColor = _selectedTextColor;
-    } else {
-        selectedTextColor = (_style == YUSegmentStyleSlider ? [UIColor blackColor] : [UIColor whiteColor]);
-    }
-    UIFont *font = _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
-    UIFont *selectedFont = _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
-    
+- (void)setupSegmentViewsWithImageViews {
     for (int i = 0; i < _numberOfSegments; i++) {
-        _labels[i].textColor = textColor;
-        _labels[i].font = font;
-        _selectedLabels[i].textColor = selectedTextColor;
-        _selectedLabels[i].font = selectedFont;
-    }
-}
-
-- (void)setupSegmentViewsWithImages {
-    for (int i = 0; i < _numberOfSegments; i++) {
-        [self setupSegmentViewWithImage:_internalImages[i]];
+        [_containerView addSubview:_imageViews[i]];
+        [_selectedContainerView addSubview:_selectedImageViews[i]];
     }
     [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
-}
-
-- (void)setupSegmentViewsWithTitlesAndImages {
-    NSMutableArray *imageTextViews = [NSMutableArray array];
-    NSMutableArray *selectedImageTextViews = [NSMutableArray array];
-    for (int i = 0; i < _numberOfSegments; i++) {
-        NSArray *views = [self setupSegmentViewWithTitle:_internalTitles[i] forImage:_internalImages[i]];
-        [imageTextViews addObject:views[0]];
-        [selectedImageTextViews addObject:views[1]];
-    }
-    [self setupConstraintsWithSegments:imageTextViews toContainerView:_containerView];
-    [self setupConstraintsWithSegments:selectedImageTextViews toContainerView:_selectedContainerView];
-}
-
-- (void)setupSegmentViewWithTitle:(NSString *)title {
-    YULabel *label = [[YULabel alloc] initWithText:title];
-    [_containerView addSubview:label];
-    [self.labels addObject:label];
-    label = [[YULabel alloc] initWithText:title];
-    [_selectedContainerView addSubview:label];
-    [self.selectedLabels addObject:label];
-}
-
-- (void)setupSegmentViewWithImage:(UIImage *)image {
-    YUImageView *imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleBasic];
-    [_containerView addSubview:imageView];
-    [self.imageViews addObject:imageView];
-    imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleSelected];
-    [_selectedContainerView addSubview:imageView];
-    [self.selectedImageViews addObject:imageView];
-}
-
-- (NSArray <YUImageTextView *> *)setupSegmentViewWithTitle:(NSString *)title forImage:(UIImage *)image {
-    YUImageTextView *imageTextView1 = [[YUImageTextView alloc] initWithTitle:title forImage:image style:YUImageTextViewStyleBasic];
-    [_containerView addSubview:imageTextView1];
-    [self.labels addObject:[imageTextView1 getLabel]];
-    [self.imageViews addObject:[imageTextView1 getImageView]];
-    YUImageTextView *imageTextView2 = [[YUImageTextView alloc] initWithTitle:title forImage:image style:YUImageTextViewStyleSelected];
-    [_selectedContainerView addSubview:imageTextView2];
-    [self.selectedLabels addObject:[imageTextView2 getLabel]];
-    [self.selectedImageViews addObject:[imageTextView2 getImageView]];
-
-    return @[imageTextView1, imageTextView2];
 }
 
 - (void)setupContainerViewSelected:(BOOL)selected {
@@ -624,6 +599,30 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     return maxWidth;
 }
 
+- (NSDictionary *)getAttributes1 {
+    NSDictionary *attributes;
+    if (_style == YUSegmentStyleSlider) {
+        attributes = @{NSFontAttributeName : _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _textColor ?: [UIColor lightGrayColor]};
+    } else {
+        attributes = @{NSFontAttributeName : _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _textColor ?: [UIColor blackColor]};
+    }
+    return attributes;
+}
+
+- (NSDictionary *)getAttributes2 {
+    NSDictionary *attributes;
+    if (_style == YUSegmentStyleSlider) {
+        attributes = @{NSFontAttributeName : _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _selectedTextColor ?: [UIColor blackColor]};
+    } else {
+        attributes = @{NSFontAttributeName : _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _selectedTextColor ?: [UIColor whiteColor]};
+    }
+    return attributes;
+}
+
 #pragma mark - Setters
 
 - (void)setTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
@@ -632,29 +631,15 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         _numberOfSegments = [titles count];
         if (images) {
             self.internalImages = [images mutableCopy];
-            [self setupSegmentViewsWithTitlesAndImages];
+            [self configureMixtureViews];
         } else {
-            [self setupSegmentViewsWithTitles];
-        }
-        if (_needsUpdateAppearance) {
-            if (_textColor) {
-                [self updateTitleWithColor:_textColor];
-            }
-            if (_font) {
-                [self updateTitleWithFont:_font];
-            }
-            if (_selectedTextColor) {
-                [self updateTitleWithSelectedColor:_selectedTextColor];
-            }
-            if (_selectedFont) {
-                [self updateTitleWithSelectedFont:_font];
-            }
+            [self configureLabels];
         }
     }
     else if (images) {
         self.internalImages = [images mutableCopy];
         _numberOfSegments = [images count];
-        [self setupSegmentViewsWithImages];
+        [self configureImages];
     }
 }
 

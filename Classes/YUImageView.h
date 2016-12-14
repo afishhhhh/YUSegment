@@ -8,17 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSUInteger, YUImageViewStyle) {
-    YUImageViewStyleCustom,
-    YUImageViewStyleBasic,
-    YUImageViewStyleSelected,
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YUImageView : UIImageView
 
-- (instancetype)initWithImage:(UIImage *)image style:(YUImageViewStyle)style;
+- (instancetype)initWithImage:(UIImage *)image renderingMode:(UIImageRenderingMode)mode;
 
 @end
 

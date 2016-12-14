@@ -10,17 +10,13 @@
 
 @implementation YUImageView
 
-- (instancetype)initWithImage:(UIImage *)image style:(YUImageViewStyle)style {
+- (instancetype)initWithImage:(UIImage *)image renderingMode:(UIImageRenderingMode)mode {
     self = [super initWithImage:image];
     if (self) {
         self.contentMode = UIViewContentModeScaleAspectFit;
         self.translatesAutoresizingMaskIntoConstraints = NO;
-        if (style == YUImageViewStyleSelected) {
-            // ...
-        } else {
-            self.image = [self.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            self.tintColor = [UIColor lightGrayColor];
-        }
+        self.image = [self.image imageWithRenderingMode:mode];
+        self.tintColor = [UIColor lightGrayColor];
     }
     return self;
 }
