@@ -34,6 +34,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) IBInspectable NSUInteger selectedIndex;
 
+/**
+ 
+ */
+@property (nonatomic, copy, readonly) NSArray <NSString *> *titles;
+
+/**
+ 
+ */
+@property (nonatomic, copy, readonly) NSArray <UIImage *>  *images;
+
 ///----------------------------------
 /// @name Managing Segment Appearance
 ///----------------------------------
@@ -43,13 +53,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A boolean value indicating a segment style. The default is false. This property will work only in interface builder.
  */
-@property (nonatomic, assign) IBInspectable BOOL roundedStyle;
+@property (nonatomic, assign) IBInspectable NSUInteger segmentStyle;
 #else
 
 /**
  A constant indicating a segment style. The default is `YUSegmentStyleSlider`. See `YUSegmentStyle` for descriptions of these constants.
  */
-@property (nonatomic, assign) YUSegmentStyle style;
+@property (nonatomic, assign, readonly) YUSegmentStyle style;
 #endif
 
 #if TARGET_INTERFACE_BUILDER
@@ -142,10 +152,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style;
+
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
+
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
+
 ///---------------------------------------
 /// @name Managing Segment Content Setting
 ///---------------------------------------
 
+/**
+ <#Description#>
+
+ @param titles <#titles description#>
+ @param images <#images description#>
+ */
 - (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images;
 
 /**

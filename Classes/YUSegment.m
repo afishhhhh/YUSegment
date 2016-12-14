@@ -65,34 +65,49 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles {
+    return [self initWithTitles:titles style:YUSegmentStyleSlider];
+}
+
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images {
+    return [self initWithImages:images style:YUSegmentStyleSlider];
+}
+
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
+    NSAssert([titles count] == [images count], @"The count of titles should be equal to the count of images.");
+    return [self initWithTitles:titles forImages:images style:YUSegmentStyleSlider];
+}
+
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _internalTitles = [titles mutableCopy];
         _numberOfSegments = [titles count];
+        _style = style;
         [self commonInit];
         [self setupSegmentViewsWithTitles];
     }
     return self;
 }
 
-- (instancetype)initWithImages:(NSArray <UIImage *> *)images {
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _internalImages = [images mutableCopy];
         _numberOfSegments = [images count];
+        _style = style;
         [self commonInit];
         [self setupSegmentViewsWithImages];
     }
     return self;
 }
 
-- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
-    NSAssert([titles count] == [images count], @"The count of titles should be equal to the count of images.");
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         _internalTitles = [titles mutableCopy];
         _internalImages = [images mutableCopy];
         _numberOfSegments = [titles count];
+        _style = style;
         [self commonInit];
         [self setupSegmentViewsWithTitlesAndImages];
     }
@@ -100,12 +115,8 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)commonInit {
-    NSLog(@"invoke commonInit");
-//    self.translatesAutoresizingMaskIntoConstraints = NO;
     _needsUpdateAppearance = NO;
     _selectedIndex = 0;
-    _indicatorMargin = 3.0;
-    _style = YUSegmentStyleSlider;
     [self setupContainerViewSelected:NO];
     [self setupContainerViewSelected:YES];
     [self setupIndicatorView];
@@ -168,17 +179,13 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)updateViewWithTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
-    YULabel *label = _labels[index];
-    label.text = title;
-    YULabel *selectedLabel = _selectedLabels[index];
-    selectedLabel.text = title;
+    _labels[index].text = title;
+    _selectedLabels[index].text = title;
 }
 
 - (void)updateViewWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    YUImageView *imageView = _imageViews[index];
-    imageView.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    YUImageView *selectedImage = _selectedImageViews[index];
-    selectedImage.image = image;
+    _imageViews[index].image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    _selectedImageViews[index].image = image;
 }
 
 #pragma mark - Content Getting
@@ -280,11 +287,59 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 #pragma mark - Views Setup
 
 - (void)setupSegmentViewsWithTitles {
+    NSAttributedString *string = [NSAttributedString str]
     for (int i = 0; i < _numberOfSegments; i++) {
         [self setupSegmentViewWithTitle:_internalTitles[i]];
     }
+    if (_needsUpdateAppearance) {
+        
+    } else {
+        [self configureTextAppearance];
+    }
     [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
+}
+
+- (void)configureTextAppearance {
+    if (_style == YUSegmentStyleSlider) {
+        for (int i = 0; i < _numberOfSegments; i++) {
+            _labels[i].textColor = [UIColor lightGrayColor];
+            _labels[i].font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+            _selectedLabels[i].textColor = [UIColor blackColor];
+            _selectedLabels[i].font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+        }
+    } else {
+        for (int i = 0; i < _numberOfSegments; i++) {
+            _labels[i].textColor = [UIColor blackColor];
+            _labels[i].font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+            _selectedLabels[i].textColor = [UIColor whiteColor];
+            _selectedLabels[i].font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+        }
+    }
+}
+
+- (void)updateTextAppearance {
+    UIColor *textColor;
+    if (_textColor) {
+        textColor = _textColor;
+    } else {
+        textColor = (_style == YUSegmentStyleSlider ? [UIColor lightGrayColor] : [UIColor blackColor]);
+    }
+    UIColor *selectedTextColor;
+    if (_selectedTextColor) {
+        selectedTextColor = _selectedTextColor;
+    } else {
+        selectedTextColor = (_style == YUSegmentStyleSlider ? [UIColor blackColor] : [UIColor whiteColor]);
+    }
+    UIFont *font = _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+    UIFont *selectedFont = _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+    
+    for (int i = 0; i < _numberOfSegments; i++) {
+        _labels[i].textColor = textColor;
+        _labels[i].font = font;
+        _selectedLabels[i].textColor = selectedTextColor;
+        _selectedLabels[i].font = selectedFont;
+    }
 }
 
 - (void)setupSegmentViewsWithImages {
@@ -308,10 +363,10 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)setupSegmentViewWithTitle:(NSString *)title {
-    YULabel *label = [[YULabel alloc] initWithText:title style:YULabelStyleBasic];
+    YULabel *label = [[YULabel alloc] initWithText:title];
     [_containerView addSubview:label];
     [self.labels addObject:label];
-    label = [[YULabel alloc] initWithText:title style:YULabelStyleSelected];
+    label = [[YULabel alloc] initWithText:title];
     [_selectedContainerView addSubview:label];
     [self.selectedLabels addObject:label];
 }
@@ -351,7 +406,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)setupIndicatorView {
-    _indicatorView = [YUIndicatorView new];
+    _indicatorView = [[YUIndicatorView alloc] initWithStyle:(YUIndicatorViewStyle)_style];
     [self insertSubview:_indicatorView atIndex:1];
     _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
 }
@@ -367,10 +422,10 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
             break;
         }
         case YUSegmentStyleRounded: {
-//            if (!self.backgroundColor) {
-//                self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
-//            }
+            self.backgroundColor = [UIColor whiteColor];
             self.layer.cornerRadius = 5.0;
+            _indicatorView.indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
+            _indicatorMargin = 3.0;
             _indicatorView.cornerRadius = 5.0;
             break;
         }
@@ -386,22 +441,6 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 #pragma mark - Views Update
-
-- (void)rebuildUI {
-    switch (_style) {
-        case YUSegmentStyleSlider: {
-            _containerView.backgroundColor = self.backgroundColor ?: [UIColor whiteColor];
-            break;
-        }
-        case YUSegmentStyleRounded: {
-            _containerView.backgroundColor = self.backgroundColor ?: [UIColor colorWithWhite:0.9 alpha:1.0];
-            _containerView.layer.cornerRadius = [self getCornerRadius] ?: 5.0;
-            _indicatorMargin = self.indicatorMargin ?: 2.0;
-            _indicatorView.cornerRadius = [self getCornerRadius] ?: 5.0;
-            break;
-        }
-    }
-}
 
 - (void)updateTitleWithColor:(UIColor *)color {
     if (!_labels) {
@@ -547,7 +586,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == YUSegmentKVOCornerRadiusContext) {
-        _indicatorView.cornerRadius = [self getCornerRadius];
+        _indicatorView.cornerRadius = [change[NSKeyValueChangeNewKey] doubleValue];
     }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -619,17 +658,16 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     }
 }
 
-- (void)setRoundedStyle:(BOOL)roundedStyle {
-    roundedStyle ? [self setStyle:YUSegmentStyleRounded] : [self setStyle:YUSegmentStyleSlider];
+- (void)setSegmentStyle:(NSUInteger)segmentStyle {
+    
 }
 
-- (void)setStyle:(YUSegmentStyle)style {
-    if (_style == style) {
+- (void)setSelectedIndex:(NSUInteger)selectedIndex {
+    if (_selectedIndex == selectedIndex) {
         return;
     }
-    _style = style;
-    [_indicatorView updateIndicatorStyle:(YUIndicatorViewStyle)style];
-    [self buildUI];
+    _selectedIndex = selectedIndex;
+    [_indicatorView setCenterX:self.segmentWidth * (0.5 + selectedIndex)];
 }
 
 - (void)setCornerRadius:(CGFloat)cornerRadius {
@@ -713,6 +751,14 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 #pragma mark - Getters
+
+- (NSArray <NSString *> *)titles {
+    return [_internalTitles copy];
+}
+
+- (NSArray <UIImage *> *)images {
+    return [_internalImages copy];
+}
 
 - (CGFloat)segmentWidth {
     if (!_segmentWidth) {

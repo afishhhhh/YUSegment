@@ -10,16 +10,9 @@
 
 @implementation YULabel
 
-- (instancetype)initWithText:(NSString *)text style:(YULabelStyle)style {
+- (instancetype)initWithText:(NSString *)text {
     self = [super init];
     if (self) {
-        if (style == YULabelStyleSelected) {
-            self.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
-            self.textColor = [UIColor blackColor];
-        } else {
-            self.font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
-            self.textColor = [UIColor lightGrayColor];
-        }
         self.textAlignment = NSTextAlignmentCenter;
         self.text = text;
         self.translatesAutoresizingMaskIntoConstraints = NO;

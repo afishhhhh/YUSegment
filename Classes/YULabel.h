@@ -8,17 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-typedef NS_ENUM(NSUInteger, YULabelStyle) {
-    YULabelStyleCustom,
-    YULabelStyleBasic,
-    YULabelStyleSelected,
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YULabel : UILabel
 
-- (instancetype)initWithText:(NSString *)text style:(YULabelStyle)style;
+- (instancetype)initWithText:(NSString *)text;
 - (instancetype)initWithText:(NSString *)text attributes:(nullable NSDictionary *)attributes;
 
 @end

@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)           CGFloat cornerRadius;
 @property (nonatomic, strong)           UIColor *indicatorColor;
 
-- (void)updateIndicatorStyle:(YUIndicatorViewStyle)style;
+- (instancetype)initWithStyle:(YUIndicatorViewStyle)style;
 - (void)setCenterX:(CGFloat)centerX;
 - (CGFloat)getCenterX;
 

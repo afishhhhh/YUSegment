@@ -19,14 +19,16 @@
 
 #pragma mark - Initialization
 
-- (instancetype)init {
+- (instancetype)initWithStyle:(YUIndicatorViewStyle)style {
     self = [super init];
     if (self) {
-        _style = YUIndicatorViewStyleSlider;
+        _style = style;
         _indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
         _maskView = [UIView new];
         _maskView.backgroundColor = [UIColor blackColor];
-        [self addSubview:self.line];
+        if (style == YUIndicatorViewStyleSlider) {
+            [self addSubview:self.line];
+        }
         self.layer.masksToBounds = YES;
     }
     return self;
@@ -40,21 +42,6 @@
 }
 
 #pragma mark -
-
-- (void)updateIndicatorStyle:(YUIndicatorViewStyle)style {
-    if (_style == style) {
-        return;
-    }
-    _style = style;
-    if (style == YUIndicatorViewStyleSlider) {
-        [self addSubview:self.line];
-    } else {
-        [_line removeFromSuperview];
-        self.line = nil;
-        self.backgroundColor = _indicatorColor;
-    }
-    [self setNeedsLayout];
-}
 
 - (void)setCenterX:(CGFloat)centerX {
     CGPoint center = self.center;

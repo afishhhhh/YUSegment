@@ -24,7 +24,7 @@
 - (instancetype)initWithTitle:(NSString *)title forImage:(UIImage *)image style:(YUImageTextViewStyle)style {
     self = [super init];
     if (self) {
-        _label = [[YULabel alloc] initWithText:title style:YULabelStyleBasic];
+        _label = [[YULabel alloc] initWithText:title];
         _imageView = [[YUImageView alloc] initWithImage:image style:YUImageViewStyleBasic];
         self.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:_label];
