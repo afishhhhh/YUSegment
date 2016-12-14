@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
-    YUIndicatorViewStyleSlider,
-    YUIndicatorViewStyleRounded,
+    YUIndicatorViewStyleLine,
+    YUIndicatorViewStyleBox,
 };
 
 NS_ASSUME_NONNULL_BEGIN

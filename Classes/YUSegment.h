@@ -9,11 +9,12 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
-    // 添加一个 default
+    // The default style for a segment.
+    YUSegmentStyleDefault,
     // The default style for a segment with a line-style indicator.
-    YUSegmentStyleSlider,
-    // A style for s segment with a rounded-style indicator.
-    YUSegmentStyleRounded,
+    YUSegmentStyleLine,
+    // A style for s segment with a box-style indicator.
+    YUSegmentStyleBox,
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) IBInspectable NSUInteger selectedIndex;
 
 /**
- 
+ Return the titles the receiver has. It is the convenient method to return the title for a specific segment.
  */
 @property (nonatomic, copy, readonly) NSArray <NSString *> *titles;
 

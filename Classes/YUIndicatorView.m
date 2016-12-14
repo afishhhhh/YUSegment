@@ -26,7 +26,7 @@
         _indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
         _maskView = [UIView new];
         _maskView.backgroundColor = [UIColor blackColor];
-        if (style == YUIndicatorViewStyleSlider) {
+        if (style == YUIndicatorViewStyleLine) {
             [self addSubview:self.line];
         }
         self.layer.masksToBounds = YES;
@@ -58,10 +58,10 @@
         indicatorColor = [UIColor whiteColor];
     }
     switch (_style) {
-        case YUIndicatorViewStyleSlider:
+        case YUIndicatorViewStyleLine:
             self.line.backgroundColor = indicatorColor;
             break;
-        case YUIndicatorViewStyleRounded: {
+        case YUIndicatorViewStyleBox: {
             self.backgroundColor = indicatorColor;
             break;
         }
@@ -73,7 +73,7 @@
         return;
     }
     _cornerRadius = cornerRadius;
-    if (_style == YUIndicatorViewStyleSlider) {
+    if (_style == YUIndicatorViewStyleLine) {
         self.line.layer.cornerRadius = 2.0;
     } else {
         self.layer.cornerRadius = cornerRadius;

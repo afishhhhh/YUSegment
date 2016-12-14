@@ -65,16 +65,16 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles {
-    return [self initWithTitles:titles style:YUSegmentStyleSlider];
+    return [self initWithTitles:titles style:YUSegmentStyleDefault];
 }
 
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images {
-    return [self initWithImages:images style:YUSegmentStyleSlider];
+    return [self initWithImages:images style:YUSegmentStyleDefault];
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
     NSAssert([titles count] == [images count], @"The count of titles should be equal to the count of images.");
-    return [self initWithTitles:titles forImages:images style:YUSegmentStyleSlider];
+    return [self initWithTitles:titles forImages:images style:YUSegmentStyleDefault];
 }
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style {
@@ -117,8 +117,19 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 - (void)commonInit {
     _needsUpdateAppearance = NO;
     _selectedIndex = 0;
-    [self setupContainerViewSelected:NO];
-    [self setupContainerViewSelected:YES];
+//    if (_style == YUSegmentStyleSlider) {
+//        _textColor = [UIColor lightGrayColor];
+//        _font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+//        _selectedTextColor = [UIColor blackColor];
+//        _selectedFont = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+//    } else {
+//        _textColor = [UIColor blackColor];
+//        _font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+//        _selectedTextColor = [UIColor whiteColor];
+//        _selectedFont = [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium];
+//    }
+    [self setupContainerView];
+    [self setupSelectedContainerView];
     [self setupIndicatorView];
     [self buildUI];
     [self addGesture];
@@ -132,14 +143,17 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     
     CGFloat segmentWidth = self.segmentWidth;
     switch (_style) {
-        case YUSegmentStyleSlider: {
+        case YUSegmentStyleDefault: {
+            break;
+        }
+        case YUSegmentStyleLine: {
             CGFloat indicatorWidth = [self calculateIndicatorWidthPlusConstant];
             CGFloat x = segmentWidth * _selectedIndex + (segmentWidth - indicatorWidth) / 2.0;
             CGRect indicatorFrame = (CGRect){x, 0, indicatorWidth, CGRectGetHeight(self.frame)};
             _indicatorView.frame = indicatorFrame;
             break;
         }
-        case YUSegmentStyleRounded: {
+        case YUSegmentStyleBox: {
             CGRect indicatorFrame = (CGRect){segmentWidth * _selectedIndex, 0, segmentWidth, CGRectGetHeight(self.frame)};
             _indicatorView.frame = CGRectInset(indicatorFrame, _indicatorMargin, _indicatorMargin);
             break;
@@ -179,8 +193,12 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)updateViewWithTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
-    _labels[index].text = title;
-    _selectedLabels[index].text = title;
+    NSMutableAttributedString *string = [_labels[index].attributedText mutableCopy];
+    [string.mutableString setString:title];
+    _labels[index].attributedText = string;
+    string = [_selectedLabels[index].attributedText mutableCopy];
+    [string.mutableString setString:title];
+    _selectedLabels[index].attributedText = string;
 }
 
 - (void)updateViewWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
@@ -204,12 +222,6 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         index = _numberOfSegments - 1;
     }
     return _internalImages[index];
-}
-
-- (NSDictionary *)titleAndImageForSegmentAtIndex:(NSUInteger)index {
-    NSAssert1(index < _numberOfSegments, @"Index should in the range of 0...%lu", _numberOfSegments - 1);
-    NSDictionary *dic = @{@"title" : _internalTitles[index], @"image" : _internalImages[index]};
-    return dic;
 }
 
 #pragma mark - Content Insert
@@ -281,40 +293,73 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 }
 
 - (void)removeItemAtIndex:(NSUInteger)index {
-    NSAssert1(index < _numberOfSegments, @"Parameter index should in the range of 0...%lu", _numberOfSegments - 1);
+    
 }
 
 #pragma mark - Views Setup
 
-- (void)configureLabels {
+- (void)configureLabelsForDefaultStyle {
+    YULabel *label;
+    NSString *title;
+    NSDictionary *attributes;
+    if (_needsUpdateAppearance) {
+        attributes = [self getAttributes1];
+    } else {
+        attributes = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : [UIColor lightGrayColor]};
+    }
+    for (int i = 0; i < _numberOfSegments; i++) {
+        title = _internalTitles[i];
+        label = [[YULabel alloc] initWithAttributedText:[[NSAttributedString alloc] initWithString:title attributes:attributes]];
+        [self.labels addObject:label];
+        [_containerView addSubview:label];
+    }
+    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
+}
+
+- (void)configureLabelsForLineAndBoxStyle {
+    YULabel *label;
+    NSString *title;
     NSDictionary *attributes1, *attributes2;
     if (_needsUpdateAppearance) {
         attributes1 = [self getAttributes1];
         attributes2 = [self getAttributes2];
     } else {
-        if (_style == YUSegmentStyleSlider) {
-            attributes1 = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
-                            NSForegroundColorAttributeName : [UIColor lightGrayColor]};
-            attributes2 = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
-                            NSForegroundColorAttributeName : [UIColor blackColor]};
-        } else {
+        if (_style == YUSegmentStyleBox) {
             attributes1 = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
                             NSForegroundColorAttributeName : [UIColor blackColor]};
             attributes2 = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
                             NSForegroundColorAttributeName : [UIColor whiteColor]};
+        } else {
+            attributes1 = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor lightGrayColor]};
+            attributes2 = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                            NSForegroundColorAttributeName : [UIColor blackColor]};
         }
     }
-    YULabel *label;
-    NSString *title;
     for (int i = 0; i < _numberOfSegments; i++) {
         title = _internalTitles[i];
         label = [[YULabel alloc] initWithAttributedText:[[NSAttributedString alloc] initWithString:title attributes:attributes1]];
         [self.labels addObject:label];
+        [_containerView addSubview:label];
         label = [[YULabel alloc] initWithAttributedText:[[NSAttributedString alloc] initWithString:title attributes:attributes2]];
         [self.selectedLabels addObject:label];
+        [_selectedContainerView addSubview:label];
     }
-    
-    [self setupSegmentViewsWithLabels];
+    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
+    [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
+}
+
+- (void)configureLabels {
+    switch (_style) {
+        case YUSegmentStyleDefault:
+            [self configureLabelsForDefaultStyle];
+            break;
+        case YUSegmentStyleLine:
+        case YUSegmentStyleBox:
+            [self configureLabelsForLineAndBoxStyle];
+            break;
+    }
 }
 
 - (void)configureImages {
@@ -350,15 +395,6 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     [self setupConstraintsWithSegments:array2 toContainerView:_selectedContainerView];
 }
 
-- (void)setupSegmentViewsWithLabels {
-    for (int i = 0; i < _numberOfSegments; i++) {
-        [_containerView addSubview:_labels[i]];
-        [_selectedContainerView addSubview:_selectedLabels[i]];
-    }
-    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
-    [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
-}
-
 - (void)setupSegmentViewsWithImageViews {
     for (int i = 0; i < _numberOfSegments; i++) {
         [_containerView addSubview:_imageViews[i]];
@@ -368,19 +404,35 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
 }
 
-- (void)setupContainerViewSelected:(BOOL)selected {
-    UIView *view = ({
+- (void)setupContainerView {
+    _containerView = ({
         UIView *containerView = [UIView new];
         containerView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:containerView];
         
         containerView;
     });
-    [self setupConstraintsToSelfWithView:view];
-    selected ? (_selectedContainerView = view) : (_containerView = view);
+    [self setupConstraintsToSelfWithView:_containerView];
+}
+
+- (void)setupSelectedContainerView {
+    if (_style == YUSegmentStyleDefault) {
+        return;
+    }
+    _selectedContainerView = ({
+        UIView *containerView = [UIView new];
+        containerView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:containerView];
+        
+        containerView;
+    });
+    [self setupConstraintsToSelfWithView:_selectedContainerView];
 }
 
 - (void)setupIndicatorView {
+    if (_style == YUSegmentStyleDefault) {
+        return;
+    }
     _indicatorView = [[YUIndicatorView alloc] initWithStyle:(YUIndicatorViewStyle)_style];
     [self insertSubview:_indicatorView atIndex:1];
     _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
@@ -388,7 +440,11 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (void)buildUI {
     switch (_style) {
-        case YUSegmentStyleSlider: {
+        case YUSegmentStyleDefault: {
+            self.backgroundColor = [UIColor whiteColor];
+            break;
+        }
+        case YUSegmentStyleLine: {
             if (self.backgroundColor) {
                 [self configureIndicatorWithBackgroundColor:self.backgroundColor];
             } else {
@@ -396,7 +452,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
             }
             break;
         }
-        case YUSegmentStyleRounded: {
+        case YUSegmentStyleBox: {
             self.backgroundColor = [UIColor whiteColor];
             self.layer.cornerRadius = 5.0;
             _indicatorView.indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
@@ -421,8 +477,13 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     if (!_labels) {
         return;
     }
+    NSRange range;
     for (int i = 0; i < _numberOfSegments; i++) {
-        _labels[i].textColor = color;
+        range = NSMakeRange(0, _internalTitles[i].length);
+        NSMutableAttributedString *string = [_labels[i].attributedText mutableCopy];
+        [string removeAttribute:NSForegroundColorAttributeName range:range];
+        [string addAttribute:NSForegroundColorAttributeName value:color range:range];
+        _labels[i].attributedText = string;
     }
 }
 
@@ -430,8 +491,13 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     if (!_selectedLabels) {
         return;
     }
+    NSRange range;
     for (int i = 0; i < _numberOfSegments; i++) {
-        _selectedLabels[i].textColor = color;
+        range = NSMakeRange(0, _internalTitles[i].length);
+        NSMutableAttributedString *string = [_selectedLabels[i].attributedText mutableCopy];
+        [string removeAttribute:NSForegroundColorAttributeName range:range];
+        [string addAttribute:NSForegroundColorAttributeName value:color range:range];
+        _selectedLabels[i].attributedText = string;
     }
 }
 
@@ -439,8 +505,13 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     if (!_labels) {
         return;
     }
+    NSRange range;
     for (int i = 0; i < _numberOfSegments; i++) {
-        _labels[i].font = font;
+        range = NSMakeRange(0, _internalTitles[i].length);
+        NSMutableAttributedString *string = [_labels[i].attributedText mutableCopy];
+        [string removeAttribute:NSFontAttributeName range:range];
+        [string addAttribute:NSFontAttributeName value:font range:range];
+        _labels[i].attributedText = string;
     }
 }
 
@@ -448,13 +519,14 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
     if (!_selectedLabels) {
         return;
     }
+    NSRange range;
     for (int i = 0; i < _numberOfSegments; i++) {
-        _selectedLabels[i].font = font;
+        range = NSMakeRange(0, _internalTitles[i].length);
+        NSMutableAttributedString *string = [_selectedLabels[i].attributedText mutableCopy];
+        [string removeAttribute:NSFontAttributeName range:range];
+        [string addAttribute:NSFontAttributeName value:font range:range];
+        _selectedLabels[i].attributedText = string;
     }
-}
-
-- (CGFloat)getCornerRadius {
-    return self.layer.cornerRadius;
 }
 
 - (void)updateViewHierarchy {
@@ -493,7 +565,7 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 #pragma mark - Event Response
 
 - (void)addGesture {
-    if (_style == YUSegmentStyleRounded) {
+    if (_style == YUSegmentStyleBox) {
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
         [self addGestureRecognizer:pan];
     }
@@ -504,8 +576,8 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 - (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:_containerView];
     NSUInteger fromIndex = self.selectedIndex;
-    self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
-    if (fromIndex != self.selectedIndex) {
+    _selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
+    if (fromIndex != _selectedIndex) {
         [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
     }
 }
@@ -525,8 +597,8 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateCancelled: {
             CGFloat indicatorCenterX = [_indicatorView getCenterX];
-            NSUInteger fromIndex = self.selectedIndex;
-            self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
+            NSUInteger fromIndex = _selectedIndex;
+            _selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
             [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
         }
         default:
@@ -601,24 +673,24 @@ static void *YUSegmentKVOCornerRadiusContext = &YUSegmentKVOCornerRadiusContext;
 
 - (NSDictionary *)getAttributes1 {
     NSDictionary *attributes;
-    if (_style == YUSegmentStyleSlider) {
-        attributes = @{NSFontAttributeName : _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
-                       NSForegroundColorAttributeName : _textColor ?: [UIColor lightGrayColor]};
-    } else {
+    if (_style == YUSegmentStyleBox) {
         attributes = @{NSFontAttributeName : _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
                        NSForegroundColorAttributeName : _textColor ?: [UIColor blackColor]};
+    } else {
+        attributes = @{NSFontAttributeName : _font ?: [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _textColor ?: [UIColor lightGrayColor]};
     }
     return attributes;
 }
 
 - (NSDictionary *)getAttributes2 {
     NSDictionary *attributes;
-    if (_style == YUSegmentStyleSlider) {
-        attributes = @{NSFontAttributeName : _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
-                       NSForegroundColorAttributeName : _selectedTextColor ?: [UIColor blackColor]};
-    } else {
+    if (_style == YUSegmentStyleBox) {
         attributes = @{NSFontAttributeName : _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
                        NSForegroundColorAttributeName : _selectedTextColor ?: [UIColor whiteColor]};
+    } else {
+        attributes = @{NSFontAttributeName : _selectedFont ?: [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
+                       NSForegroundColorAttributeName : _selectedTextColor ?: [UIColor blackColor]};
     }
     return attributes;
 }
