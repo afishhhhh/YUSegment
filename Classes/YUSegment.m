@@ -21,6 +21,7 @@
 @property (nonatomic, strong) UIScrollView                           *scrollView;
 @property (nonatomic, strong) YUIndicatorView                        *indicatorView;
 @property (nonatomic, assign) BOOL                                   needsUpdateAppearance;
+@property (nonatomic, assign) BOOL                                   needsUpdateViewHierarchy;
 
 /// @name Constraints
 
@@ -61,7 +62,7 @@
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [self commonInit];
+        [self setDefaultValueForProperties];
     }
     return self;
 }
@@ -85,6 +86,7 @@
         _internalTitles = [titles mutableCopy];
         _numberOfSegments = [titles count];
         _style = style;
+        [self setDefaultValueForProperties];
         [self commonInit];
         [self configureLabels];
     }
@@ -97,6 +99,7 @@
         _internalImages = [images mutableCopy];
         _numberOfSegments = [images count];
         _style = style;
+        [self setDefaultValueForProperties];
         [self commonInit];
         [self configureImages];
     }
@@ -110,17 +113,21 @@
         _internalImages = [images mutableCopy];
         _numberOfSegments = [titles count];
         _style = style;
+        [self setDefaultValueForProperties];
         [self commonInit];
         [self configureMixtureViews];
     }
     return self;
 }
 
-- (void)commonInit {
-    // Set default values
+- (void)setDefaultValueForProperties {
+    _needsUpdateViewHierarchy = NO;
     _needsUpdateAppearance = NO;
     _selectedIndex = 0;
-    self.backgroundColor = [UIColor whiteColor];
+//    self.backgroundColor = [UIColor whiteColor];
+}
+
+- (void)commonInit {
     // Build UI
     [self setupContainerView];
     [self setupSelectedContainerView];
@@ -202,6 +209,42 @@
         if (_style == YUSegmentStyleDefault) {
             _imageViews[index].image = image;
         }
+    }
+}
+
+- (void)setTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
+    if (_numberOfSegments) {
+        return;
+    }
+    [self setTitles:titles forImages:images style:YUSegmentStyleDefault];
+}
+
+- (void)setTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style {
+    if (!titles && !images) {
+        return;
+    }
+    if (_numberOfSegments) {
+        return;
+    }
+    _style = style;
+    [self commonInit];
+    if (titles) {
+        self.internalTitles = [titles mutableCopy];
+        _numberOfSegments = [titles count];
+        if (images) {
+            self.internalImages = [images mutableCopy];
+            [self configureMixtureViews];
+        } else {
+            [self configureLabels];
+        }
+    }
+    else if (images) {
+        self.internalImages = [images mutableCopy];
+        _numberOfSegments = [images count];
+        [self configureImages];
+    }
+    if (_needsUpdateViewHierarchy) {
+        [self updateViewHierarchy];
     }
 }
 
@@ -539,16 +582,19 @@
     // Add container to scroll view
     [_containerView removeFromSuperview];
     [self.scrollView addSubview:_containerView];
-    // Add indicator to scroll view
-    [_indicatorView removeFromSuperview];
-    [_scrollView addSubview:_indicatorView];
-    // Add selected container to scroll view
-    [_selectedContainerView removeFromSuperview];
-    [_scrollView addSubview:_selectedContainerView];
-    
-    // Setup constraints
     [self setupConstraintsToScrollViewWithView:_containerView];
-    [self setupConstraintsToScrollViewWithView:_selectedContainerView];
+    
+    if (_style != YUSegmentStyleDefault) {
+        // Add indicator to scroll view
+        [_indicatorView removeFromSuperview];
+        [_scrollView addSubview:_indicatorView];
+        // Add selected container to scroll view
+        [_selectedContainerView removeFromSuperview];
+        [_scrollView addSubview:_selectedContainerView];
+        // Setup constraints
+        [self setupConstraintsToScrollViewWithView:_selectedContainerView];
+    }
+    
     [self updateWidthConstraintsForSegments];
 }
 
@@ -639,7 +685,7 @@
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex animated:(BOOL)animated {
     if (animated) {
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0.25 animations:^{
             [_indicatorView setCenterX:self.segmentWidth * (0.5 + toIndex)];
         } completion:^(BOOL finished) {
             if (finished) {
@@ -690,24 +736,6 @@
 
 #pragma mark - Setters
 
-- (void)setTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images {
-    if (titles) {
-        self.internalTitles = [titles mutableCopy];
-        _numberOfSegments = [titles count];
-        if (images) {
-            self.internalImages = [images mutableCopy];
-            [self configureMixtureViews];
-        } else {
-            [self configureLabels];
-        }
-    }
-    else if (images) {
-        self.internalImages = [images mutableCopy];
-        _numberOfSegments = [images count];
-        [self configureImages];
-    }
-}
-
 - (void)setSegmentStyle:(NSUInteger)segmentStyle {
     
 }
@@ -738,7 +766,11 @@
         return;
     }
     _segmentWidth = segmentWidth;
-    [self updateViewHierarchy];
+    if (_numberOfSegments) {
+        [self updateViewHierarchy];
+    } else {
+        _needsUpdateViewHierarchy = YES;
+    }
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
@@ -756,6 +788,9 @@
 }
 
 - (void)setIndicatorColor:(UIColor *)indicatorColor {
+    if (!_indicatorView) {
+        return;
+    }
     NSAssert(indicatorColor, @"The color should not be nil.");
     if (indicatorColor != _indicatorColor && ![indicatorColor isEqual:_indicatorColor]) {
         _indicatorColor = indicatorColor;

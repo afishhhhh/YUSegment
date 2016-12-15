@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A boolean value indicating a segment style. The default is false. This property will work only in interface builder.
  */
-@property (nonatomic, assign) IBInspectable NSUInteger segmentStyle;
+//@property (nonatomic, assign) IBInspectable NSUInteger segmentStyle;
 #else
 
 /**
@@ -174,6 +174,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param images <#images description#>
  */
 - (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images;
+
+- (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
 /**
  Set the content of a segment to a given title.
@@ -298,7 +300,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<NSString *> *)titles __attribute__((deprecated("Use -titleForSegmentAtIndex: instead.")));
 - (NSArray<UIImage *> *)images __attribute__((deprecated("Use -imageForSegmentAtIndex: instead.")));
-- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("...")));
+- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("This method is not supported.")));
+- (instancetype)init __attribute__((deprecated("This method is not supported.")));
+- (instancetype)new __attribute__((deprecated("This method is not supported.")));
 
 @end
 
