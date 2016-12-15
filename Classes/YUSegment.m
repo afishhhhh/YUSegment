@@ -123,10 +123,16 @@
     self.backgroundColor = [UIColor whiteColor];
     // Build UI
     [self setupContainerView];
-    [self setupIndicatorView];
     [self setupSelectedContainerView];
+    [self setupIndicatorView];
     [self buildUI];
-    [self addGesture];
+    // Add gestures
+    if (_style == YUSegmentStyleBox) {
+        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+        [self addGestureRecognizer:pan];
+    }
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self addGestureRecognizer:tap];
 }
 
 - (void)layoutSubviews {
@@ -185,17 +191,18 @@
 }
 
 - (void)updateViewWithTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
-    NSMutableAttributedString *string = [_labels[index].attributedText mutableCopy];
-    [string.mutableString setString:title];
-    _labels[index].attributedText = string;
-    string = [_selectedLabels[index].attributedText mutableCopy];
-    [string.mutableString setString:title];
-    _selectedLabels[index].attributedText = string;
+    _selectedLabels[index].text = title;
+    _labels[index].text = title;
 }
 
 - (void)updateViewWithImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    _imageViews[index].image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     _selectedImageViews[index].image = image;
+    _imageViews[index].image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    if (index == _selectedIndex) {
+        if (_style == YUSegmentStyleDefault) {
+            _imageViews[index].image = image;
+        }
+    }
 }
 
 #pragma mark - Content Getting
@@ -440,7 +447,7 @@
         return;
     }
     _indicatorView = [[YUIndicatorView alloc] initWithStyle:(YUIndicatorViewStyle)_style];
-    [self addSubview:_indicatorView];
+    [self insertSubview:_indicatorView atIndex:1];
     _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
 }
 
@@ -453,6 +460,7 @@
             break;
         }
         case YUSegmentStyleLine: {
+            _indicatorView.backgroundColor = self.backgroundColor;
             break;
         }
         case YUSegmentStyleBox: {
@@ -562,15 +570,6 @@
 
 #pragma mark - Event Response
 
-- (void)addGesture {
-    if (_style == YUSegmentStyleBox) {
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
-        [self addGestureRecognizer:pan];
-    }
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:tap];
-}
-
 - (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:_containerView];
     NSUInteger fromIndex = self.selectedIndex;
@@ -578,7 +577,7 @@
     if (fromIndex != _selectedIndex) {
         switch (_style) {
             case YUSegmentStyleDefault:
-                [self makeLabelSelectedAtIndex:_selectedIndex deselectedAtIndex:fromIndex];
+                [self makeSegmentSelectedAtIndex:_selectedIndex deselectedAtIndex:fromIndex];
                 break;
             case YUSegmentStyleLine:
             case YUSegmentStyleBox:
@@ -617,17 +616,25 @@
     return index < _numberOfSegments ? index : _numberOfSegments - 1;
 }
 
-- (void)makeLabelSelectedAtIndex:(NSUInteger)newIndex deselectedAtIndex:(NSUInteger)oldIndex {
-    NSMutableAttributedString *string = [_labels[oldIndex].attributedText mutableCopy];
-    [string setAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium],
-                            NSForegroundColorAttributeName : [UIColor lightGrayColor]}
-                    range:NSMakeRange(0, _internalTitles[oldIndex].length)];
-    _labels[oldIndex].attributedText = [string copy];
-    string = [_labels[newIndex].attributedText mutableCopy];
-    [string setAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium],
-                            NSForegroundColorAttributeName : [UIColor blackColor]}
-                    range:NSMakeRange(0, _internalTitles[newIndex].length)];
-    _labels[newIndex].attributedText = [string copy];
+- (void)makeSegmentSelectedAtIndex:(NSUInteger)newIndex deselectedAtIndex:(NSUInteger)oldIndex {
+    if (_labels) {
+        if (_imageViews) {
+            _labels[oldIndex].textColor = self.textColor;
+            _labels[oldIndex].font = self.font;
+            _labels[newIndex].textColor = self.selectedTextColor;
+            _labels[newIndex].font = self.selectedFont;
+            _imageViews[oldIndex].image = [_internalImages[oldIndex] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            _imageViews[newIndex].image = [_internalImages[newIndex] imageWithRenderingMode:UIImageRenderingModeAutomatic];
+        } else {
+            _labels[oldIndex].textColor = self.textColor;
+            _labels[oldIndex].font = self.font;
+            _labels[newIndex].textColor = self.selectedTextColor;
+            _labels[newIndex].font = self.selectedFont;
+        }
+    } else {
+        _imageViews[oldIndex].image = [_internalImages[oldIndex] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _imageViews[newIndex].image = [_internalImages[newIndex] imageWithRenderingMode:UIImageRenderingModeAutomatic];
+    }
 }
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex animated:(BOOL)animated {
@@ -732,6 +739,20 @@
     }
     _segmentWidth = segmentWidth;
     [self updateViewHierarchy];
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    NSAssert(backgroundColor, @"The color should not be nil.");
+    [super setBackgroundColor:backgroundColor];
+    if (_indicatorView) {
+        if (_style == YUSegmentStyleLine) {
+            if ([backgroundColor isEqual:[UIColor clearColor]]) {
+                _indicatorView.backgroundColor = [UIColor whiteColor];
+            } else {
+                _indicatorView.backgroundColor = backgroundColor;
+            }
+        }
+    }
 }
 
 - (void)setIndicatorColor:(UIColor *)indicatorColor {

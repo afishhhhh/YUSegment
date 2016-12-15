@@ -24,6 +24,8 @@
     if (self) {
         _label = label;
         _imageView = imageView;
+        _label.translatesAutoresizingMaskIntoConstraints = YES;
+        _imageView.translatesAutoresizingMaskIntoConstraints = YES;
         self.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:_label];
         [self addSubview:_imageView];
@@ -36,8 +38,8 @@
     NSLog(@"ImageTextView layoutSubviews");
     CGFloat width = CGRectGetWidth(self.frame);
     CGFloat height = CGRectGetHeight(self.frame);
-    _imageView.frame = (CGRect){0, 0, width, (height - 8) * 0.7};
-    _label.frame = (CGRect){0, CGRectGetMaxY(_imageView.frame) + 8, width, (height - 8) * 0.3};
+    _imageView.frame = (CGRect){0, 0, width, (height - 8) * 0.6};
+    _label.frame = (CGRect){0, CGRectGetMaxY(_imageView.frame) + 8, width, (height - 8) * 0.4};
 }
 
 #pragma mark -

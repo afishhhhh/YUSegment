@@ -100,8 +100,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong) IBInspectable UIColor *indicatorColor;
 
-//@property (nonatomic, assign) IBInspectable BOOL    indicatorRoundedOff;
-
 ///-------------------------------
 /// @name Managing Text Appearance
 ///-------------------------------
