@@ -25,7 +25,7 @@
         _style = style;
         _indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
         _maskView = [UIView new];
-        _maskView.backgroundColor = [UIColor blackColor];
+        _maskView.backgroundColor = [UIColor whiteColor];
         if (style == YUIndicatorViewStyleLine) {
             [self addSubview:self.line];
         }

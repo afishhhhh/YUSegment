@@ -9,12 +9,12 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
-    // The default style for a segment.
-    YUSegmentStyleDefault,
     // The default style for a segment with a line-style indicator.
     YUSegmentStyleLine,
     // A style for s segment with a box-style indicator.
     YUSegmentStyleBox,
+    // The default style for a segment.
+    YUSegmentStyleDefault,
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -74,12 +74,12 @@ NS_ASSUME_NONNULL_BEGIN
  The color of the segment's border.
  */
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;
+#endif
 
 /**
  The radius to use when drawing rounded corners for the layer’s background.
  */
 @property (nonatomic, assign) IBInspectable CGFloat cornerRadius;
-#endif
 
 /**
  The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
@@ -99,6 +99,8 @@ NS_ASSUME_NONNULL_BEGIN
  The color of the indicator.
  */
 @property (nonatomic, strong) IBInspectable UIColor *indicatorColor;
+
+//@property (nonatomic, assign) IBInspectable BOOL    indicatorRoundedOff;
 
 ///-------------------------------
 /// @name Managing Text Appearance
@@ -123,6 +125,10 @@ NS_ASSUME_NONNULL_BEGIN
  The font of the text when the segment is selected. The default is the same as `font`.
  */
 @property (nonatomic, strong) UIFont *selectedFont;
+
+@property (nonatomic, copy) NSDictionary *titleAttributes;
+
+@property (nonatomic, copy) NSDictionary *selectedTitleAttributes;
 
 ///---------------------
 /// @name Initialization
@@ -294,6 +300,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<NSString *> *)titles __attribute__((deprecated("Use -titleForSegmentAtIndex: instead.")));
 - (NSArray<UIImage *> *)images __attribute__((deprecated("Use -imageForSegmentAtIndex: instead.")));
+- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("...")));
 
 @end
 

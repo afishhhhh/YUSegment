@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YULabel : UILabel
 
+- (instancetype)initWithText:(NSString *)text;
+
 - (instancetype)initWithAttributedText:(NSAttributedString *)text;
 
 @end
