@@ -33,13 +33,55 @@ typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
     YUSegmentStyleLine,
     // A style for s segment with a box-style indicator.
     YUSegmentStyleBox,
-    // The default style for a segment.
-    YUSegmentStyleDefault,
+};
+
+typedef NS_ENUM(NSUInteger, YUSegmentedControlState) {
+    // The normal, or default state of the segmented control
+    YUSegmentedControlStateNormal,
+    // Selected state of the segmented control
+    YUSegmentedControlStateSelected,
 };
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YUSegment : UIControl
+
+#if TARGET_INTERFACE_BUILDER
+
+///------------------------
+/// @name Managing Segments
+///------------------------
+
+/**
+ The titles the receiver has. Set this property in attributes inspector.
+ */
+@property (nonatomic, copy) IBInspectable NSString *segmentTitles;
+
+/**
+ The images(names) the receiver has. Set this property in attributes inspector.
+ */
+@property (nonatomic, copy) IBInspectable NSString *segmentImages;
+
+///----------------------------------
+/// @name Managing Segment Appearance
+///----------------------------------
+
+/**
+ The width of the segmented control's border.
+ */
+@property (nonatomic, assign) IBInspectable CGFloat borderWidth;
+
+/**
+ The color of the segmented control's border.
+ */
+@property (nonatomic, strong) IBInspectable UIColor *borderColor;
+
+/**
+ The boolean value whether to set the style to `YUSegmentStyleBox`.
+ */
+@property (nonatomic, assign) IBInspectable BOOL boxStyle;
+
+#endif
 
 ///------------------------
 /// @name Managing Segments
@@ -73,22 +115,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The segmented control style. See `YUSegmentStyle` for the possible values. 
- The default is `YUSegmentStyleDefault`.
+ The default is `YUSegmentStyleLine`.
  */
 @property (nonatomic, assign, readonly) YUSegmentStyle style;
-
-#if TARGET_INTERFACE_BUILDER
-
-/**
- The width of the segmented control's border.
- */
-@property (nonatomic, assign) IBInspectable CGFloat borderWidth;
-
-/**
- The color of the segmented control's border.
- */
-@property (nonatomic, strong) IBInspectable UIColor *borderColor;
-#endif
 
 /**
  The radius to use when drawing rounded corners for the layer’s background.
@@ -139,17 +168,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong) UIFont *selectedFont;
 
-@property (nonatomic, copy) NSDictionary *titleAttributes;
-
-@property (nonatomic, copy) NSDictionary *selectedTitleAttributes;
-
 ///---------------------
 /// @name Initialization
 ///---------------------
 
 /**
  Initializes and returns a segmented control with segments having the given titles. 
- The style is `YUSegmentStyleDefault`.
+ The style is `YUSegmentStyleLine`.
 
  @param titles An array of `NSString` objects. The value must not be nil or empty array.
  @return The newly-created instance of the `YUSegment`.
@@ -158,7 +183,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Initializes and returns s segmented control with segments having the given images.
- The style is `YUSegmentStyleDefault`.
+ The style is `YUSegmentStyleLine`.
 
  @param images An array of `UIImage` objects. The value must not be nil or empty array.
  @return The newly-created instance of the `YUSegment`.
@@ -167,7 +192,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Initializes and returns s segmented control with segments having the given titles and images.
- The style is `YUSegmentStyleDefault`.
+ The style is `YUSegmentStyleLine`.
 
  @param titles An array of `NSString` objects. This value must not be nil or empty array.
  @param images An array of `UIImage` objects. This value must not be nil or empty array.
@@ -206,23 +231,6 @@ NS_ASSUME_NONNULL_BEGIN
 ///---------------------------------------
 /// @name Managing Segment Content Setting
 ///---------------------------------------
-
-/**
- Set the content of segmented control to the given titles and images.
-
- @param titles An array of `NSString` objects.
- @param images An array of `UIImage` objects.
- */
-- (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images;
-
-/**
- Set the content of segmented control to the given titles, images and style.
-
- @param titles An array of `NSString` objects.
- @param images An array of `UIImage` objects.
- @param style The segmented control style. See `YUSegmentStyle` for the possible values.
- */
-- (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
 /**
  Set the content of a segment to a given title.
@@ -341,12 +349,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeItemAtIndex:(NSUInteger)index;
 
+///-----------------------------------
+/// @name Managing Segments Appearance
+///-----------------------------------
+
+/**
+ Sets the text attributes of the title for a given control state.
+
+ @param attributes The text attributes of the title.
+ @param state A control state.
+ */
+- (void)setTitleTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state;
+
+- (NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
+
 @end
 
 @interface YUSegment (Deprecated)
 
-- (NSArray<NSString *> *)titles __attribute__((deprecated("Use -titleForSegmentAtIndex: instead.")));
-- (NSArray<UIImage *> *)images __attribute__((deprecated("Use -imageForSegmentAtIndex: instead.")));
 - (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("This method is not supported.")));
 - (instancetype)init __attribute__((deprecated("This method is not supported.")));
 - (instancetype)new __attribute__((deprecated("This method is not supported.")));
