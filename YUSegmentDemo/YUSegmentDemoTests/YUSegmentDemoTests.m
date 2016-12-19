@@ -5,6 +5,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <YUSegment/YUSegment.h>
 
 @interface YUSegmentDemoTests : XCTestCase
 

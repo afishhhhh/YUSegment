@@ -18,11 +18,9 @@
 		0908B48D1E02F1410048A150 /* ExampleOneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4871E02F1410048A150 /* ExampleOneViewController.m */; };
 		0908B48E1E02F1410048A150 /* ExampleThreeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4891E02F1410048A150 /* ExampleThreeViewController.m */; };
 		0908B48F1E02F1410048A150 /* ExampleTwoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */; };
-		0908B49B1E02F1830048A150 /* YUImageTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4921E02F1830048A150 /* YUImageTextView.m */; };
-		0908B49C1E02F1830048A150 /* YUImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4941E02F1830048A150 /* YUImageView.m */; };
-		0908B49D1E02F1830048A150 /* YUIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4961E02F1830048A150 /* YUIndicatorView.m */; };
-		0908B49E1E02F1830048A150 /* YULabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4981E02F1830048A150 /* YULabel.m */; };
-		0908B49F1E02F1830048A150 /* YUSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B49A1E02F1830048A150 /* YUSegment.m */; };
+		2FD243D7BEC06C636D668E61 /* libPods-YUSegmentDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4055B548F1B443D8EB0834DF /* libPods-YUSegmentDemoTests.a */; };
+		3D1CBE85EAC7BF0135B4C0A0 /* libPods-YUSegmentDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E804FED320FE775459EAB0F /* libPods-YUSegmentDemo.a */; };
+		7A0B4B5FE45F114AE4F9DE0D /* libPods-YUSegmentDemoUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A9A19CC5B9F0C6D1BD3F98 /* libPods-YUSegmentDemoUITests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,16 +63,15 @@
 		0908B4891E02F1410048A150 /* ExampleThreeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleThreeViewController.m; sourceTree = "<group>"; };
 		0908B48A1E02F1410048A150 /* ExampleTwoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleTwoViewController.h; sourceTree = "<group>"; };
 		0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleTwoViewController.m; sourceTree = "<group>"; };
-		0908B4911E02F1830048A150 /* YUImageTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YUImageTextView.h; sourceTree = "<group>"; };
-		0908B4921E02F1830048A150 /* YUImageTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YUImageTextView.m; sourceTree = "<group>"; };
-		0908B4931E02F1830048A150 /* YUImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YUImageView.h; sourceTree = "<group>"; };
-		0908B4941E02F1830048A150 /* YUImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YUImageView.m; sourceTree = "<group>"; };
-		0908B4951E02F1830048A150 /* YUIndicatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YUIndicatorView.h; sourceTree = "<group>"; };
-		0908B4961E02F1830048A150 /* YUIndicatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YUIndicatorView.m; sourceTree = "<group>"; };
-		0908B4971E02F1830048A150 /* YULabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YULabel.h; sourceTree = "<group>"; };
-		0908B4981E02F1830048A150 /* YULabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YULabel.m; sourceTree = "<group>"; };
-		0908B4991E02F1830048A150 /* YUSegment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YUSegment.h; sourceTree = "<group>"; };
-		0908B49A1E02F1830048A150 /* YUSegment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YUSegment.m; sourceTree = "<group>"; };
+		165ED66657466967F2FAF6BB /* Pods-YUSegmentDemoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemoTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemoTests/Pods-YUSegmentDemoTests.release.xcconfig"; sourceTree = "<group>"; };
+		18A9A19CC5B9F0C6D1BD3F98 /* libPods-YUSegmentDemoUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YUSegmentDemoUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4055B548F1B443D8EB0834DF /* libPods-YUSegmentDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YUSegmentDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E6814F49EFCE6811A909282 /* Pods-YUSegmentDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemo/Pods-YUSegmentDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		91470536BB9791E9D66E0629 /* Pods-YUSegmentDemoUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemoUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemoUITests/Pods-YUSegmentDemoUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		9E804FED320FE775459EAB0F /* libPods-YUSegmentDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YUSegmentDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA6051A594B7BE04C1F8C900 /* Pods-YUSegmentDemoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemoTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemoTests/Pods-YUSegmentDemoTests.debug.xcconfig"; sourceTree = "<group>"; };
+		CAD44985D30FBB6247FF34DA /* Pods-YUSegmentDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemo/Pods-YUSegmentDemo.release.xcconfig"; sourceTree = "<group>"; };
+		E97406EAC07400D84AEC15C1 /* Pods-YUSegmentDemoUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemoUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemoUITests/Pods-YUSegmentDemoUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D1CBE85EAC7BF0135B4C0A0 /* libPods-YUSegmentDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FD243D7BEC06C636D668E61 /* libPods-YUSegmentDemoTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A0B4B5FE45F114AE4F9DE0D /* libPods-YUSegmentDemoUITests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +109,8 @@
 				0908B46A1E02F0A90048A150 /* YUSegmentDemoTests */,
 				0908B4751E02F0A90048A150 /* YUSegmentDemoUITests */,
 				0908B44F1E02F0A90048A150 /* Products */,
+				816CA59963773C31D0653402 /* Pods */,
+				2C30E77129C159E2C10FC207 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,17 +127,16 @@
 		0908B4501E02F0A90048A150 /* YUSegmentDemo */ = {
 			isa = PBXGroup;
 			children = (
-				0908B4901E02F1830048A150 /* SegmentedControls */,
 				0908B4541E02F0A90048A150 /* AppDelegate.h */,
 				0908B4551E02F0A90048A150 /* AppDelegate.m */,
-				0908B4841E02F1410048A150 /* ExampleFourViewController.h */,
-				0908B4851E02F1410048A150 /* ExampleFourViewController.m */,
 				0908B4861E02F1410048A150 /* ExampleOneViewController.h */,
 				0908B4871E02F1410048A150 /* ExampleOneViewController.m */,
-				0908B4881E02F1410048A150 /* ExampleThreeViewController.h */,
-				0908B4891E02F1410048A150 /* ExampleThreeViewController.m */,
 				0908B48A1E02F1410048A150 /* ExampleTwoViewController.h */,
 				0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */,
+				0908B4881E02F1410048A150 /* ExampleThreeViewController.h */,
+				0908B4891E02F1410048A150 /* ExampleThreeViewController.m */,
+				0908B4841E02F1410048A150 /* ExampleFourViewController.h */,
+				0908B4851E02F1410048A150 /* ExampleFourViewController.m */,
 				0908B45A1E02F0A90048A150 /* Main.storyboard */,
 				0908B45D1E02F0A90048A150 /* Assets.xcassets */,
 				0908B45F1E02F0A90048A150 /* LaunchScreen.storyboard */,
@@ -171,21 +172,27 @@
 			path = YUSegmentDemoUITests;
 			sourceTree = "<group>";
 		};
-		0908B4901E02F1830048A150 /* SegmentedControls */ = {
+		2C30E77129C159E2C10FC207 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0908B4911E02F1830048A150 /* YUImageTextView.h */,
-				0908B4921E02F1830048A150 /* YUImageTextView.m */,
-				0908B4931E02F1830048A150 /* YUImageView.h */,
-				0908B4941E02F1830048A150 /* YUImageView.m */,
-				0908B4951E02F1830048A150 /* YUIndicatorView.h */,
-				0908B4961E02F1830048A150 /* YUIndicatorView.m */,
-				0908B4971E02F1830048A150 /* YULabel.h */,
-				0908B4981E02F1830048A150 /* YULabel.m */,
-				0908B4991E02F1830048A150 /* YUSegment.h */,
-				0908B49A1E02F1830048A150 /* YUSegment.m */,
+				9E804FED320FE775459EAB0F /* libPods-YUSegmentDemo.a */,
+				4055B548F1B443D8EB0834DF /* libPods-YUSegmentDemoTests.a */,
+				18A9A19CC5B9F0C6D1BD3F98 /* libPods-YUSegmentDemoUITests.a */,
 			);
-			path = SegmentedControls;
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		816CA59963773C31D0653402 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8E6814F49EFCE6811A909282 /* Pods-YUSegmentDemo.debug.xcconfig */,
+				CAD44985D30FBB6247FF34DA /* Pods-YUSegmentDemo.release.xcconfig */,
+				CA6051A594B7BE04C1F8C900 /* Pods-YUSegmentDemoTests.debug.xcconfig */,
+				165ED66657466967F2FAF6BB /* Pods-YUSegmentDemoTests.release.xcconfig */,
+				91470536BB9791E9D66E0629 /* Pods-YUSegmentDemoUITests.debug.xcconfig */,
+				E97406EAC07400D84AEC15C1 /* Pods-YUSegmentDemoUITests.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,9 +202,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0908B47B1E02F0A90048A150 /* Build configuration list for PBXNativeTarget "YUSegmentDemo" */;
 			buildPhases = (
+				F13B5F1FF0B292AE75FB7E97 /* [CP] Check Pods Manifest.lock */,
 				0908B44A1E02F0A80048A150 /* Sources */,
 				0908B44B1E02F0A80048A150 /* Frameworks */,
 				0908B44C1E02F0A80048A150 /* Resources */,
+				6288FA715AC99682067019BC /* [CP] Embed Pods Frameworks */,
+				5C7DD23206EC25948F3A1C60 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -212,9 +222,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0908B47E1E02F0A90048A150 /* Build configuration list for PBXNativeTarget "YUSegmentDemoTests" */;
 			buildPhases = (
+				B6B92E5789B4923FC491BD48 /* [CP] Check Pods Manifest.lock */,
 				0908B4631E02F0A90048A150 /* Sources */,
 				0908B4641E02F0A90048A150 /* Frameworks */,
 				0908B4651E02F0A90048A150 /* Resources */,
+				0A7A5C96399C7924FAC45D12 /* [CP] Embed Pods Frameworks */,
+				08C002CFF6DA139800803D9E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -230,9 +243,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0908B4811E02F0A90048A150 /* Build configuration list for PBXNativeTarget "YUSegmentDemoUITests" */;
 			buildPhases = (
+				733E00AF08E5F694219297E2 /* [CP] Check Pods Manifest.lock */,
 				0908B46E1E02F0A90048A150 /* Sources */,
 				0908B46F1E02F0A90048A150 /* Frameworks */,
 				0908B4701E02F0A90048A150 /* Resources */,
+				FDC2B4EADEF7BF2C1A36FAEC /* [CP] Embed Pods Frameworks */,
+				02D09720F6B11CA5BA42FF84 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -316,6 +332,144 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		02D09720F6B11CA5BA42FF84 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemoUITests/Pods-YUSegmentDemoUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		08C002CFF6DA139800803D9E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemoTests/Pods-YUSegmentDemoTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		0A7A5C96399C7924FAC45D12 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemoTests/Pods-YUSegmentDemoTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5C7DD23206EC25948F3A1C60 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemo/Pods-YUSegmentDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6288FA715AC99682067019BC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemo/Pods-YUSegmentDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		733E00AF08E5F694219297E2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B6B92E5789B4923FC491BD48 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		F13B5F1FF0B292AE75FB7E97 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		FDC2B4EADEF7BF2C1A36FAEC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-YUSegmentDemoUITests/Pods-YUSegmentDemoUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0908B44A1E02F0A80048A150 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -324,14 +478,9 @@
 				0908B48E1E02F1410048A150 /* ExampleThreeViewController.m in Sources */,
 				0908B48C1E02F1410048A150 /* ExampleFourViewController.m in Sources */,
 				0908B48F1E02F1410048A150 /* ExampleTwoViewController.m in Sources */,
-				0908B49F1E02F1830048A150 /* YUSegment.m in Sources */,
 				0908B4561E02F0A90048A150 /* AppDelegate.m in Sources */,
-				0908B49C1E02F1830048A150 /* YUImageView.m in Sources */,
 				0908B48D1E02F1410048A150 /* ExampleOneViewController.m in Sources */,
 				0908B4531E02F0A90048A150 /* main.m in Sources */,
-				0908B49D1E02F1830048A150 /* YUIndicatorView.m in Sources */,
-				0908B49E1E02F1830048A150 /* YULabel.m in Sources */,
-				0908B49B1E02F1830048A150 /* YUImageTextView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +553,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -426,7 +576,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -452,6 +602,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -468,7 +619,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -478,6 +629,7 @@
 		};
 		0908B47C1E02F0A90048A150 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8E6814F49EFCE6811A909282 /* Pods-YUSegmentDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
@@ -489,6 +641,7 @@
 		};
 		0908B47D1E02F0A90048A150 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CAD44985D30FBB6247FF34DA /* Pods-YUSegmentDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
@@ -500,6 +653,7 @@
 		};
 		0908B47F1E02F0A90048A150 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA6051A594B7BE04C1F8C900 /* Pods-YUSegmentDemoTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = YUSegmentDemoTests/Info.plist;
@@ -512,6 +666,7 @@
 		};
 		0908B4801E02F0A90048A150 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 165ED66657466967F2FAF6BB /* Pods-YUSegmentDemoTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = YUSegmentDemoTests/Info.plist;
@@ -524,6 +679,7 @@
 		};
 		0908B4821E02F0A90048A150 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91470536BB9791E9D66E0629 /* Pods-YUSegmentDemoUITests.debug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = YUSegmentDemoUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -535,6 +691,7 @@
 		};
 		0908B4831E02F0A90048A150 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97406EAC07400D84AEC15C1 /* Pods-YUSegmentDemoUITests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = YUSegmentDemoUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
