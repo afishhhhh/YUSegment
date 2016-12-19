@@ -12,7 +12,7 @@ A customizable segmented control for iOS.
 ## Features
 
 - Supports both (Attributed)text and image
-- Supports three style
+- Has three styles to choose
 - Supports horizontal scrolling
 - YUSegment works on iOS 8.0+ and is compatible with ARC projects
 
