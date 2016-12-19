@@ -4,6 +4,7 @@
 [![Pod License](https://img.shields.io/cocoapods/l/YUSegment.svg)]()
 
 A customizable segmented control for iOS.
+
 ![YUSegment-demo](https://github.com/afishhhhh/YUSegment/Images/demo.gif)
 
 ## Features
@@ -27,22 +28,22 @@ A customizable segmented control for iOS.
 
 1. In the Object Library, select the "UIView" object and drag it into the view.
 2. Change the position and size of the view.
-![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad2.png)
+  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad2.png)
 3. In the Identify Inspector, change the class to "YUSegment". Then connect outlet.
-![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad1.png)
-```objective-c
-@property (weak, nonatomic) IBOutlet YUSegment *segment;
-```
+  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad1.png)
+  ```objective-c
+  @property (weak, nonatomic) IBOutlet YUSegment *segment;
+  ```
 4. Add the following code to where you need to set content. For example, in the `viewDidLoad:` method.
-```objective-c
-- (void)viewDidLoad {
-  [super viewDidLoad];
-  NSArray *titles = @[@"Left", @"Medium", @"Right"];
-  [segment setTitles:titles forImages:nil];
-}
-```
+  ```objective-c
+  - (void)viewDidLoad {
+    [super viewDidLoad];
+    NSArray *titles = @[@"Left", @"Medium", @"Right"];
+    [segment setTitles:titles forImages:nil];
+  }
+  ```
 5. You could modify some properties in Attributes Inspector.
-![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyoard3.png)
+  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyoard3.png)
 
 ### Creating a YUSegment Programmatically
 
