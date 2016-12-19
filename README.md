@@ -28,8 +28,10 @@ A customizable segmented control for iOS.
 
 1. In the Object Library, select the "UIView" object and drag it into the view.
 2. Change the position and size of the view.
+
   ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad2.png)
 3. In the Identify Inspector, change the class to "YUSegment". Then connect outlet.
+
   ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad1.png)
   ```objective-c
   @property (weak, nonatomic) IBOutlet YUSegment *segment;
@@ -43,6 +45,7 @@ A customizable segmented control for iOS.
   }
   ```
 5. You could modify some properties in Attributes Inspector.
+
   ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyoard3.png)
 
 ### Creating a YUSegment Programmatically
