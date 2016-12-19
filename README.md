@@ -37,6 +37,7 @@ A customizable segmented control for iOS.
   @property (weak, nonatomic) IBOutlet YUSegment *segment;
   ```
 4. Add the following code to where you need to set content. For example, in the `viewDidLoad:` method.
+
   ```objective-c
   - (void)viewDidLoad {
     [super viewDidLoad];
