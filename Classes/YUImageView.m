@@ -13,7 +13,7 @@
     if (self) {
         self.contentMode = UIViewContentModeScaleAspectFit;
         self.translatesAutoresizingMaskIntoConstraints = NO;
-        self.image = [self.image imageWithRenderingMode:mode];
+        self.image = [image imageWithRenderingMode:mode];
         self.tintColor = [UIColor lightGrayColor];
     }
     return self;

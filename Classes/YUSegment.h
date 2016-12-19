@@ -228,9 +228,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
-///---------------------------------------
-/// @name Managing Segment Content Setting
-///---------------------------------------
+///-------------------------------
+/// @name Managing Segment Content
+///-------------------------------
 
 /**
  Set the content of a segment to a given title.
@@ -257,10 +257,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
-///---------------------------------------
-/// @name Managing Segment Content Getting
-///---------------------------------------
-
 /**
  Returns the title for a specific segment.
 
@@ -276,10 +272,6 @@ NS_ASSUME_NONNULL_BEGIN
  @return The image for a specific segment.
  */
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
-
-///-------------------------------
-/// @name Managing Segments Insert
-///-------------------------------
 
 /**
  Inserts a segment at the end and gives it a title as content.
@@ -327,10 +319,6 @@ NS_ASSUME_NONNULL_BEGIN
  @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
  */
 - (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index;
- 
-///-------------------------------
-/// @name Managing Segments Delete
-///-------------------------------
 
 /**
  Removes all segments of the receiver.

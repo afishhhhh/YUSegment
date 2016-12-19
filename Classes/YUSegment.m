@@ -167,7 +167,7 @@
     }
 }
 
-#pragma mark - Content Setting
+#pragma mark - Content
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
     NSAssert(_internalTitles, @"You should use this method when the content of segment is `NSString` object.");
@@ -216,8 +216,6 @@
     }
 }
 
-#pragma mark - Content Getting
-
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index {
     NSAssert(_internalTitles, @"You should use this method when the content of segment is `NSString` object.");
     if (index > _numberOfSegments - 1) {
@@ -233,8 +231,6 @@
     }
     return _internalImages[index];
 }
-
-#pragma mark - Content Insert
 
 - (void)addSegmentWithTitle:(NSString *)title {
     [self insertSegmentWithTitle:title atIndex:_numberOfSegments];
@@ -255,6 +251,7 @@
     }
     [self.internalTitles insertObject:title atIndex:index];
     _numberOfSegments++;
+    [self insertViewWithTitle:title atIndex:index];
 }
 
 - (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index {
@@ -264,6 +261,7 @@
     }
     [self.internalImages insertObject:image atIndex:index];
     _numberOfSegments++;
+    [self insertViewWithImage:image atIndex:index];
 }
 
 - (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
@@ -274,25 +272,42 @@
     [self.internalTitles insertObject:title atIndex:index];
     [self.internalImages insertObject:image atIndex:index];
     _numberOfSegments++;
+    [self insertViewWithTitle:title forImage:image atIndex:index];
 }
 
 - (void)insertViewWithTitle:(NSString *)title atIndex:(NSUInteger)index {
-    // setup view
-//    [self setupSegmentViewWithTitle:title selected:NO];
-//    [self setupSegmentViewWithTitle:title selected:YES];
-    // update c
-//    [self updateConstraintsWithInsertSegmentView:segmentView atIndex:index];
+    YULabel *label = [self configureBasicLabelWithTitle:title];
+    [self.labels insertObject:label atIndex:index];
+    [_containerView insertSubview:label atIndex:index];
+    label = [self configureSelectedLabelWithTitle:title];
+    [self.selectedLabels insertObject:label atIndex:index];
+    [_selectedContainerView insertSubview:label atIndex:index];
 }
 
 - (void)insertViewWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-    
+    YUImageView *imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+    [self.imageViews insertObject:imageView atIndex:index];
+    [_containerView insertSubview:imageView atIndex:index];
+    imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+    [self.selectedImageViews insertObject:imageView atIndex:index];
+    [_selectedContainerView insertSubview:imageView atIndex:index];
 }
 
 - (void)insertViewWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
+    YULabel *label = [self configureBasicLabelWithTitle:title];
+    [self.labels insertObject:label atIndex:index];
+    YUImageView *imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+    [self.imageViews insertObject:imageView atIndex:index];
+    YUImageTextView *mixtureView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
+    [_containerView insertSubview:mixtureView atIndex:index];
     
+    label = [self configureSelectedLabelWithTitle:title];
+    [self.selectedLabels insertObject:label atIndex:index];
+    imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+    [self.selectedImageViews insertObject:imageView atIndex:index];
+    mixtureView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
+    [_selectedContainerView insertSubview:mixtureView atIndex:index];
 }
-
-#pragma mark - Content Delete
 
 - (void)removeAllItems {
     
@@ -308,109 +323,88 @@
 
 #pragma mark - Views Setup
 
-- (void)configureBasicLabels {
-    YULabel *label;
-    NSString *title;
-    for (int i = 0; i < _numberOfSegments; i++) {
-        title = _internalTitles[i];
-        label = [[YULabel alloc] initWithText:title];
-        label.font = self.font;
-        label.textColor = self.textColor;
-        [self.labels addObject:label];
-        [_containerView addSubview:label];
-    }
-    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
+- (YULabel *)configureBasicLabelWithTitle:(NSString *)title {
+    YULabel *label = [[YULabel alloc] init];
+    label.text = title;
+    label.font = self.font;
+    label.textColor = self.textColor;
+    return label;
 }
 
-- (void)configureSelectedLabels {
-    YULabel *label;
-    NSString *title;
-    for (int i = 0; i < _numberOfSegments; i++) {
-        title = _internalTitles[i];
-        label = [[YULabel alloc] initWithText:title];
-        label.font = self.selectedFont;
-        label.textColor = self.selectedTextColor;
-        [self.selectedLabels addObject:label];
-        [_selectedContainerView addSubview:label];
-    }
-    [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
+- (YULabel *)configureSelectedLabelWithTitle:(NSString *)title {
+    YULabel *label = [[YULabel alloc] init];
+    label.text = title;
+    label.font = self.selectedFont;
+    label.textColor = self.selectedTextColor;
+    return label;
 }
 
 - (void)configureLabels {
-    [self configureBasicLabels];
-    [self configureSelectedLabels];
+    YULabel *label;
+    NSString *title;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        title = _internalTitles[i];
+        // Configure basic label
+        label = [self configureBasicLabelWithTitle:title];
+        [self.labels addObject:label];
+        [_containerView addSubview:label];
+        // Configure selected label
+        label = [self configureSelectedLabelWithTitle:title];
+        [self.selectedLabels addObject:label];
+        [_selectedContainerView addSubview:label];
+    }
+    [self setupConstraintsWithSegments:_labels toContainerView:_containerView];
+    [self setupConstraintsWithSegments:_selectedLabels toContainerView:_selectedContainerView];
 }
 
-- (void)configureBasicImages {
+- (void)configureImages {
     YUImageView *imageView;
     UIImage *image;
     for (int i = 0; i < _numberOfSegments; i++) {
         image = _internalImages[i];
+        // Configure basic image view
         imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
         [self.imageViews addObject:imageView];
         [_containerView addSubview:imageView];
-    }
-    [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
-}
-
-- (void)configureSelectedImages {
-    YUImageView *imageView;
-    UIImage *image;
-    for (int i = 0; i < _numberOfSegments; i++) {
-        image = _internalImages[i];
+        // Configure selected image view
         imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
         [self.selectedImageViews addObject:imageView];
         [_selectedContainerView addSubview:imageView];
     }
+    [self setupConstraintsWithSegments:_imageViews toContainerView:_containerView];
     [self setupConstraintsWithSegments:_selectedImageViews toContainerView:_selectedContainerView];
 }
 
-- (void)configureImages {
-    [self configureBasicImages];
-    [self configureSelectedImages];
-}
-
-- (void)configureBasicMixtureViews {
+- (void)configureMixtureViews {
+    NSString *title;
+    UIImage *image;
     YULabel *label;
     YUImageView *imageView;
     YUImageTextView *mixtrueView;
-    NSMutableArray *array = [NSMutableArray array];
+    NSMutableArray *array1 = [NSMutableArray array];
+    NSMutableArray *array2 = [NSMutableArray array];
     for (int i = 0; i < _numberOfSegments; i++) {
-        label = [[YULabel alloc] initWithText:_internalTitles[i]];
-        label.font = self.font;
-        label.textColor = self.textColor;
+        title = _internalTitles[i];
+        image = _internalImages[i];
+        // Configure basic mixture view
+        label = [self configureBasicLabelWithTitle:title];
         [self.labels addObject:label];
-        imageView = [[YUImageView alloc] initWithImage:_internalImages[i] renderingMode:UIImageRenderingModeAlwaysTemplate];
+        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
         [self.imageViews addObject:imageView];
         mixtrueView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
-        [array addObject:mixtrueView];
+        [array1 addObject:mixtrueView];
         [_containerView addSubview:mixtrueView];
-    }
-    [self setupConstraintsWithSegments:array toContainerView:_containerView];
-}
-
-- (void)configureSelectedMixtureViews {
-    YULabel *label;
-    YUImageView *imageView;
-    YUImageTextView *mixtrueView;
-    NSMutableArray *array = [NSMutableArray array];
-    for (int i = 0; i < _numberOfSegments; i++) {
-        label = [[YULabel alloc] initWithText:_internalTitles[i]];
-        label.font = self.selectedFont;
-        label.textColor = self.selectedTextColor;
+        // Configure selected mixture view
+        label = [self configureSelectedLabelWithTitle:title];
         [self.selectedLabels addObject:label];
-        imageView = [[YUImageView alloc] initWithImage:_internalImages[i] renderingMode:UIImageRenderingModeAutomatic];
+        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
         [self.selectedImageViews addObject:imageView];
         mixtrueView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
-        [array addObject:mixtrueView];
+        [array2 addObject:mixtrueView];
         [_selectedContainerView addSubview:mixtrueView];
     }
-    [self setupConstraintsWithSegments:array toContainerView:_selectedContainerView];
-}
-
-- (void)configureMixtureViews {
-    [self configureBasicMixtureViews];
-    [self configureSelectedMixtureViews];
+    [self setupConstraintsWithSegments:array1 toContainerView:_containerView];
+    [self setupConstraintsWithSegments:array2 toContainerView:_selectedContainerView];
 }
 
 - (void)setupContainerView {
@@ -421,7 +415,7 @@
         
         containerView;
     });
-    [self setupConstraintsToSelfWithView:_containerView];
+    [self setupConstraintsWithItem:_containerView toItem:self];
 }
 
 - (void)setupSelectedContainerView {
@@ -432,7 +426,7 @@
         
         containerView;
     });
-    [self setupConstraintsToSelfWithView:_selectedContainerView];
+    [self setupConstraintsWithItem:_selectedContainerView toItem:self];
 }
 
 - (void)setupIndicatorView {
@@ -520,7 +514,7 @@
     // Add container to scroll view
     [_containerView removeFromSuperview];
     [self.scrollView addSubview:_containerView];
-    [self setupConstraintsToScrollViewWithView:_containerView];
+    [self setupConstraintsToScrollViewWithItem:_containerView];
     
     // Add indicator to scroll view
     [_indicatorView removeFromSuperview];
@@ -529,7 +523,7 @@
     // Add selected container to scroll view
     [_selectedContainerView removeFromSuperview];
     [_scrollView addSubview:_selectedContainerView];
-    [self setupConstraintsToScrollViewWithView:_selectedContainerView];
+    [self setupConstraintsToScrollViewWithItem:_selectedContainerView];
     
     [self updateWidthConstraintsForSegments];
 }
@@ -898,7 +892,7 @@
         
         scrollView;
     });
-    [self setupConstraintsToSelfWithView:_scrollView];
+    [self setupConstraintsWithItem:_scrollView toItem:self];
     
     return _scrollView;
 }
@@ -984,26 +978,19 @@
     [NSLayoutConstraint constraintWithItem:containerView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
 }
 
-- (void)setupConstraintsToSelfWithView:(UIView *)view {
-    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
+- (void)setupConstraintsWithItem:(id)item1 toItem:(id)item2 {
+    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
     
-    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
     
-    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
     
-    [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
 }
 
-- (void)setupConstraintsToScrollViewWithView:(UIView *)view {
-    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0.0].active = YES;
+- (void)setupConstraintsToScrollViewWithItem:(id)item {
+    [self setupConstraintsWithItem:_scrollView toItem:item];
+    [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:item attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0.0].active = YES;
 }
 
 - (void)updateWidthConstraintsForSegments {
@@ -1023,37 +1010,31 @@
     }
 }
 
-- (void)updateConstraintsWithInsertSegmentView:(UIView *)segmentView atIndex:(NSUInteger)index {
+- (void)updateConstraintsWithItem:(id)item1 toItem:(id)item2 atIndex:(NSUInteger)index {
     if (_leadingConstraints) {
         NSLayoutConstraint *oldLeading = _leadingConstraints[index];
         id item = oldLeading.firstItem;
         id toItem = oldLeading.secondItem;
         oldLeading.active = NO;
         
-        NSLayoutConstraint *newLeading = [NSLayoutConstraint constraintWithItem:segmentView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
+        [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeTop multiplier:1.0 constant:8.0].active = YES;
+        
+        [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-8.0].active = YES;
+        
+        NSLayoutConstraint *newLeading = [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
         newLeading.active = YES;
         [self.leadingConstraints insertObject:newLeading atIndex:index];
         
-        oldLeading = [NSLayoutConstraint constraintWithItem:item attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:segmentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
+        oldLeading = [NSLayoutConstraint constraintWithItem:item attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:item1 attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
         oldLeading.active = YES;
         self.leadingConstraints[index + 1] = oldLeading;
         
-        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:segmentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:0.0];
+        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:0.0];
         widthConstraint.active = YES;
         
-        [self layoutIfNeeded];
-        
-        [NSLayoutConstraint constraintWithItem:segmentView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_containerView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
-        
-        [NSLayoutConstraint constraintWithItem:segmentView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_containerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
-        
-        widthConstraint.active = NO;
-        widthConstraint = [NSLayoutConstraint constraintWithItem:segmentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0];
-        widthConstraint.active = YES;
-        
-        [UIView animateWithDuration:3 animations:^{
-            [self layoutIfNeeded];
-        }];
+//        [UIView animateWithDuration:3 animations:^{
+//            [self layoutIfNeeded];
+//        }];
     }
 }
 
