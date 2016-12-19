@@ -4,13 +4,14 @@
 [![Pod License](https://img.shields.io/cocoapods/l/YUSegment.svg)]()
 
 A customizable segmented control for iOS.
+![YUSegment-demo](https://github.com/afishhhhh/YUSegment/Images/demo.gif)
 
 ## Features
 
 - Supports both (Attributed)text and image
 - Supports three style
 - Supports horizontal scrolling
-- YUSegment works on iOS 8.0+ and is compatible with ARC projects.
+- YUSegment works on iOS 8.0+ and is compatible with ARC projects
 
 ## Installation
 
@@ -18,7 +19,7 @@ A customizable segmented control for iOS.
 
 1. Add a pod entry to your Podfile `pod 'YUSegment'`
 2. Running `pod install`
-3. `#import "YUSegment.h"` where you need.
+3. `#import "YUSegment.h"` where you need
 
 ## Usage
 
@@ -26,8 +27,22 @@ A customizable segmented control for iOS.
 
 1. In the Object Library, select the "UIView" object and drag it into the view.
 2. Change the position and size of the view.
-3. In the Identify Inspector, change the class to "YUSegment". Connect outlet.
+![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad2.png)
+3. In the Identify Inspector, change the class to "YUSegment". Then connect outlet.
+![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyborad1.png)
+```objective-c
+@property (weak, nonatomic) IBOutlet YUSegment *segment;
+```
 4. Add the following code to where you need to set content. For example, in the `viewDidLoad:` method.
+```objective-c
+- (void)viewDidLoad {
+  [super viewDidLoad];
+  NSArray *titles = @[@"Left", @"Medium", @"Right"];
+  [segment setTitles:titles forImages:nil];
+}
+```
+5. You could modify some properties in Attributes Inspector.
+![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/Images/storyoard3.png)
 
 ### Creating a YUSegment Programmatically
 
