@@ -57,11 +57,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Return the titles the receiver has. It is the convenient method to return the title for a specific segment.
+ For example, `titles[i]` and `titleForSegmentAtIndex:i` do the same thing.
  */
 @property (nonatomic, copy, readonly) NSArray <NSString *> *titles;
 
 /**
- 
+ Return the images the receiver has. It is the convenient method to return the image for a specific segment.
+ For example `images[i]` and `imageForSegmentAtIndex:i` do the same thing.
  */
 @property (nonatomic, copy, readonly) NSArray <UIImage *>  *images;
 
@@ -69,29 +71,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Managing Segment Appearance
 ///----------------------------------
 
-#if TARGET_INTERFACE_BUILDER
-
 /**
- A boolean value indicating a segment style. The default is false. This property will work only in interface builder.
- */
-//@property (nonatomic, assign) IBInspectable NSUInteger segmentStyle;
-#else
-
-/**
- A constant indicating a segment style. The default is `YUSegmentStyleSlider`. See `YUSegmentStyle` for descriptions of these constants.
+ The segmented control style. See `YUSegmentStyle` for the possible values. 
+ The default is `YUSegmentStyleDefault`.
  */
 @property (nonatomic, assign, readonly) YUSegmentStyle style;
-#endif
 
 #if TARGET_INTERFACE_BUILDER
 
 /**
- The width of the segment's border.
+ The width of the segmented control's border.
  */
 @property (nonatomic, assign) IBInspectable CGFloat borderWidth;
 
 /**
- The color of the segment's border.
+ The color of the segmented control's border.
  */
 @property (nonatomic, strong) IBInspectable UIColor *borderColor;
 #endif
@@ -111,12 +105,13 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------
 
 /**
- The spacing of the indicator to its superview. Only works with `YUSegmentRounded` style. The default is 2.
+ The spacing of the indicator to its superview. The default is 2. 
+ Only valid when the style is `YUSegmentStyleBox`.
  */
 @property (nonatomic, assign) IBInspectable CGFloat indicatorMargin;
 
 /**
- The color of the indicator.
+ The color of the indicator. The default is `[UIColor colorWithWhite:0.2 alpha:1.0]`.
  */
 @property (nonatomic, strong) IBInspectable UIColor *indicatorColor;
 
@@ -125,22 +120,22 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------------
 
 /**
- The color of the text, it only works when the type of items is `NSString`. The default is lightGrayColor.
+ The color of the text. The default is `[UIColor lightGrayColor]`.
  */
 @property (nonatomic, strong) IBInspectable UIColor *textColor;
 
 /**
- The color of the text when the segment is selected. The default is darkGrayColor.
+ The color of the text when the segment is selected. The default is `[UIColor blackColor]`. If the style is `YUSegmentStyleBox`, the default is `[UIColor whiteColor]`.
  */
 @property (nonatomic, strong) IBInspectable UIColor *selectedTextColor;
 
 /**
- The font of the text, identical to `textColor`, it only works when the type of items is `NSString`.
+ The font of the text. The default is `[UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium]`.
  */
 @property (nonatomic, strong) UIFont *font;
 
 /**
- The font of the text when the segment is selected. The default is the same as `font`.
+ The font of the text when the segment is selected. The default is `[UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium]`.
  */
 @property (nonatomic, strong) UIFont *selectedFont;
 
@@ -153,7 +148,8 @@ NS_ASSUME_NONNULL_BEGIN
 ///---------------------
 
 /**
- Initializes and returns a segmented control with segments having the given titles.
+ Initializes and returns a segmented control with segments having the given titles. 
+ The style is `YUSegmentStyleDefault`.
 
  @param titles An array of `NSString` objects. The value must not be nil or empty array.
  @return The newly-created instance of the `YUSegment`.
@@ -162,6 +158,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Initializes and returns s segmented control with segments having the given images.
+ The style is `YUSegmentStyleDefault`.
 
  @param images An array of `UIImage` objects. The value must not be nil or empty array.
  @return The newly-created instance of the `YUSegment`.
@@ -169,7 +166,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images;
 
 /**
- Initializes and returns s segmented control with segments having the given titles and images. The image is at the top of the title.
+ Initializes and returns s segmented control with segments having the given titles and images.
+ The style is `YUSegmentStyleDefault`.
 
  @param titles An array of `NSString` objects. This value must not be nil or empty array.
  @param images An array of `UIImage` objects. This value must not be nil or empty array.
@@ -177,10 +175,32 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
+/**
+ Initializes and returns a segmented control with segments having the given titles and style.
+
+ @param titles An array of `NSString` objects. The value must not be nil or empty array.
+ @param style The segmented control style. See `YUSegmentStyle` for the possible values.
+ @return The newly-created instance of the `YUSegment`.
+ */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style;
 
+/**
+ Initializes and returns a segmented control with segments having the given images and style.
+
+ @param images An array of `UIImage` objects. This value must not be nil or empty array.
+ @param style The segmented control style. See `YUSegmentStyle` for the possible values.
+ @return The newly-created instance of the `YUSegment`.
+ */
 - (instancetype)initWithImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
+/**
+ Initializes and returns s segmented control with segments having the given titles, images and style.
+
+ @param titles An array of `NSString` objects. The value must not be nil or empty array.
+ @param images An array of `UIImage` objects. This value must not be nil or empty array.
+ @param style The segmented control style. See `YUSegmentStyle` for the possible values.
+ @return The newly-created instance of the `YUSegment`.
+ */
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
 ///---------------------------------------
@@ -188,13 +208,20 @@ NS_ASSUME_NONNULL_BEGIN
 ///---------------------------------------
 
 /**
- <#Description#>
+ Set the content of segmented control to the given titles and images.
 
- @param titles <#titles description#>
- @param images <#images description#>
+ @param titles An array of `NSString` objects.
+ @param images An array of `UIImage` objects.
  */
 - (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images;
 
+/**
+ Set the content of segmented control to the given titles, images and style.
+
+ @param titles An array of `NSString` objects.
+ @param images An array of `UIImage` objects.
+ @param style The segmented control style. See `YUSegmentStyle` for the possible values.
+ */
 - (void)setTitles:(nullable NSArray <NSString *> *)titles forImages:(nullable NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
 /**

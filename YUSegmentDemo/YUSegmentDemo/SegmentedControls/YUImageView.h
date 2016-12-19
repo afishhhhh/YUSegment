@@ -1,8 +1,6 @@
 //
-//  UUImageView.h
-//  demo
-//
-//  Created by 虞冠群 on 2016/11/21.
+//  YUImageView.h
+//  Created by YyGqQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
