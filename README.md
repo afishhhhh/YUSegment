@@ -3,6 +3,8 @@
 [![Pod Platform](https://img.shields.io/cocoapods/p/YUSegment.svg?style=flat)]()
 [![Pod License](https://img.shields.io/cocoapods/l/YUSegment.svg)]()
 
+[中文文档](http://www.jianshu.com/p/dfe654b749b3)
+
 A customizable segmented control for iOS.
 
 ![YUSegment-demo](https://github.com/afishhhhh/YUSegment/blob/master/Images/demo.gif)
