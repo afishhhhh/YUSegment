@@ -35,7 +35,16 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"IndicatorView layoutSubviews");
-    _line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
+    if (_line) {
+        _line.frame = (CGRect){0, CGRectGetHeight(self.frame) - 4, CGRectGetWidth(self.frame), 4};
+        if (_cornerRadius) {
+            _line.layer.cornerRadius = 2.0;
+        }
+    }
+    if (_cornerRadius) {
+        CGFloat maxRadius = CGRectGetHeight(self.frame) / 2.0;
+        self.layer.cornerRadius = _cornerRadius <= maxRadius ? _cornerRadius : maxRadius;
+    }
     _maskView.frame = self.frame;
 }
 
@@ -71,11 +80,6 @@
         return;
     }
     _cornerRadius = cornerRadius;
-    if (_style == YUIndicatorViewStyleLine) {
-        self.line.layer.cornerRadius = 2.0;
-    } else {
-        self.layer.cornerRadius = cornerRadius;
-    }
 }
 
 #pragma mark - Getters

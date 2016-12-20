@@ -1,13 +1,11 @@
 //
-//  ExampleFourViewController.m
-//  demo
-//
-//  Created by 虞冠群 on 2016/12/15.
+//  YUSegmentDemo
+//  Created by YyGgQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
 #import "ExampleFourViewController.h"
-#import "YUSegment.h"
+#import <YUSegment/YUSegment.h>
 
 @interface ExampleFourViewController ()
 
@@ -22,13 +20,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSArray *titles1 = @[@"Left3", @"Left2", @"Left1", @"Medium", @"Right1", @"Right2", @"Right3"];
-    NSArray *titles2 = @[@"Left", @"Medium", @"Right"];
-    NSArray *images = @[[UIImage imageNamed:@"pic1"], [UIImage imageNamed:@"pic2"], [UIImage imageNamed:@"pic3"]];
-    
-    [self.segment1 setTitles:titles1 forImages:nil];
-    [self.segment2 setTitles:nil forImages:images];
-    [self.segment3 setTitles:titles2 forImages:images];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

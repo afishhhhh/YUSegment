@@ -16,8 +16,6 @@
 		0908B4771E02F0A90048A150 /* YUSegmentDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4761E02F0A90048A150 /* YUSegmentDemoUITests.m */; };
 		0908B48C1E02F1410048A150 /* ExampleFourViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4851E02F1410048A150 /* ExampleFourViewController.m */; };
 		0908B48D1E02F1410048A150 /* ExampleOneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4871E02F1410048A150 /* ExampleOneViewController.m */; };
-		0908B48E1E02F1410048A150 /* ExampleThreeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B4891E02F1410048A150 /* ExampleThreeViewController.m */; };
-		0908B48F1E02F1410048A150 /* ExampleTwoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */; };
 		2FD243D7BEC06C636D668E61 /* libPods-YUSegmentDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4055B548F1B443D8EB0834DF /* libPods-YUSegmentDemoTests.a */; };
 		3D1CBE85EAC7BF0135B4C0A0 /* libPods-YUSegmentDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E804FED320FE775459EAB0F /* libPods-YUSegmentDemo.a */; };
 		7A0B4B5FE45F114AE4F9DE0D /* libPods-YUSegmentDemoUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 18A9A19CC5B9F0C6D1BD3F98 /* libPods-YUSegmentDemoUITests.a */; };
@@ -59,10 +57,6 @@
 		0908B4851E02F1410048A150 /* ExampleFourViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleFourViewController.m; sourceTree = "<group>"; };
 		0908B4861E02F1410048A150 /* ExampleOneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleOneViewController.h; sourceTree = "<group>"; };
 		0908B4871E02F1410048A150 /* ExampleOneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleOneViewController.m; sourceTree = "<group>"; };
-		0908B4881E02F1410048A150 /* ExampleThreeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleThreeViewController.h; sourceTree = "<group>"; };
-		0908B4891E02F1410048A150 /* ExampleThreeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleThreeViewController.m; sourceTree = "<group>"; };
-		0908B48A1E02F1410048A150 /* ExampleTwoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleTwoViewController.h; sourceTree = "<group>"; };
-		0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleTwoViewController.m; sourceTree = "<group>"; };
 		165ED66657466967F2FAF6BB /* Pods-YUSegmentDemoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YUSegmentDemoTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-YUSegmentDemoTests/Pods-YUSegmentDemoTests.release.xcconfig"; sourceTree = "<group>"; };
 		18A9A19CC5B9F0C6D1BD3F98 /* libPods-YUSegmentDemoUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YUSegmentDemoUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4055B548F1B443D8EB0834DF /* libPods-YUSegmentDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YUSegmentDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,10 +125,6 @@
 				0908B4551E02F0A90048A150 /* AppDelegate.m */,
 				0908B4861E02F1410048A150 /* ExampleOneViewController.h */,
 				0908B4871E02F1410048A150 /* ExampleOneViewController.m */,
-				0908B48A1E02F1410048A150 /* ExampleTwoViewController.h */,
-				0908B48B1E02F1410048A150 /* ExampleTwoViewController.m */,
-				0908B4881E02F1410048A150 /* ExampleThreeViewController.h */,
-				0908B4891E02F1410048A150 /* ExampleThreeViewController.m */,
 				0908B4841E02F1410048A150 /* ExampleFourViewController.h */,
 				0908B4851E02F1410048A150 /* ExampleFourViewController.m */,
 				0908B45A1E02F0A90048A150 /* Main.storyboard */,
@@ -475,9 +465,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0908B48E1E02F1410048A150 /* ExampleThreeViewController.m in Sources */,
 				0908B48C1E02F1410048A150 /* ExampleFourViewController.m in Sources */,
-				0908B48F1E02F1410048A150 /* ExampleTwoViewController.m in Sources */,
 				0908B4561E02F0A90048A150 /* AppDelegate.m in Sources */,
 				0908B48D1E02F1410048A150 /* ExampleOneViewController.m in Sources */,
 				0908B4531E02F0A90048A150 /* main.m in Sources */,
@@ -632,6 +620,7 @@
 			baseConfigurationReference = 8E6814F49EFCE6811A909282 /* Pods-YUSegmentDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.afishhhhh.YUSegmentDemo;
@@ -644,6 +633,7 @@
 			baseConfigurationReference = CAD44985D30FBB6247FF34DA /* Pods-YUSegmentDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.afishhhhh.YUSegmentDemo;

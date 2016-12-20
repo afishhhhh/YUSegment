@@ -1,8 +1,6 @@
 //
-//  ExampleFourViewController.h
-//  demo
-//
-//  Created by 虞冠群 on 2016/12/15.
+//  YUSegmentDemo
+//  Created by YyGgQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 

@@ -1,5 +1,5 @@
 //
-//  YUSegmentDemoTests.m
+//  YUSegmentDemo
 //  Created by YyGgQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
@@ -25,7 +25,7 @@
 
 - (void)testInitializationWithTitle {
     NSArray *titles = @[@"Left", @"Medium", @"Right"];
-    YUSegmentStyle style = YUSegmentStyleDefault;
+    YUSegmentStyle style = YUSegmentStyleLine;
     YUSegment *segment = [[YUSegment alloc] initWithTitles:titles style:style];
     
     XCTAssertNotNil(segment, @"Segment should be created.");
@@ -38,7 +38,7 @@
 
 - (void)testInitializationWithImage {
     NSArray *images = @[[UIImage imageNamed:@"pic1"], [UIImage imageNamed:@"pic2"], [UIImage imageNamed:@"pic3"]];
-    YUSegmentStyle style = YUSegmentStyleDefault;
+    YUSegmentStyle style = YUSegmentStyleLine;
     YUSegment *segment = [[YUSegment alloc] initWithImages:images style:style];
     
     XCTAssertNotNil(segment, @"Segment should be created.");
@@ -50,7 +50,7 @@
 - (void)testInitializationWithTitleAndImage {
     NSArray *titles = @[@"Left", @"Medium", @"Right"];
     NSArray *images = @[[UIImage imageNamed:@"pic1"], [UIImage imageNamed:@"pic2"], [UIImage imageNamed:@"pic3"]];
-    YUSegmentStyle style = YUSegmentStyleDefault;
+    YUSegmentStyle style = YUSegmentStyleLine;
     YUSegment *segment = [[YUSegment alloc] initWithTitles:titles forImages:images style:style];
     
     XCTAssertNotNil(segment, @"Segment should be created.");
