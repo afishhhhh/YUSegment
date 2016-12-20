@@ -134,7 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------
 
 /**
- The spacing of the indicator to its superview. The default is 2. 
+ The spacing of the indicator to its superview. The default is 3.0. 
  Only valid when the style is `YUSegmentStyleBox`.
  */
 @property (nonatomic, assign) IBInspectable CGFloat indicatorMargin;
@@ -273,70 +273,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
 
-/**
- Inserts a segment at the end and gives it a title as content.
-
- @param title A `NSString` object to use as the content of the segment.
- */
-- (void)addSegmentWithTitle:(NSString *)title;
-
-/**
- Inserts a segment at the end and gives it an image as content.
-
- @param image A `UIImage` object to use as the content of the segment.
- */
-- (void)addSegmentWithImage:(UIImage *)image;
-
-/**
- Inserts a segment at the end and gives it a title and an image as content.
-
- @param title A `NSString` object to use as the content of the segment.
- @param image A `UIImage` object to use as the content of the segment.
- */
-- (void)addSegmentWithTitle:(NSString *)title forImage:(UIImage *)image;
-
-/**
- Inserts a segment at a specificed position in the receiver and gives it a title as content.
-
- @param title A `NSString` object to use as the content of the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index;
-
-/**
- Inserts a segment at a specificed position in the receiver and gives it an image as content.
-
- @param image A `UIImage` object to use as the content of the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index;
-
-/**
- Inserts a segment at a speecified position in the receiver and gives it a title and an image as content.
-
- @param title A `NSString` object to use as the content of the segment.
- @param image A `UIImage` object to use as the content of the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index;
-
-/**
- Removes all segments of the receiver.
- */
-- (void)removeAllItems;
-
-/**
- Removes the first segment of the receiver.
- */
-- (void)removeLastItem;
-
-/**
- Removes the specified segment of the receiver.
-
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)removeItemAtIndex:(NSUInteger)index;
-
 ///-----------------------------------
 /// @name Managing Segments Appearance
 ///-----------------------------------
@@ -349,6 +285,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setTitleTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state;
 
+/**
+ Returns the text attributes of the title for a given control state.
+
+ @param state A control state.
+ @return The text attributes of the title for state.
+ */
 - (NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
 
 @end
