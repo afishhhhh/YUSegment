@@ -12,7 +12,7 @@ A customizable segmented control for iOS.
 ## Features
 
 - Supports both (Attributed)text and image
-- Has three styles to choose
+- Has two styles(linear and rectangular) to choose
 - Supports horizontal scrolling
 - YUSegment works on iOS 8.0+ and is compatible with ARC projects
 
@@ -26,6 +26,15 @@ A customizable segmented control for iOS.
 
 ## Usage
 
+### Creating a YUSegment Programmatically (Recommended)
+
+```objective-c
+NSArray *titles = @[@"Left", @"Medium", @"Right"];
+YUSegment *segment = [[YUSegment alloc] initWithTitles:titles];
+[self.view addSubview:segment];
+segment.frame = (CGRect){20, 60, [UIScreen mainScreen].bounds.size.width - 40, 44};
+```
+
 ### Creating a YUSegment Using a Storyboard
 
 1. In the Object Library, select the "UIView" object and drag it into the view.
@@ -38,29 +47,44 @@ A customizable segmented control for iOS.
   ```objective-c
   @property (weak, nonatomic) IBOutlet YUSegment *segment;
   ```
-4. Add the following code to where you need to set content. For example, in the `viewDidLoad:` method.
-
-  ```objective-c
-  - (void)viewDidLoad {
-    [super viewDidLoad];
-    NSArray *titles = @[@"Left", @"Medium", @"Right"];
-    [segment setTitles:titles forImages:nil];
-  }
-  ```
-5. You could modify some properties in Attributes Inspector.
+4. You could modify some properties in Attributes Inspector.
 
   ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/blob/master/Images/storyboard3.png)
 
-### Creating a YUSegment Programmatically
+More details in [YUSegmentDemo](YUSegmentDemo).
 
+## APIs
+
+### Target-Action
+
+Similar to UISegmentedControl, you just need the following code:
 ```objective-c
-NSArray *titles = @[@"Left", @"Medium", @"Right"];
-YUSegment *segment = [[YUSegment alloc] initWithTitles:titles];
-[self.view addSubview:segment];
-segment.frame = (CGRect){20, 60, [UIScreen mainScreen].bounds.size.width - 40, 44};
+[segment addTarget:self action:@selector(someMethod) forControlEvents:UIControlEventValueChanged];
 ```
 
-More details in [YUSegmentDemo](YUSegmentDemo).
+### Attributed Text
+
+There is no direct method which make attributed string as argument to set attributed string. You should use `-setTitleTextAttributes:forState:` to set attributed string. For example:
+```objeective-c
+NSDictionary *attributes = @{NSFontAttributeName : [UIFont systemFontOfSize:20]};
+[segment setTitleTextAttributes:attributes forState:YUSegmentedControlStateNormal];
+```
+
+### Layer
+
+You could set `borderColor`, `borderWidth`, and `cornerRadius` in Attributes Inspector. In addition, without interface builder, code like this:
+```objective-c
+segment.layer.borderWidth = someValue;
+segment.layer.borderColor = someValue;
+```
+Note: You should use `cornerRadius` like this. Because if you set `cornerRaduis` for segmented control, the indicator will rounded automatically.
+```objective-c
+segment.cornerRadius = someValue;
+```
+
+### Scrolling Enable
+
+
 
 ## License
 
