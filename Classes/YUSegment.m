@@ -22,7 +22,6 @@
 
 /// @name Constraints
 
-@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *widthConstraints;
 //@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraintsNormal;
 //@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraintsSelected;
 
@@ -278,10 +277,10 @@
 }
 
 - (void)insertViewWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-    YUImageView *imageView1 = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+    YUImageView *imageView1 = [[YUImageView alloc] initWithImage:image];
     [self.imageViews insertObject:imageView1 atIndex:index];
     [_containerView insertSubview:imageView1 atIndex:index];
-    YUImageView *imageView2 = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+    YUImageView *imageView2 = [[YUImageView alloc] initWithImage:image];
     [self.selectedImageViews insertObject:imageView2 atIndex:index];
     [_selectedContainerView insertSubview:imageView2 atIndex:index];
     
@@ -292,14 +291,14 @@
 - (void)insertViewWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
     YULabel *label = [self configureBasicLabelWithTitle:title];
     [self.labels insertObject:label atIndex:index];
-    YUImageView *imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+    YUImageView *imageView = [[YUImageView alloc] initWithImage:image];
     [self.imageViews insertObject:imageView atIndex:index];
     YUImageTextView *mixtureView1 = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
     [_containerView insertSubview:mixtureView1 atIndex:index];
     
     label = [self configureSelectedLabelWithTitle:title];
     [self.selectedLabels insertObject:label atIndex:index];
-    imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+    imageView = [[YUImageView alloc] initWithImage:image];
     [self.selectedImageViews insertObject:imageView atIndex:index];
     YUImageTextView *mixtureView2 = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
     [_selectedContainerView insertSubview:mixtureView2 atIndex:index];
@@ -362,11 +361,11 @@
     for (int i = 0; i < _numberOfSegments; i++) {
         image = _internalImages[i];
         // Configure basic image view
-        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+        imageView = [[YUImageView alloc] initWithImage:image];
         [self.imageViews addObject:imageView];
         [_containerView addSubview:imageView];
         // Configure selected image view
-        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+        imageView = [[YUImageView alloc] initWithImage:image];
         [self.selectedImageViews addObject:imageView];
         [_selectedContainerView addSubview:imageView];
     }
@@ -388,7 +387,7 @@
         // Configure basic mixture view
         label = [self configureBasicLabelWithTitle:title];
         [self.labels addObject:label];
-        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAlwaysTemplate];
+        imageView = [[YUImageView alloc] initWithImage:image];
         [self.imageViews addObject:imageView];
         mixtrueView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
         [array1 addObject:mixtrueView];
@@ -396,7 +395,7 @@
         // Configure selected mixture view
         label = [self configureSelectedLabelWithTitle:title];
         [self.selectedLabels addObject:label];
-        imageView = [[YUImageView alloc] initWithImage:image renderingMode:UIImageRenderingModeAutomatic];
+        imageView = [[YUImageView alloc] initWithImage:image];
         [self.selectedImageViews addObject:imageView];
         mixtrueView = [[YUImageTextView alloc] initWithLabel:label imageView:imageView];
         [array2 addObject:mixtrueView];
@@ -512,21 +511,20 @@
 }
 
 - (void)setTitleTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state {
-    // If don't have titles, return
     if (!_internalTitles) {
         return;
     }
-    NSAssert(attributes, @"The attributes should not be nil.");
+    NSParameterAssert(attributes);
     switch (state) {
         case YUSegmentedControlStateNormal:
-            _textAttributesNormal = attributes;
+            self.textAttributesNormal = attributes;
             for (int i = 0; i < _numberOfSegments; i++) {
                 _labels[i].attributedText = [[NSAttributedString alloc] initWithString:_internalTitles[i]
                                                                             attributes:attributes];
             }
             break;
         case YUSegmentedControlStateSelected:
-            _textAttributesSelected = attributes;
+            self.textAttributesSelected = attributes;
             for (int i = 0; i < _numberOfSegments; i++) {
                 _selectedLabels[i].attributedText = [[NSAttributedString alloc] initWithString:_internalTitles[i]
                                                                                     attributes:attributes];
@@ -538,9 +536,9 @@
 - (NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state {
     switch (state) {
         case YUSegmentedControlStateNormal:
-            return _textAttributesNormal;
+            return self.textAttributesNormal;
         case YUSegmentedControlStateSelected:
-            return _textAttributesSelected;
+            return self.textAttributesSelected;
     }
 }
 
@@ -731,22 +729,19 @@
     [super setBackgroundColor:backgroundColor];
     if (_indicatorView) {
         if (_style == YUSegmentStyleLine) {
-            if ([backgroundColor isEqual:[UIColor clearColor]]) {
-                _indicatorView.backgroundColor = [UIColor whiteColor];
-            } else {
-                _indicatorView.backgroundColor = backgroundColor;
-            }
+            _indicatorView.backgroundColor = backgroundColor;
         }
     }
 }
 
 - (void)setIndicatorColor:(UIColor *)indicatorColor {
-    if (!_indicatorView) {
-        return;
-    }
+    if (!_indicatorView) return;
     NSAssert(indicatorColor, @"The color should not be nil.");
     if (indicatorColor != _indicatorColor && ![indicatorColor isEqual:_indicatorColor]) {
         _indicatorColor = indicatorColor;
+        if (_style == YUSegmentStyleBox && [indicatorColor isEqual:[UIColor clearColor]]) {
+            indicatorColor = self.backgroundColor;
+        }
         _indicatorView.indicatorColor = indicatorColor;
     }
 }
@@ -858,14 +853,6 @@
     return _scrollView;
 }
 
-- (NSMutableArray <NSLayoutConstraint *> *)widthConstraints {
-    if (_widthConstraints) {
-        return _widthConstraints;
-    }
-    _widthConstraints = [NSMutableArray array];
-    return _widthConstraints;
-}
-
 - (NSMutableArray <YULabel *> *)labels {
     if (_labels) {
         return _labels;
@@ -918,9 +905,7 @@
             leading.active = YES;
             leading.identifier = [NSString stringWithFormat:@"%d", i];
             
-            NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:segments[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0];
-            width.active = YES;
-//            [self.widthConstraints addObject:width];
+            [NSLayoutConstraint constraintWithItem:segments[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0].active = YES;
         }
         else {
             NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:segments[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];

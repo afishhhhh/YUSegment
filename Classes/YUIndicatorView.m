@@ -61,17 +61,13 @@
 
 - (void)setIndicatorColor:(UIColor *)indicatorColor {
     _indicatorColor = indicatorColor;
-    if ([indicatorColor isEqual:[UIColor clearColor]]) {
-        indicatorColor = [UIColor whiteColor];
-    }
     switch (_style) {
         case YUIndicatorViewStyleLine:
             self.line.backgroundColor = indicatorColor;
             break;
-        case YUIndicatorViewStyleBox: {
+        case YUIndicatorViewStyleBox:
             self.backgroundColor = indicatorColor;
             break;
-        }
     }
 }
 

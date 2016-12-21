@@ -273,6 +273,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
 
+- (void)replaceDeselectedImagesWithImages:(NSArray <UIImage *> *)images;
+
+- (void)replaceDeselectedImageWithImage:(UIImage *)image atIndex:(NSUInteger)index;
+
 ///-----------------------------------
 /// @name Managing Segments Appearance
 ///-----------------------------------
@@ -291,7 +295,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param state A control state.
  @return The text attributes of the title for state.
  */
-- (NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
+- (nullable NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
 
 @end
 
