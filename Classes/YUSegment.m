@@ -169,32 +169,25 @@
 #pragma mark - Content
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
-    NSAssert(_internalTitles, @"You should use this method when the content of segment is `NSString` object.");
-    if (index > _numberOfSegments - 1) {
-        index = _numberOfSegments - 1;
-    }
-    [self updateTitle:title image:nil forSegmentAtIndex:index];
+    NSParameterAssert(title);
+    [self setTitle:title forImage:nil forSegmentAtIndex:index];
 }
 
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    NSAssert(_internalImages, @"You should use this method when the content of segment is `UImage` object.");
-    if (index > _numberOfSegments - 1) {
-        index = _numberOfSegments - 1;
-    }
-    [self updateTitle:nil image:image forSegmentAtIndex:index];
+    NSParameterAssert(image);
+    [self setTitle:nil forImage:image forSegmentAtIndex:index];
 }
 
 - (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
-    NSAssert(_internalTitles && _internalImages, @"You should use this method when the content of segment includes title and image.");
     if (index > _numberOfSegments - 1) {
         index = _numberOfSegments - 1;
     }
-    [self updateTitle:title image:image forSegmentAtIndex:index];
+    [self setSegmentWithTitle:title image:image atIndex:index];
 }
 
-- (void)updateTitle:(NSString *)title image:(UIImage *)image forSegmentAtIndex:(NSUInteger)index {
+- (void)setSegmentWithTitle:(NSString *)title image:(UIImage *)image atIndex:(NSUInteger)index {
     if (title) {
-        self.internalTitles[index] = title;
+        self.internalTitles[index] = [title copy];
         if (_textAttributesNormal) {
             _labels[index].attributedText = [[NSAttributedString alloc] initWithString:title
                                                                             attributes:_textAttributesNormal];
@@ -216,19 +209,17 @@
 }
 
 - (NSString *)titleForSegmentAtIndex:(NSUInteger)index {
-    NSAssert(_internalTitles, @"You should use this method when the content of segment is `NSString` object.");
     if (index > _numberOfSegments - 1) {
         index = _numberOfSegments - 1;
     }
-    return _internalTitles[index];
+    return _internalTitles ? _internalTitles[index] : nil;
 }
 
 - (UIImage *)imageForSegmentAtIndex:(NSUInteger)index {
-    NSAssert(_internalImages, @"You should use this method when the content of segment is `UImage` object.");
     if (index > _numberOfSegments - 1) {
         index = _numberOfSegments - 1;
     }
-    return _internalImages[index];
+    return _internalImages ? _internalImages[index] : nil;
 }
 
 - (void)addSegmentWithTitle:(NSString *)title {
