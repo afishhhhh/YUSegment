@@ -126,7 +126,6 @@
 - (void)setDefaultValueForProperties {
     _needsUpdateViewHierarchy = NO;
     _selectedIndex = 0;
-//    self.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)commonInit {
@@ -203,7 +202,7 @@
     if (image) {
         self.internalImages[index] = image;
         _selectedImageViews[index].image = image;
-        _imageViews[index].image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _imageViews[index].image = image;
     }
 }
 
@@ -540,6 +539,21 @@
         case YUSegmentedControlStateSelected:
             return self.textAttributesSelected;
     }
+}
+
+- (void)replaceDeselectedImagesWithImages:(NSArray <UIImage *> *)images {
+    NSParameterAssert(images);
+    for (int i = 0; i < _numberOfSegments; i++) {
+        _imageViews[i].image = images[i];
+    }
+}
+
+- (void)replaceDeselectedImageWithImage:(UIImage *)image atIndex:(NSUInteger)index {
+    NSParameterAssert(image);
+    if (index > _numberOfSegments - 1) {
+        index = _numberOfSegments - 1;
+    }
+    _imageViews[index].image = image;
 }
 
 - (void)makeCurrentSegmentCenterInSelf {

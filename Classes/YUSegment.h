@@ -273,8 +273,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
 
+/**
+ Replaces the deselected images with new images. The receiver uses the same images by default, no matter whether a specific image selected.
+
+ @param images An array of `UIImage` objects.
+ */
 - (void)replaceDeselectedImagesWithImages:(NSArray <UIImage *> *)images;
 
+/**
+ Replaces the deselected image with given image.
+
+ @param image A new image display in the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
 - (void)replaceDeselectedImageWithImage:(UIImage *)image atIndex:(NSUInteger)index;
 
 ///-----------------------------------
