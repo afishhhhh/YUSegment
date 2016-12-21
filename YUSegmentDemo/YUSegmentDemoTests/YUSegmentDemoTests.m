@@ -23,6 +23,25 @@
     [super tearDown];
 }
 
+- (void)testSetTitle {
+    NSArray *titles = @[@"Left", @"Medium", @"Right"];
+    YUSegment *segment = [[YUSegment alloc] initWithTitles:titles];
+    
+    // NSString
+//    NSString *newTitle = @"newLeft";
+//    [segment setTitle:newTitle forSegmentAtIndex:0];
+//
+//    XCTAssertEqualObjects(segment.titles[0], newTitle);
+    
+    // NSMutableString
+    NSMutableString *newTitle = [NSMutableString stringWithString:@"newLeft"];
+    [segment setTitle:newTitle forSegmentAtIndex:0];
+    XCTAssertEqualObjects(segment.titles[0], @"newLeft");
+    
+    [newTitle appendString:@"append"];
+    XCTAssertEqualObjects(segment.titles[0], @"newLeft");
+}
+
 - (void)testInitializationWithTitle {
     NSArray *titles = @[@"Left", @"Medium", @"Right"];
     YUSegmentStyle style = YUSegmentStyleLine;
