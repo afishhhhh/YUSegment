@@ -255,7 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param image A new image display in the segment.
  @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
  */
-- (void)setTitle:(NSString *)title forImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
+- (void)setTitle:(nullable NSString *)title forImage:(nullable UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
 /**
  Returns the title for a specific segment.
@@ -263,7 +263,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
  @return The title for a specific segment.
  */
-- (NSString *)titleForSegmentAtIndex:(NSUInteger)index;
+- (nullable NSString *)titleForSegmentAtIndex:(NSUInteger)index;
 
 /**
  Returns the image for a specific segment.
@@ -271,7 +271,22 @@ NS_ASSUME_NONNULL_BEGIN
  @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
  @return The image for a specific segment.
  */
-- (UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
+- (nullable UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
+
+/**
+ Replaces the deselected images with new images. The receiver uses the same images by default, no matter whether a specific image selected.
+
+ @param images An array of `UIImage` objects.
+ */
+- (void)replaceDeselectedImagesWithImages:(NSArray <UIImage *> *)images;
+
+/**
+ Replaces the deselected image with given image.
+
+ @param image A new image display in the segment.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ */
+- (void)replaceDeselectedImageWithImage:(UIImage *)image atIndex:(NSUInteger)index;
 
 ///-----------------------------------
 /// @name Managing Segments Appearance
@@ -291,7 +306,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param state A control state.
  @return The text attributes of the title for state.
  */
-- (NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
+- (nullable NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
 
 @end
 

@@ -8,13 +8,11 @@
 
 @implementation YUImageView
 
-- (instancetype)initWithImage:(UIImage *)image renderingMode:(UIImageRenderingMode)mode {
+- (instancetype)initWithImage:(UIImage *)image {
     self = [super initWithImage:image];
     if (self) {
         self.contentMode = UIViewContentModeScaleAspectFit;
         self.translatesAutoresizingMaskIntoConstraints = NO;
-        self.image = [image imageWithRenderingMode:mode];
-        self.tintColor = [UIColor lightGrayColor];
     }
     return self;
 }

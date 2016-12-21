@@ -64,7 +64,7 @@ Similar to UISegmentedControl, you just need the following code:
 
 ### Attributed Text
 
-There is no direct method which make attributed string as argument to set attributed string. You should use `-setTitleTextAttributes:forState:` to set attributed string. For example:
+You should use `-setTitleTextAttributes:forState:` to set attributed string. For example:
 ```objeective-c
 NSDictionary *attributes = @{NSFontAttributeName : [UIFont systemFontOfSize:20]};
 [segment setTitleTextAttributes:attributes forState:YUSegmentedControlStateNormal];
@@ -72,19 +72,19 @@ NSDictionary *attributes = @{NSFontAttributeName : [UIFont systemFontOfSize:20]}
 
 ### Layer
 
-You could set `borderColor`, `borderWidth`, and `cornerRadius` in Attributes Inspector. In addition, without interface builder, code like this:
+You could set `borderColor`, `borderWidth`, and `cornerRadius` in Attributes Inspector. If you don't use interface builder, the code should look like this:
 ```objective-c
 segment.layer.borderWidth = someValue;
 segment.layer.borderColor = someValue;
 ```
-Note: You should use `cornerRadius` like this. Because if you set `cornerRaduis` for segmented control, the indicator will rounded automatically.
+Note: You should use `cornerRadius` instead of `layer.cornerRadius`. Because if you set `cornerRaduis` for segmented control, the indicator will become rounded automatically.
 ```objective-c
 segment.cornerRadius = someValue;
 ```
 
-### Scrolling Enable
+### Scrolling Enabled
 
-
+YUSegment don't have property look like `scrollEnabled`, you just need to set the width of each segment(`segmentWidth`). This property causes the segmented control scroll horizontally.
 
 ## License
 
