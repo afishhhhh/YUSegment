@@ -25,7 +25,7 @@
     
     NSArray *titles1 = @[@"Left", @"Medium", @"Right"];
     NSArray *titles2 = @[@"Left3", @"Left2", @"Left1", @"Medium", @"Right1", @"Right2", @"Right3"];
-    NSArray *images = @[[UIImage imageNamed:@"pic1"], [UIImage imageNamed:@"pic2"], [UIImage imageNamed:@"pic3"]];
+    NSArray *images = @[[UIImage imageNamed:@"au"], [UIImage imageNamed:@"ca"], [UIImage imageNamed:@"cn"]];
     
     self.segment1 = [[YUSegment alloc] initWithTitles:titles1];
     [self.view addSubview:self.segment1];
@@ -40,11 +40,12 @@
     self.segment3 = [[YUSegment alloc] initWithImages:images];
     [self.view addSubview:self.segment3];
     self.segment3.frame = (CGRect){20, 188, [UIScreen mainScreen].bounds.size.width - 40, 44};
+    self.segment3.indicatorColor = [UIColor orangeColor];
     
     self.segment4 = [[YUSegment alloc] initWithImages:images style:YUSegmentStyleBox];
     [self.view addSubview:self.segment4];
     self.segment4.frame = (CGRect){20, 252, [UIScreen mainScreen].bounds.size.width - 40, 44};
-    self.segment4.indicatorColor = [UIColor lightGrayColor];
+    self.segment4.indicatorColor = [UIColor colorWithWhite:0.90 alpha:1.0];
     
     self.segment5 = [[YUSegment alloc] initWithTitles:titles1 forImages:images];
     [self.view addSubview:self.segment5];
