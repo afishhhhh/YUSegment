@@ -7,7 +7,7 @@
 
 A customizable segmented control for iOS.
 
-![YUSegment-demo](https://github.com/afishhhhh/YUSegment/blob/master/Images/demo.gif)
+![YUSegment-demo](https://github.com/afishhhhh/YUSegment/blob/master/Images/demo.png)
 
 ## Features
 
@@ -61,6 +61,10 @@ Similar to UISegmentedControl, you just need the following code:
 ```objective-c
 [segment addTarget:self action:@selector(someMethod) forControlEvents:UIControlEventValueChanged];
 ```
+
+### Image
+
+The image is the same by default, no matter whether the image selected. If you want to show different image when a specific segment selected, you should call `-replaceDeselectedImagesWithImages:` or `-replaceDeselectedImageWithImage:atIndex:`.
 
 ### Attributed Text
 
