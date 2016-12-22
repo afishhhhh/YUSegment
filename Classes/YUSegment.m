@@ -443,7 +443,7 @@
         }
         case YUSegmentStyleBox: {
             self.layer.cornerRadius = 5.0;
-            _indicatorView.indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
+//            _indicatorView.indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
             _indicatorMargin = 3.0;
             _indicatorView.cornerRadius = 5.0;
             break;
