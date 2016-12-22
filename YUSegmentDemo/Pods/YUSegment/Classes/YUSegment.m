@@ -10,6 +10,9 @@
 #import "YUImageTextView.h"
 #import "YUIndicatorView.h"
 
+static const NSTimeInterval kMovingAnimationDuration = 0.3;
+static const CGFloat        kIndicatorWidthOffset    = 24.0;
+
 @interface YUSegment ()
 
 /// @name Views
@@ -39,10 +42,6 @@
 @property (nonatomic, copy)   NSDictionary *textAttributesNormal;
 @property (nonatomic, copy)   NSDictionary *textAttributesSelected;
 
-/// @name Gesture
-
-@property (nonatomic, assign) CGFloat panCorrection;
-
 @end
 
 @implementation YUSegment {
@@ -51,6 +50,7 @@
     UIColor *_selectedTextColor;
     UIFont  *_font;
     UIFont  *_selectedFont;
+    CGFloat _panCorrection;
 }
 
 @dynamic segmentWidth;
@@ -60,6 +60,10 @@
 @dynamic selectedFont;
 
 #pragma mark - Initialization
+
+//- (void)dealloc {
+//    NSLog(@"dealloc");
+//}
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -130,17 +134,12 @@
 
 - (void)commonInit {
     // Build UI
-    [self setupContainerView];
-    [self setupSelectedContainerView];
+    _containerView = [self setupContainerView];
+    _selectedContainerView = [self setupContainerView];
     [self setupIndicatorView];
     [self buildUI];
     // Add gestures
-    if (_style == YUSegmentStyleBox) {
-        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
-        [self addGestureRecognizer:pan];
-    }
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:tap];
+    [self setupGesture];
 }
 
 - (void)layoutSubviews {
@@ -404,32 +403,19 @@
     [self setupConstraintsWithSegments:array2 selected:YES];
 }
 
-- (void)setupContainerView {
-    _containerView = ({
-        UIView *containerView = [UIView new];
-        containerView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:containerView];
-        
-        containerView;
-    });
-    [self setupConstraintsWithItem:_containerView toItem:self];
-}
-
-- (void)setupSelectedContainerView {
-    _selectedContainerView = ({
-        UIView *containerView = [UIView new];
-        containerView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:containerView];
-        
-        containerView;
-    });
-    [self setupConstraintsWithItem:_selectedContainerView toItem:self];
+- (UIView *)setupContainerView {
+    UIView *containerView = [UIView new];
+    containerView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:containerView];
+    [self setupConstraintsWithItem:containerView toItem:self];
+    
+    return containerView;
 }
 
 - (void)setupIndicatorView {
     _indicatorView = [[YUIndicatorView alloc] initWithStyle:(YUIndicatorViewStyle)_style];
     [self insertSubview:_indicatorView atIndex:1];
-    _selectedContainerView.layer.mask = _indicatorView.maskView.layer;
+    _selectedContainerView.layer.mask = _indicatorView.mask.layer;
 }
 
 - (void)buildUI {
@@ -443,19 +429,10 @@
         }
         case YUSegmentStyleBox: {
             self.layer.cornerRadius = 5.0;
-            _indicatorView.indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
             _indicatorMargin = 3.0;
             _indicatorView.cornerRadius = 5.0;
             break;
         }
-    }
-}
-
-- (void)configureIndicatorWithBackgroundColor:(UIColor *)color {
-    if (![color isEqual:[UIColor clearColor]]) {
-        _indicatorView.backgroundColor = color;
-    } else {
-        _indicatorView.backgroundColor = [UIColor whiteColor];
     }
 }
 
@@ -556,7 +533,25 @@
     _imageViews[index].image = image;
 }
 
-- (void)makeCurrentSegmentCenterInSelf {
+- (UIView *)indicator {
+    return self.indicatorView;
+}
+
+- (YUSegment * _Nonnull (^)(CGFloat))borderWidth {
+    return ^ id (CGFloat borderWidth) {
+        self.layer.borderWidth = borderWidth;
+        return self;
+    };
+}
+
+- (YUSegment * _Nonnull (^)(UIColor * _Nonnull))borderColor {
+    return ^ id (UIColor *borderColor) {
+        self.layer.borderColor = borderColor.CGColor;
+        return self;
+    };
+}
+
+- (void)makeCurrentSegmentCenterInSelfAnimated:(BOOL)animated {
     CGFloat finalOffset = self.segmentWidth * (_selectedIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
     CGFloat maxOffset = _scrollView.contentSize.width - CGRectGetWidth(self.frame);
     CGPoint contentOffset = _scrollView.contentOffset;
@@ -569,22 +564,32 @@
     else {
         contentOffset.x = finalOffset;
     }
-    _scrollView.contentOffset = contentOffset;
+    if (animated) {
+        [UIView animateWithDuration:kMovingAnimationDuration animations:^{
+            _scrollView.contentOffset = contentOffset;
+        }];
+    } else {
+        _scrollView.contentOffset = contentOffset;
+    }
 }
 
 #pragma mark - Event Response
 
+- (void)setupGesture {
+    if (_style == YUSegmentStyleBox) {
+        UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+        [self addGestureRecognizer:pan];
+    }
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self addGestureRecognizer:tap];
+}
+
 - (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:_containerView];
-    NSUInteger fromIndex = self.selectedIndex;
+    NSUInteger fromIndex = _selectedIndex;
     _selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
     if (fromIndex != _selectedIndex) {
-        switch (_style) {
-            case YUSegmentStyleLine:
-            case YUSegmentStyleBox:
-                [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
-                break;
-        }
+        [self moveIndicatorFromIndex:fromIndex toIndex:_selectedIndex animated:YES];
     }
 }
 
@@ -619,19 +624,19 @@
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex animated:(BOOL)animated {
     if (animated) {
-        [UIView animateWithDuration:0.25 animations:^{
+        [UIView animateWithDuration:kMovingAnimationDuration animations:^{
             [_indicatorView setCenterX:self.segmentWidth * (0.5 + toIndex)];
         } completion:^(BOOL finished) {
             if (finished) {
                 [self sendActionsForControlEvents:UIControlEventValueChanged];
-                [self makeCurrentSegmentCenterInSelf];
+                [self makeCurrentSegmentCenterInSelfAnimated:animated];
             }
         }];
     }
     else {
         [_indicatorView setCenterX:self.segmentWidth * (0.5 + toIndex)];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
-        [self makeCurrentSegmentCenterInSelf];
+        [self makeCurrentSegmentCenterInSelfAnimated:animated];
     }
 }
 
@@ -640,27 +645,23 @@
 - (CGFloat)calculateIndicatorWidthPlusConstant {
     CGFloat maxWidth = 0.0;
     CGFloat width;
-    if (_internalTitles && _internalImages) {
-        maxWidth = _selectedImageViews[0].intrinsicContentSize.width;
-        for (YULabel *label in _selectedLabels) {
+    if (_internalTitles) {
+        for (UILabel *label in _selectedLabels) {
             width = label.intrinsicContentSize.width;
             if (width > maxWidth) {
                 maxWidth = width;
             }
         }
-    }
-    else if (_internalImages) {
-        maxWidth = _selectedImageViews[0].intrinsicContentSize.width;
-    }
-    else {
-        for (YULabel *label in _selectedLabels) {
-            width = label.intrinsicContentSize.width;
+        if (_internalImages) {
+            width = _selectedImageViews[0].intrinsicContentSize.width;
             if (width > maxWidth) {
                 maxWidth = width;
             }
         }
+    } else {
+        maxWidth = _selectedImageViews[0].intrinsicContentSize.width;
     }
-    maxWidth += 32.0;
+    maxWidth += kIndicatorWidthOffset;
     CGFloat segmentWidth = self.segmentWidth;
     if (maxWidth > segmentWidth) {
         maxWidth = segmentWidth;
