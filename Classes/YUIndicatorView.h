@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YUIndicatorView : UIView
 
-@property (nonatomic, strong, readonly) UIView  *maskView;
+@property (nonatomic, strong, readonly) UIView  *mask;
 @property (nonatomic, assign)           CGFloat cornerRadius;
 @property (nonatomic, strong)           UIColor *indicatorColor;
 

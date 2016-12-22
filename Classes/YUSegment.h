@@ -308,6 +308,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
 
+/**
+ Returns a block which accepts an argument as the value of `borderWidth`.
+ 
+ @return A block which accepts a `CGFloat` value.
+ */
+- (YUSegment * (^)(CGFloat borderWidth))borderWidth;
+
+/**
+ Returns a block which accepts an argument as the value of `borderColor`.
+ 
+ @return A block which accepts a `UIColor` value.
+ */
+- (YUSegment * (^)(UIColor *borderColor))borderColor;
+
 @end
 
 @interface YUSegment (Deprecated)

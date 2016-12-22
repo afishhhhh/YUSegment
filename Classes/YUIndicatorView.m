@@ -21,8 +21,8 @@
     if (self) {
         _style = style;
         _indicatorColor = [UIColor colorWithWhite:0.2 alpha:1.0];
-        _maskView = [UIView new];
-        _maskView.backgroundColor = [UIColor whiteColor];
+        _mask = [UIView new];
+        _mask.backgroundColor = [UIColor whiteColor];
         self.layer.masksToBounds = YES;
     }
     return self;
@@ -31,7 +31,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSLog(@"IndicatorView layoutSubviews");
-    _maskView.frame = self.frame;
+    _mask.frame = self.frame;
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -55,7 +55,7 @@
     CGPoint center = self.center;
     center.x = centerX;
     self.center = center;
-    _maskView.frame = self.frame;
+    _mask.frame = self.frame;
 }
 
 #pragma mark - Setters
