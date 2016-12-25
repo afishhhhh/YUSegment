@@ -1,19 +1,19 @@
 //
-//  YUImageTextView.m
+//  YUMixtureView.m
 //  Created by YyGqQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
 
-#import "YUImageTextView.h"
+#import "YUMixtureView.h"
 
-@interface YUImageTextView ()
+@interface YUMixtureView ()
 
 @property (nonatomic, strong) UILabel     *label;
 @property (nonatomic, strong) UIImageView *imageView;
 
 @end
 
-@implementation YUImageTextView
+@implementation YUMixtureView
 
 #pragma mark - Initialization
 

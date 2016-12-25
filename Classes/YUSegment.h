@@ -31,18 +31,36 @@
 typedef NS_ENUM(NSUInteger, YUSegmentStyle) {
     // The default style for a segment with a line-style indicator.
     YUSegmentStyleLine,
-    // A style for s segment with a box-style indicator.
+    // A style for a segment with a box-style indicator.
     YUSegmentStyleBox,
 };
 
 typedef NS_ENUM(NSUInteger, YUSegmentedControlState) {
-    // The normal, or default state of the segmented control
+    // The normal, or default state of the segmented control.
     YUSegmentedControlStateNormal,
-    // Selected state of the segmented control
+    // Selected state of the segmented control.
     YUSegmentedControlStateSelected,
 };
 
+typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
+    YUIndicatorViewStyleLine,
+    YUIndicatorViewStyleBox,
+};
+
 NS_ASSUME_NONNULL_BEGIN
+
+/**
+ The indicator of the segmented control.
+ */
+@interface YUIndicatorView : UIView
+
+//@property (nonatomic, assign) CGFloat height;
+
+- (YUIndicatorView * (^)(CGFloat borderWidth))borderWidth;
+- (YUIndicatorView * (^)(UIColor *borderColor))borderColor;
+
+@end
+
 
 @interface YUSegment : UIControl
 
@@ -122,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The radius to use when drawing rounded corners for the layer’s background.
  */
-@property (nonatomic, assign) IBInspectable CGFloat cornerRadius;
+//@property (nonatomic, assign) IBInspectable CGFloat cornerRadius;
 
 /**
  The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
@@ -134,15 +152,9 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------
 
 /**
- The spacing of the indicator to its superview. The default is 3.0. 
- Only valid when the style is `YUSegmentStyleBox`.
+ The indicator view of segmented control.
  */
-@property (nonatomic, assign) IBInspectable CGFloat indicatorMargin;
-
-/**
- The color of the indicator. The default is `[UIColor colorWithWhite:0.2 alpha:1.0]`.
- */
-@property (nonatomic, strong) IBInspectable UIColor *indicatorColor;
+@property (nonatomic, strong, readonly) YUIndicatorView *indicator;
 
 ///-------------------------------
 /// @name Managing Text Appearance
@@ -321,6 +333,8 @@ NS_ASSUME_NONNULL_BEGIN
  @return A block which accepts a `UIColor` value.
  */
 - (YUSegment * (^)(UIColor *borderColor))borderColor;
+
+//- (YUIndicatorView *)indicator;
 
 @end
 
