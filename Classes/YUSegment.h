@@ -43,6 +43,7 @@ typedef NS_ENUM(NSUInteger, YUSegmentedControlState) {
 };
 
 typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
+    // See `YUSegmentStyle` for more detail.
     YUIndicatorViewStyleLine,
     YUIndicatorViewStyleBox,
 };
@@ -56,7 +57,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 //@property (nonatomic, assign) CGFloat height;
 
+/**
+ Returns a block which accepts an argument as the value of `borderWidth`.
+ 
+ @note You could use chainable syntax look like `segment.indicator.borderWidth(1.0).borderColor([UIColor redColor])` to set both `borderWidth` and `borderColor`. You also could set `borderWidth` look like `segment.indicator.layer.borderWidth = 1.0`.
+ 
+ @return A block which accepts a `CGFloat` value.
+ */
 - (YUIndicatorView * (^)(CGFloat borderWidth))borderWidth;
+
+/**
+ Returns a block which accepts an argument as the value of `borderColor`.
+ 
+ @note You could use chainable syntax look like `segment.indicator.borderWidth(1.0).borderColor([UIColor redColor])` to set both `borderWidth` and `borderColor`. You also could set `borderColor` look like `segment.indicator.layer.borderColor = [UIColor redColor].CGColor`.
+ 
+ @return A block which accepts a `UIColor` value.
+ */
 - (YUIndicatorView * (^)(UIColor *borderColor))borderColor;
 
 @end
@@ -117,13 +133,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Return the titles the receiver has. It is the convenient method to return the title for a specific segment.
- For example, `titles[i]` and `titleForSegmentAtIndex:i` do the same thing.
+ For example, `titles[i]` and `[segment titleForSegmentAtIndex:i]` do the same thing.
  */
 @property (nonatomic, copy, readonly) NSArray <NSString *> *titles;
 
 /**
  Return the images the receiver has. It is the convenient method to return the image for a specific segment.
- For example `images[i]` and `imageForSegmentAtIndex:i` do the same thing.
+ For example `images[i]` and `[segment imageForSegmentAtIndex:i]` do the same thing.
  */
 @property (nonatomic, copy, readonly) NSArray <UIImage *>  *images;
 
@@ -138,12 +154,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) YUSegmentStyle style;
 
 /**
- The radius to use when drawing rounded corners for the layer’s background.
- */
-//@property (nonatomic, assign) IBInspectable CGFloat cornerRadius;
-
-/**
- The width for each segment. Assignment to this value will make segment scroll enable. Set width to 0 is not valid.
+ The width for each segment. Assignment to this value will make segment scroll enable. 
+ 
+ @note Set width to 0 is not valid.
  */
 @property (nonatomic, assign) IBInspectable CGFloat segmentWidth;
 
@@ -153,6 +166,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The indicator view of segmented control.
+ 
+ @note Access this property to set attributes for indicator, such as `backgroundColor`, `borderWidth`, `borderColor`, etc.
  */
 @property (nonatomic, strong, readonly) YUIndicatorView *indicator;
 
@@ -161,22 +176,22 @@ NS_ASSUME_NONNULL_BEGIN
 ///-------------------------------
 
 /**
- The color of the text. The default is `[UIColor lightGrayColor]`.
+ The color of the text.
  */
 @property (nonatomic, strong) IBInspectable UIColor *textColor;
 
 /**
- The color of the text when the segment is selected. The default is `[UIColor blackColor]`. If the style is `YUSegmentStyleBox`, the default is `[UIColor whiteColor]`.
+ The color of the text when the segment is selected.
  */
 @property (nonatomic, strong) IBInspectable UIColor *selectedTextColor;
 
 /**
- The font of the text. The default is `[UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium]`.
+ The font of the text.
  */
 @property (nonatomic, strong) UIFont *font;
 
 /**
- The font of the text when the segment is selected. The default is `[UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium]`.
+ The font of the text when the segment is selected.
  */
 @property (nonatomic, strong) UIFont *selectedFont;
 
@@ -323,6 +338,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a block which accepts an argument as the value of `borderWidth`.
  
+ @note You could use chainable syntax look like `segment.borderWidth(1.0).borderColor([UIColor redColor])` to set both `borderWidth` and `borderColor`. You also could set `borderWidth` look like `segment.layer.borderWidth = 1.0`.
+ 
  @return A block which accepts a `CGFloat` value.
  */
 - (YUSegment * (^)(CGFloat borderWidth))borderWidth;
@@ -330,13 +347,23 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a block which accepts an argument as the value of `borderColor`.
  
+ @note You could use chainable syntax look like `segment.borderWidth(1.0).borderColor([UIColor redColor])` to set both `borderWidth` and `borderColor`. You also could set `borderColor` look like `segment.layer.borderColor = [UIColor redColor].CGColor`.
+ 
  @return A block which accepts a `UIColor` value.
  */
 - (YUSegment * (^)(UIColor *borderColor))borderColor;
 
-//- (YUIndicatorView *)indicator;
+@end
+
+
+@interface YUIndicatorView (Deprecated)
+
+- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("This method is not supported.")));
+- (instancetype)init __attribute__((deprecated("This method is not supported.")));
+- (instancetype)new __attribute__((deprecated("This method is not supported.")));
 
 @end
+
 
 @interface YUSegment (Deprecated)
 

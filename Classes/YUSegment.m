@@ -33,8 +33,6 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
 @property (nonatomic, strong) NSMutableArray <UIImageView *>    *imageViewsNormal;
 @property (nonatomic, strong) NSMutableArray <UILabel *>        *labelsSelected;
 @property (nonatomic, strong) NSMutableArray <UIImageView *>    *imageViewsSelected;
-//@property (nonatomic, strong) NSMutableArray <YUMixtureView *>  *mixtureViewsNormal;
-//@property (nonatomic, strong) NSMutableArray <YUMixtureView *>  *mixtureViewsSelected;
 
 /// @name Appearance
 
@@ -359,8 +357,6 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
         
         // Configure normal image view
         imageView = [self configureImageViewWithImage:image];
-        self.contentMode = UIViewContentModeScaleAspectFit;
-        self.translatesAutoresizingMaskIntoConstraints = NO;
         [self.imageViewsNormal addObject:imageView];
         [_containerNormal addSubview:imageView];
         
@@ -423,6 +419,8 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
 - (void)buildUI {
     if (!self.backgroundColor) {
         self.backgroundColor = [UIColor whiteColor];
+    } else {
+        [_indicator private_setBackgroundColor:self.backgroundColor];
     }
     
     switch (_style) {
@@ -852,14 +850,6 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
     return _imageViewsNormal;
 }
 
-//- (NSMutableArray <YUMixtureView *> *)mixtureViewsNormal {
-//    if (_mixtureViewsNormal) {
-//        return _mixtureViewsNormal;
-//    }
-//    _mixtureViewsNormal = [NSMutableArray array];
-//    return _mixtureViewsNormal;
-//}
-
 - (NSMutableArray <UILabel *> *)labelsSelected {
     if (_labelsSelected) {
         return _labelsSelected;
@@ -875,14 +865,6 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
     _imageViewsSelected = [NSMutableArray array];
     return _imageViewsSelected;
 }
-
-//- (NSMutableArray <YUMixtureView *> *)mixtureViewsSelected {
-//    if (_mixtureViewsSelected) {
-//        return _mixtureViewsSelected;
-//    }
-//    _mixtureViewsSelected = [NSMutableArray array];
-//    return _mixtureViewsSelected;
-//}
 
 #pragma mark - Constraints
 
