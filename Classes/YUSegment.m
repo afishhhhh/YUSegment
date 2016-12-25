@@ -607,14 +607,12 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
 }
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex widthShouldChange:(BOOL)change {
-    CGFloat indicatorWidth;
+    CGFloat indicatorWidth = -1;
     if (change) {
         indicatorWidth = [self calculateIndicatorWidthAtSegmentIndex:toIndex];
     }
     [UIView animateWithDuration:kMovingAnimationDuration animations:^{
-        if (change) {
-            [_indicator setWidth:indicatorWidth];
-        }
+        [_indicator setWidth:indicatorWidth];
         [_indicator setCenterX:self.segmentWidth * (0.5 + toIndex)];
     } completion:^(BOOL finished) {
         if (finished) {
@@ -986,6 +984,9 @@ static const CGFloat        kIndicatorWidthOffset    = 20.0;
 #pragma mark -
 
 - (void)setWidth:(CGFloat)width {
+    if (width < 0) {
+        return;
+    }
     CGRect frame = self.frame;
     frame.size.width = width;
     self.frame = frame;
