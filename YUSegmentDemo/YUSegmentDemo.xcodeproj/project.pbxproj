@@ -261,6 +261,7 @@
 				TargetAttributes = {
 					0908B44D1E02F0A80048A150 = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = F5QALYXN7M;
 						ProvisioningStyle = Automatic;
 					};
 					0908B4661E02F0A90048A150 = {
@@ -620,7 +621,7 @@
 			baseConfigurationReference = 8E6814F49EFCE6811A909282 /* Pods-YUSegmentDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = F5QALYXN7M;
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.afishhhhh.YUSegmentDemo;
@@ -633,7 +634,7 @@
 			baseConfigurationReference = CAD44985D30FBB6247FF34DA /* Pods-YUSegmentDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = F5QALYXN7M;
 				INFOPLIST_FILE = YUSegmentDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.afishhhhh.YUSegmentDemo;
