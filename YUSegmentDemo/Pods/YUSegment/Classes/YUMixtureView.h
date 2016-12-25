@@ -1,5 +1,5 @@
 //
-//  YUImageTextView.h
+//  YUMixtureView.h
 //  Created by YyGqQq on 2016/12/15.
 //  Copyright © 2016年 Yu Guanqun. All rights reserved.
 //
@@ -8,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YUImageTextView : UIView
+@interface YUMixtureView : UIView
 
 - (instancetype)initWithLabel:(UILabel *)label imageView:(UIImageView *)imageView;
 - (void)setTitle:(NSString *)title;

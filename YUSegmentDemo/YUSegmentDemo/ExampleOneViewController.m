@@ -30,30 +30,28 @@
     self.segment1 = [[YUSegment alloc] initWithTitles:titles1];
     [self.view addSubview:self.segment1];
     self.segment1.frame = (CGRect){20, 60, [UIScreen mainScreen].bounds.size.width - 40, 44};
-    self.segment1.indicatorColor = [UIColor orangeColor];
     
     self.segment2 = [[YUSegment alloc] initWithTitles:titles1 style:YUSegmentStyleBox];
     [self.view addSubview:self.segment2];
-    self.segment2.frame = (CGRect){20, 124, [UIScreen mainScreen].bounds.size.width - 40, 44};
-    self.segment2.cornerRadius = 22.0;
+    self.segment2.frame = (CGRect){20, 144, [UIScreen mainScreen].bounds.size.width - 40, 44};
     
     self.segment3 = [[YUSegment alloc] initWithImages:images];
     [self.view addSubview:self.segment3];
-    self.segment3.frame = (CGRect){20, 188, [UIScreen mainScreen].bounds.size.width - 40, 44};
-    self.segment3.indicatorColor = [UIColor orangeColor];
+    self.segment3.frame = (CGRect){20, 228, [UIScreen mainScreen].bounds.size.width - 40, 44};
     
     self.segment4 = [[YUSegment alloc] initWithImages:images style:YUSegmentStyleBox];
     [self.view addSubview:self.segment4];
-    self.segment4.frame = (CGRect){20, 252, [UIScreen mainScreen].bounds.size.width - 40, 44};
-    self.segment4.indicatorColor = [UIColor colorWithWhite:0.90 alpha:1.0];
+    self.segment4.frame = (CGRect){20, 312, [UIScreen mainScreen].bounds.size.width - 40, 44};
+    self.segment4.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+    self.segment4.indicator.backgroundColor = [UIColor whiteColor];
     
     self.segment5 = [[YUSegment alloc] initWithTitles:titles1 forImages:images];
     [self.view addSubview:self.segment5];
-    self.segment5.frame = (CGRect){20, 316, [UIScreen mainScreen].bounds.size.width - 40, 72};
+    self.segment5.frame = (CGRect){20, 396, [UIScreen mainScreen].bounds.size.width - 40, 72};
     
     self.segment6 = [[YUSegment alloc] initWithTitles:titles2];
     [self.view addSubview:self.segment6];
-    self.segment6.frame = (CGRect){20, 408, [UIScreen mainScreen].bounds.size.width - 40, 44};
+    self.segment6.frame = (CGRect){20, 508, [UIScreen mainScreen].bounds.size.width - 40, 44};
     self.segment6.segmentWidth = 88.0;
 }
 

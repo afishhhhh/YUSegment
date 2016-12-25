@@ -41,25 +41,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zsn-2b-2Tg" customClass="YUSegment">
-                                <rect key="frame" x="16" y="252" width="343" height="72"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="72" id="NPL-0e-rwE"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="segmentTitles">
-                                        <string key="value">Left
-Medium
-Right</string>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="segmentImages">
-                                        <string key="value">pic1
-pic2
-pic3</string>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VvV-Ee-Qem" customClass="YUSegment">
                                 <rect key="frame" x="16" y="84" width="343" height="44"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -82,31 +63,27 @@ Right</string>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="segmentImages">
-                                        <string key="value">pic1
-pic2
-pic3</string>
+                                        <string key="value">au
+ca
+cn</string>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.93333333330000001" green="0.93333333330000001" blue="0.93333333330000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="zsn-2b-2Tg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="97R-Du-Qmy"/>
                             <constraint firstItem="NDw-hz-jSZ" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="9qB-V5-VHM"/>
                             <constraint firstItem="NDw-hz-jSZ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="JWB-hd-2ZY"/>
                             <constraint firstItem="VvV-Ee-Qem" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="64" id="gii-vS-olT"/>
                             <constraint firstItem="VvV-Ee-Qem" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="iEr-eE-KxK"/>
                             <constraint firstItem="NDw-hz-jSZ" firstAttribute="top" secondItem="VvV-Ee-Qem" secondAttribute="bottom" constant="40" id="m6G-zJ-9xG"/>
-                            <constraint firstItem="zsn-2b-2Tg" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="qLi-4V-xf0"/>
                             <constraint firstItem="VvV-Ee-Qem" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="tkk-pN-MOx"/>
-                            <constraint firstItem="zsn-2b-2Tg" firstAttribute="top" secondItem="NDw-hz-jSZ" secondAttribute="bottom" constant="40" id="ugC-wh-l9O"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Example 2" id="V0d-7D-7Dl"/>
                     <connections>
                         <outlet property="segment1" destination="VvV-Ee-Qem" id="pOk-qr-DQ4"/>
                         <outlet property="segment2" destination="NDw-hz-jSZ" id="YLf-aN-LEe"/>
-                        <outlet property="segment3" destination="zsn-2b-2Tg" id="9v3-lg-u03"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

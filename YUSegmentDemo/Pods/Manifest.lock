@@ -1,11 +1,11 @@
 PODS:
-  - YUSegment (0.1.4)
+  - YUSegment (0.2.0)
 
 DEPENDENCIES:
   - YUSegment
 
 SPEC CHECKSUMS:
-  YUSegment: 40e0ca8881258e14b10d4978fc5c535443525d1b
+  YUSegment: a1fa1237dfd5e6cbca28ca3b1eeac1151d0fb3b5
 
 PODFILE CHECKSUM: 1a5c31b5c01a5f078f11a79b51509fe9b183c747
 

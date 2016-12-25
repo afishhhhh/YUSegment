@@ -11,7 +11,6 @@
 
 @property (weak, nonatomic) IBOutlet YUSegment *segment1;
 @property (weak, nonatomic) IBOutlet YUSegment *segment2;
-@property (weak, nonatomic) IBOutlet YUSegment *segment3;
 
 @end
 

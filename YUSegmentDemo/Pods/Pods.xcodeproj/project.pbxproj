@@ -7,25 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C47CFF5CBFE87826B0CBC7BF5B787FF /* YUSegment.h in Headers */ = {isa = PBXBuildFile; fileRef = 95E2CD1F84356BC97976D60834F45204 /* YUSegment.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0FE6C3C765C5303BA2A8D8973C36B8EC /* YUSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5638F41017471C64BDB4359951E192 /* YUSegment.m */; };
-		2A1F92024BA9F82E95B9DE84B02E3E7A /* YUImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = F71152876A1704CE22A70A290F5406CF /* YUImageView.m */; };
-		51A20A2C7DBDF8E09D126C479AABF185 /* YUImageTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E9CBB70CAEC2EEEA9A9AACAA5341462 /* YUImageTextView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7A49CF0EA12EB0B376A1070006C8278E /* YUImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = EA43F516159856565B4E434EA465B121 /* YUImageView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		184CA8ACEEE8CCA61ADE57064284B09C /* YUSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0169EED1617F761786E435843A329 /* YUSegment.m */; };
+		4700E051A50C77E988C215885E98E170 /* YUMixtureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70B69AC620D2564C84516062457FBFAC /* YUMixtureView.m */; };
+		5673C4E3082092B71B9C8B0FDA19083F /* YUMixtureView.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F4890FA1D6C331C9E6E65D7DEE62CD /* YUMixtureView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AE919890016C0DB7A77BD1AD2FF3F406 /* Pods-YUSegmentDemoTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E713D2A14A51BA8FB31F51BC73588B2 /* Pods-YUSegmentDemoTests-dummy.m */; };
 		AFD60819102C3F41A979415D16F35D5A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EC994CDC2D681BA26389F78A7E4B325 /* UIKit.framework */; };
+		B110F8A74AF9AD0F49D32518337DAD51 /* YUSegment.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E1A984F98FFA174B9DCFC0D99A4E2E4 /* YUSegment.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B40C13007E4939F07EB30830E94DF412 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 616BEB51ECCAD129BDBCB7A956B56CC6 /* Foundation.framework */; };
-		B4E8EC2C308C2F92EF89E18457609053 /* YULabel.h in Headers */ = {isa = PBXBuildFile; fileRef = 469EE6C1B1C87818AE57C913D234E39E /* YULabel.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		C44C6311CBDCBB810ECDC9163B1DC896 /* YULabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 388586F8028CC9412F507F114B790BC9 /* YULabel.m */; };
+		C3209B59E35875CF4C437257164C06D6 /* YUSegment-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FEBDA739AA2E8E8A374173D8AA90118E /* YUSegment-dummy.m */; };
 		CD4327FF4D4608F38EB47A4CF1054F76 /* Pods-YUSegmentDemo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9B0A71C723EE685597F6A32CD770F4 /* Pods-YUSegmentDemo-dummy.m */; };
-		D4DB6B42D679EDC2B31BC72667188792 /* YUIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D723294E8E24E927A19CA8C5A1499EF /* YUIndicatorView.m */; };
 		D936A06A23A9000EFD5765D2E8ED7755 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 616BEB51ECCAD129BDBCB7A956B56CC6 /* Foundation.framework */; };
 		E36AF6ED96511619E0F372ADFCC4029E /* Pods-YUSegmentDemoUITests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8806A73CCC013B0A6E632D5FB6D8DB /* Pods-YUSegmentDemoUITests-dummy.m */; };
 		E616FB99F065171877803BA29C7B77DF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 616BEB51ECCAD129BDBCB7A956B56CC6 /* Foundation.framework */; };
-		EAC5AB66DB020FE832FCEE8F8DBC66DB /* YUIndicatorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 4E3C90B01569F6525B959450247532D9 /* YUIndicatorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EB2CA8F3D9184ECD8FEDCF3EF8ED3FF7 /* YUImageTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A822B3F37635B508AAB56B2F6EFF112F /* YUImageTextView.m */; };
 		F75AFD08138514983E628CB76AC3CB87 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 616BEB51ECCAD129BDBCB7A956B56CC6 /* Foundation.framework */; };
-		F779EB2EE410851D7CE57750000E125D /* YUSegment-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FF09DA06EFE6F1162270BD9FC0FA531 /* YUSegment-dummy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,47 +33,41 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0E1A984F98FFA174B9DCFC0D99A4E2E4 /* YUSegment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUSegment.h; path = Classes/YUSegment.h; sourceTree = "<group>"; };
 		156260A6C3B788FF5A6A41A57F6BF87F /* Pods-YUSegmentDemo-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemo-resources.sh"; sourceTree = "<group>"; };
 		33435E763C9A08AACE5E468EA83CC947 /* libPods-YUSegmentDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-YUSegmentDemoTests.a"; path = "libPods-YUSegmentDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		388586F8028CC9412F507F114B790BC9 /* YULabel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YULabel.m; path = Classes/YULabel.m; sourceTree = "<group>"; };
 		3C548A92BA77B70EC325C91C711CD084 /* Pods-YUSegmentDemoUITests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemoUITests-frameworks.sh"; sourceTree = "<group>"; };
-		469EE6C1B1C87818AE57C913D234E39E /* YULabel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YULabel.h; path = Classes/YULabel.h; sourceTree = "<group>"; };
 		4BCC0F24F114BFEE46EE3F378DD3034D /* Pods-YUSegmentDemoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemoTests.release.xcconfig"; sourceTree = "<group>"; };
-		4E3C90B01569F6525B959450247532D9 /* YUIndicatorView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUIndicatorView.h; path = Classes/YUIndicatorView.h; sourceTree = "<group>"; };
-		4FF09DA06EFE6F1162270BD9FC0FA531 /* YUSegment-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "YUSegment-dummy.m"; sourceTree = "<group>"; };
 		56F7D688823A2B4A4A1E5504BDA7D3CF /* Pods-YUSegmentDemo-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-YUSegmentDemo-acknowledgements.markdown"; sourceTree = "<group>"; };
-		5D723294E8E24E927A19CA8C5A1499EF /* YUIndicatorView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUIndicatorView.m; path = Classes/YUIndicatorView.m; sourceTree = "<group>"; };
+		5AB0169EED1617F761786E435843A329 /* YUSegment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUSegment.m; path = Classes/YUSegment.m; sourceTree = "<group>"; };
 		616BEB51ECCAD129BDBCB7A956B56CC6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		6E9CBB70CAEC2EEEA9A9AACAA5341462 /* YUImageTextView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUImageTextView.h; path = Classes/YUImageTextView.h; sourceTree = "<group>"; };
+		70B69AC620D2564C84516062457FBFAC /* YUMixtureView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUMixtureView.m; path = Classes/YUMixtureView.m; sourceTree = "<group>"; };
 		7EC994CDC2D681BA26389F78A7E4B325 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		7FF1FBA400584027A945C691E02F3295 /* Pods-YUSegmentDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		8C3B03DA4D8ACF04D4975DAA703FE5FA /* Pods-YUSegmentDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemo.release.xcconfig"; sourceTree = "<group>"; };
+		8CC8D7101780FF46A931BF180A691DF3 /* YUSegment-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "YUSegment-prefix.pch"; sourceTree = "<group>"; };
 		8E713D2A14A51BA8FB31F51BC73588B2 /* Pods-YUSegmentDemoTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-YUSegmentDemoTests-dummy.m"; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		952E51FFBF411B907AFEE120038E6A6A /* Pods-YUSegmentDemoUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemoUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		95E2CD1F84356BC97976D60834F45204 /* YUSegment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUSegment.h; path = Classes/YUSegment.h; sourceTree = "<group>"; };
+		96F4890FA1D6C331C9E6E65D7DEE62CD /* YUMixtureView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUMixtureView.h; path = Classes/YUMixtureView.h; sourceTree = "<group>"; };
 		9A7350276375649A39FF4896D5E5EDC2 /* Pods-YUSegmentDemoTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemoTests-frameworks.sh"; sourceTree = "<group>"; };
-		9B5638F41017471C64BDB4359951E192 /* YUSegment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUSegment.m; path = Classes/YUSegment.m; sourceTree = "<group>"; };
 		A44102EF2F1DE8661E84A693CF93F8AA /* Pods-YUSegmentDemoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemoTests.debug.xcconfig"; sourceTree = "<group>"; };
-		A822B3F37635B508AAB56B2F6EFF112F /* YUImageTextView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUImageTextView.m; path = Classes/YUImageTextView.m; sourceTree = "<group>"; };
 		AAFB37F23E838AEEC4F0E360F7A19F97 /* Pods-YUSegmentDemoUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-YUSegmentDemoUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B57BAB4912FAC198CE5A0791C865AE63 /* Pods-YUSegmentDemoUITests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-YUSegmentDemoUITests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		C73C901EBDF0AB1D12C530456CB4533F /* Pods-YUSegmentDemoTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-YUSegmentDemoTests-acknowledgements.plist"; sourceTree = "<group>"; };
 		CAD217B4F34F7FADECDE06509E9D1CF9 /* Pods-YUSegmentDemoUITests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemoUITests-resources.sh"; sourceTree = "<group>"; };
 		CC66F43768C7BAF49F634A6339C1B702 /* libPods-YUSegmentDemoUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-YUSegmentDemoUITests.a"; path = "libPods-YUSegmentDemoUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD936D4F65BA365B0C82C3FFA5801671 /* libPods-YUSegmentDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libPods-YUSegmentDemo.a"; path = "libPods-YUSegmentDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1E6FC2B555188B50E32369255824A77 /* YUSegment.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = YUSegment.xcconfig; sourceTree = "<group>"; };
 		DAA9841D340A790E9A19172E34FD72B4 /* Pods-YUSegmentDemo-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemo-frameworks.sh"; sourceTree = "<group>"; };
-		DC07008D73D7EF4DD2DB25A53D3A6071 /* YUSegment-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "YUSegment-prefix.pch"; sourceTree = "<group>"; };
 		DC98B1517CFF9F3E59FDAF1B90343CE6 /* libYUSegment.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libYUSegment.a; path = libYUSegment.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC9B0A71C723EE685597F6A32CD770F4 /* Pods-YUSegmentDemo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-YUSegmentDemo-dummy.m"; sourceTree = "<group>"; };
 		DD8806A73CCC013B0A6E632D5FB6D8DB /* Pods-YUSegmentDemoUITests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-YUSegmentDemoUITests-dummy.m"; sourceTree = "<group>"; };
 		DDC75C064EDD53F648C62E239F1BDFED /* Pods-YUSegmentDemo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-YUSegmentDemo-acknowledgements.plist"; sourceTree = "<group>"; };
 		E7E595E28543E5A1FC5599CB8F8A3D76 /* Pods-YUSegmentDemoTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-YUSegmentDemoTests-resources.sh"; sourceTree = "<group>"; };
 		E81ED1F0823E204036C8C2D421627C2A /* Pods-YUSegmentDemoUITests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-YUSegmentDemoUITests-acknowledgements.plist"; sourceTree = "<group>"; };
-		EA43F516159856565B4E434EA465B121 /* YUImageView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = YUImageView.h; path = Classes/YUImageView.h; sourceTree = "<group>"; };
 		EB34F86DE0A334E43D6811DBE7032E65 /* Pods-YUSegmentDemoTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-YUSegmentDemoTests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		F71152876A1704CE22A70A290F5406CF /* YUImageView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = YUImageView.m; path = Classes/YUImageView.m; sourceTree = "<group>"; };
+		F1CE44CE1F8F6192E523E5806979D390 /* YUSegment.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = YUSegment.xcconfig; sourceTree = "<group>"; };
+		FEBDA739AA2E8E8A374173D8AA90118E /* YUSegment-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "YUSegment-dummy.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,25 +107,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		07C525DE009FE235E6200CA315E074AE /* YUSegment */ = {
-			isa = PBXGroup;
-			children = (
-				6E9CBB70CAEC2EEEA9A9AACAA5341462 /* YUImageTextView.h */,
-				A822B3F37635B508AAB56B2F6EFF112F /* YUImageTextView.m */,
-				EA43F516159856565B4E434EA465B121 /* YUImageView.h */,
-				F71152876A1704CE22A70A290F5406CF /* YUImageView.m */,
-				4E3C90B01569F6525B959450247532D9 /* YUIndicatorView.h */,
-				5D723294E8E24E927A19CA8C5A1499EF /* YUIndicatorView.m */,
-				469EE6C1B1C87818AE57C913D234E39E /* YULabel.h */,
-				388586F8028CC9412F507F114B790BC9 /* YULabel.m */,
-				95E2CD1F84356BC97976D60834F45204 /* YUSegment.h */,
-				9B5638F41017471C64BDB4359951E192 /* YUSegment.m */,
-				908FB7241A02879268F064F9399E4D61 /* Support Files */,
-			);
-			name = YUSegment;
-			path = YUSegment;
-			sourceTree = "<group>";
-		};
 		0B0383B58C51827B7E55C78705A33309 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +171,30 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		58C4FE6545B150B487D2226E60A1D72E /* YUSegment */ = {
+			isa = PBXGroup;
+			children = (
+				96F4890FA1D6C331C9E6E65D7DEE62CD /* YUMixtureView.h */,
+				70B69AC620D2564C84516062457FBFAC /* YUMixtureView.m */,
+				0E1A984F98FFA174B9DCFC0D99A4E2E4 /* YUSegment.h */,
+				5AB0169EED1617F761786E435843A329 /* YUSegment.m */,
+				63840A84970DA67BDFECAEAEE8013F33 /* Support Files */,
+			);
+			name = YUSegment;
+			path = YUSegment;
+			sourceTree = "<group>";
+		};
+		63840A84970DA67BDFECAEAEE8013F33 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				F1CE44CE1F8F6192E523E5806979D390 /* YUSegment.xcconfig */,
+				FEBDA739AA2E8E8A374173D8AA90118E /* YUSegment-dummy.m */,
+				8CC8D7101780FF46A931BF180A691DF3 /* YUSegment-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/YUSegment";
+			sourceTree = "<group>";
+		};
 		71BBC9C1DCF29733B37F7A19904C824E /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -217,21 +210,18 @@
 			children = (
 				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
 				433CD3331B6C3787F473C941B61FC68F /* Frameworks */,
-				ED7FA2B04B4EF9D89CA2F5B0CDC16657 /* Pods */,
+				E3B97340B578B58002CF9CC8DA1FF597 /* Pods */,
 				0B0383B58C51827B7E55C78705A33309 /* Products */,
 				71BBC9C1DCF29733B37F7A19904C824E /* Targets Support Files */,
 			);
 			sourceTree = "<group>";
 		};
-		908FB7241A02879268F064F9399E4D61 /* Support Files */ = {
+		E3B97340B578B58002CF9CC8DA1FF597 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				D1E6FC2B555188B50E32369255824A77 /* YUSegment.xcconfig */,
-				4FF09DA06EFE6F1162270BD9FC0FA531 /* YUSegment-dummy.m */,
-				DC07008D73D7EF4DD2DB25A53D3A6071 /* YUSegment-prefix.pch */,
+				58C4FE6545B150B487D2226E60A1D72E /* YUSegment */,
 			);
-			name = "Support Files";
-			path = "../Target Support Files/YUSegment";
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		E6EE98446B568159EE277B68FD442AF0 /* iOS */ = {
@@ -243,26 +233,15 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		ED7FA2B04B4EF9D89CA2F5B0CDC16657 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				07C525DE009FE235E6200CA315E074AE /* YUSegment */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		231AE82BE42BD5C0BE191C9833A1EEBD /* Headers */ = {
+		D6730677320649F8317EF2E5C3B6169B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51A20A2C7DBDF8E09D126C479AABF185 /* YUImageTextView.h in Headers */,
-				7A49CF0EA12EB0B376A1070006C8278E /* YUImageView.h in Headers */,
-				EAC5AB66DB020FE832FCEE8F8DBC66DB /* YUIndicatorView.h in Headers */,
-				B4E8EC2C308C2F92EF89E18457609053 /* YULabel.h in Headers */,
-				0C47CFF5CBFE87826B0CBC7BF5B787FF /* YUSegment.h in Headers */,
+				5673C4E3082092B71B9C8B0FDA19083F /* YUMixtureView.h in Headers */,
+				B110F8A74AF9AD0F49D32518337DAD51 /* YUSegment.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,9 +269,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8A085563E23740A0BBCABAD95F418F0 /* Build configuration list for PBXNativeTarget "YUSegment" */;
 			buildPhases = (
-				C665AED9F2AD7FC929DEEA45076A2598 /* Sources */,
+				9946063254DB0039E8347F6D0E91175C /* Sources */,
 				13814D67BA280E439ECE4D8B84A9C4B0 /* Frameworks */,
-				231AE82BE42BD5C0BE191C9833A1EEBD /* Headers */,
+				D6730677320649F8317EF2E5C3B6169B /* Headers */,
 			);
 			buildRules = (
 			);
@@ -381,24 +360,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9946063254DB0039E8347F6D0E91175C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4700E051A50C77E988C215885E98E170 /* YUMixtureView.m in Sources */,
+				C3209B59E35875CF4C437257164C06D6 /* YUSegment-dummy.m in Sources */,
+				184CA8ACEEE8CCA61ADE57064284B09C /* YUSegment.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB940268A1DBBF4177BB068474C7854F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				CD4327FF4D4608F38EB47A4CF1054F76 /* Pods-YUSegmentDemo-dummy.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C665AED9F2AD7FC929DEEA45076A2598 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EB2CA8F3D9184ECD8FEDCF3EF8ED3FF7 /* YUImageTextView.m in Sources */,
-				2A1F92024BA9F82E95B9DE84B02E3E7A /* YUImageView.m in Sources */,
-				D4DB6B42D679EDC2B31BC72667188792 /* YUIndicatorView.m in Sources */,
-				C44C6311CBDCBB810ECDC9163B1DC896 /* YULabel.m in Sources */,
-				F779EB2EE410851D7CE57750000E125D /* YUSegment-dummy.m in Sources */,
-				0FE6C3C765C5303BA2A8D8973C36B8EC /* YUSegment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,7 +459,7 @@
 		};
 		223116D43E3EE1B9979DB97DAF73970E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D1E6FC2B555188B50E32369255824A77 /* YUSegment.xcconfig */;
+			baseConfigurationReference = F1CE44CE1F8F6192E523E5806979D390 /* YUSegment.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -638,7 +614,7 @@
 		};
 		E4D4962158E8FA610D3C6E7920A27C3F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D1E6FC2B555188B50E32369255824A77 /* YUSegment.xcconfig */;
+			baseConfigurationReference = F1CE44CE1F8F6192E523E5806979D390 /* YUSegment.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
