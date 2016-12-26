@@ -83,6 +83,7 @@ segment.layer.borderWidth = someValue;
 segment.layer.borderColor = someValue;
 ```
 ~~Note: You should use `cornerRadius` instead of `layer.cornerRadius`. Because if you set `cornerRaduis` for segmented control, the indicator will become rounded automatically.~~
+Note: About `cornerRadius`. Both segmented control and its indicator have default value of `cornerRadius`. The default value is equal to half the height of the segmented control. In version 0.2.0, the indicator will not become rounded automatically if you just set `cornerRaduis` of the segmented control. You also need to set `cornerRadius` for indicator manually.
 
 ### Scrolling Enabled
 
@@ -102,6 +103,8 @@ sgement.borderWidth(1.0).borderColor([UIColor redColor]);
 - Exposes property `indicator(readonly)`, you could set attributes for indicator such as `backgroundColor`, `borderWidth`, `borderColor`, etc.
 ```objective-c
 segment.indicator.backgroundColor = [UIColor redColor];
+segment.indicator.layer.borderWidth = 1.0;
+segment.indicator.layer.borderColor = [UIColor redColor].CGColor;
 ```
 
 - Supports chainable syntax. You could set `borderWidth` and `borderColor` for indicator look like:
