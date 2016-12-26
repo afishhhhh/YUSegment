@@ -81,14 +81,27 @@ You could set `borderColor`, `borderWidth`, and `cornerRadius` in Attributes Ins
 segment.layer.borderWidth = someValue;
 segment.layer.borderColor = someValue;
 ```
-Note: You should use `cornerRadius` instead of `layer.cornerRadius`. Because if you set `cornerRaduis` for segmented control, the indicator will become rounded automatically.
-```objective-c
-segment.cornerRadius = someValue;
-```
+~~Note: You should use `cornerRadius` instead of `layer.cornerRadius`. Because if you set `cornerRaduis` for segmented control, the indicator will become rounded automatically.~~
 
 ### Scrolling Enabled
 
 YUSegment don't have property look like `scrollEnabled`, you just need to set the width of each segment(`segmentWidth`). This property causes the segmented control scroll horizontally.
+
+## New Features
+
+###### Version 0.1.4:
+
+- Supports chainable syntax. You could set `borderWidth` and `borderColor` for segmented control look like:
+```objective-c
+sgement.borderWidth(1.0).borderColor([UIColor redColor]);
+```
+
+###### Version 0.2.0:
+
+- Supports chain able syntax. You could set `borderWidth` and `borderColor` for indicator look like:
+```objective-c
+segment.indicator.borderWidth(1.0).borderColor([UIColor redColor]);
+```	
 
 ## License
 
