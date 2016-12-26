@@ -14,6 +14,7 @@ A customizable segmented control for iOS.
 - Supports both (Attributed)text and image
 - Has two styles(linear and rectangular) to choose
 - Supports horizontal scrolling
+- Supports customize font and color
 - YUSegment works on iOS 8.0+ and is compatible with ARC projects
 
 ## Installation
@@ -85,7 +86,7 @@ segment.layer.borderColor = someValue;
 
 ### Scrolling Enabled
 
-YUSegment don't have property look like `scrollEnabled`, you just need to set the width of each segment(`segmentWidth`). This property causes the segmented control scroll horizontally.
+YUSegment don't have property look like `scrollEnabled`, you just need to set the width of each segment(`segmentWidth`). This property will make the segmented control scroll horizontally.
 
 ## New Features
 
@@ -98,7 +99,12 @@ sgement.borderWidth(1.0).borderColor([UIColor redColor]);
 
 ###### Version 0.2.0:
 
-- Supports chain able syntax. You could set `borderWidth` and `borderColor` for indicator look like:
+- Exposes property `indicator(readonly)`, you could set attributes for indicator such as `backgroundColor`, `borderWidth`, `borderColor`, etc.
+```objective-c
+segment.indicator.backgroundColor = [UIColor redColor];
+```
+
+- Supports chainable syntax. You could set `borderWidth` and `borderColor` for indicator look like:
 ```objective-c
 segment.indicator.borderWidth(1.0).borderColor([UIColor redColor]);
 ```	
