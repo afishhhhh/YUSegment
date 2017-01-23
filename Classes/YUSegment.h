@@ -42,12 +42,6 @@ typedef NS_ENUM(NSUInteger, YUSegmentedControlState) {
     YUSegmentedControlStateSelected,
 };
 
-typedef NS_ENUM(NSUInteger, YUIndicatorViewStyle) {
-    // See `YUSegmentStyle` for more detail.
-    YUIndicatorViewStyleLine,
-    YUIndicatorViewStyleBox,
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -55,7 +49,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface YUIndicatorView : UIView
 
-//@property (nonatomic, assign) CGFloat height;
+@property (nonatomic, assign) CGFloat width;
+
+@property (nonatomic, assign) CGFloat height;
+
+- (void)adjustsContentToFitWidth;
 
 /**
  Returns a block which accepts an argument as the value of `borderWidth`.
@@ -80,43 +78,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YUSegment : UIControl
 
-#if TARGET_INTERFACE_BUILDER
-
-///------------------------
-/// @name Managing Segments
-///------------------------
-
-/**
- The titles the receiver has. Set this property in attributes inspector.
- */
-@property (nonatomic, copy) IBInspectable NSString *segmentTitles;
-
-/**
- The images(names) the receiver has. Set this property in attributes inspector.
- */
-@property (nonatomic, copy) IBInspectable NSString *segmentImages;
-
-///----------------------------------
-/// @name Managing Segment Appearance
-///----------------------------------
-
-/**
- The width of the segmented control's border.
- */
-@property (nonatomic, assign) IBInspectable CGFloat borderWidth;
-
-/**
- The color of the segmented control's border.
- */
-@property (nonatomic, strong) IBInspectable UIColor *borderColor;
-
-/**
- The boolean value whether to set the style to `YUSegmentStyleBox`.
- */
-@property (nonatomic, assign) IBInspectable BOOL boxStyle;
-
-#endif
-
 ///------------------------
 /// @name Managing Segments
 ///------------------------
@@ -129,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The index number identifying the selected segment. The default is 0;
  */
-@property (nonatomic, assign) IBInspectable NSUInteger selectedIndex;
+@property (nonatomic, assign) NSUInteger selectedIndex;
 
 /**
  Return the titles the receiver has. It is the convenient method to return the title for a specific segment.
@@ -158,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @note Set width to 0 is not valid.
  */
-@property (nonatomic, assign) IBInspectable CGFloat segmentWidth;
+@property (nonatomic, assign) CGFloat segmentWidth;
 
 ///-------------------------
 /// @name Managing Indicator
@@ -175,57 +136,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Managing Text Appearance
 ///-------------------------------
 
-/**
- The color of the text.
- */
-@property (nonatomic, strong) IBInspectable UIColor *textColor;
 
-/**
- The color of the text when the segment is selected.
- */
-@property (nonatomic, strong) IBInspectable UIColor *selectedTextColor;
-
-/**
- The font of the text.
- */
-@property (nonatomic, strong) UIFont *font;
-
-/**
- The font of the text when the segment is selected.
- */
-@property (nonatomic, strong) UIFont *selectedFont;
 
 ///---------------------
 /// @name Initialization
 ///---------------------
-
-/**
- Initializes and returns a segmented control with segments having the given titles. 
- The style is `YUSegmentStyleLine`.
-
- @param titles An array of `NSString` objects. The value must not be nil or empty array.
- @return The newly-created instance of the `YUSegment`.
- */
-- (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
-
-/**
- Initializes and returns s segmented control with segments having the given images.
- The style is `YUSegmentStyleLine`.
-
- @param images An array of `UIImage` objects. The value must not be nil or empty array.
- @return The newly-created instance of the `YUSegment`.
- */
-- (instancetype)initWithImages:(NSArray <UIImage *> *)images;
-
-/**
- Initializes and returns s segmented control with segments having the given titles and images.
- The style is `YUSegmentStyleLine`.
-
- @param titles An array of `NSString` objects. This value must not be nil or empty array.
- @param images An array of `UIImage` objects. This value must not be nil or empty array.
- @return The newly-created instance of the `YUSegment`.
- */
-- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images;
 
 /**
  Initializes and returns a segmented control with segments having the given titles and style.
@@ -234,26 +149,26 @@ NS_ASSUME_NONNULL_BEGIN
  @param style The segmented control style. See `YUSegmentStyle` for the possible values.
  @return The newly-created instance of the `YUSegment`.
  */
-- (instancetype)initWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style;
++ (instancetype)yu_segmentWithTitles:(NSArray <NSString *> *)titles style:(YUSegmentStyle)style;
 
 /**
  Initializes and returns a segmented control with segments having the given images and style.
 
- @param images An array of `UIImage` objects. This value must not be nil or empty array.
+ @param images An array of `UIImage` objects. The value must not be nil or empty array.
  @param style The segmented control style. See `YUSegmentStyle` for the possible values.
  @return The newly-created instance of the `YUSegment`.
  */
-- (instancetype)initWithImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
++ (instancetype)yu_segmentWithImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
 
 /**
- Initializes and returns s segmented control with segments having the given titles, images and style.
+ Initializes and returns a segmented control with segments having the given images and style.
 
- @param titles An array of `NSString` objects. The value must not be nil or empty array.
- @param images An array of `UIImage` objects. This value must not be nil or empty array.
+ @param images An array of `UIImage` objects. The value must not be nil or empty array.
+ @param unselectedImages An array of `UIImage` objects. The value must not be nil or empty array.
  @param style The segmented control style. See `YUSegmentStyle` for the possible values.
  @return The newly-created instance of the `YUSegment`.
  */
-- (instancetype)initWithTitles:(NSArray <NSString *> *)titles forImages:(NSArray <UIImage *> *)images style:(YUSegmentStyle)style;
++ (instancetype)yu_segmentWithImages:(NSArray <UIImage *> *)images unselectedImages:(NSArray <UIImage *> *)unselectedImages style:(YUSegmentStyle)style;
 
 ///-------------------------------
 /// @name Managing Segment Content
@@ -263,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
  Set the content of a segment to a given title.
 
  @param title A new title display in the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1.
  */
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index;
 
@@ -271,23 +186,16 @@ NS_ASSUME_NONNULL_BEGIN
  Set the content of a segment to a given image.
 
  @param image A new image display in the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1.
  */
 - (void)setImage:(UIImage *)image forSegmentAtIndex:(NSUInteger)index;
 
-/**
- Set the content of a segment to given title and image. You could just use `-setTitle:forSegmentAtIndex:` or `-setImage:forSegmentAtIndex:` to modify title or image only.
-
- @param title A new title display in the segment.
- @param image A new image display in the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)setTitle:(nullable NSString *)title forImage:(nullable UIImage *)image forSegmentAtIndex:(NSUInteger)index;
+- (void)setImage:(UIImage *)image unselectedImage:(UIImage *)unselectedImage forSegmentAtIndex:(NSUInteger)index;
 
 /**
  Returns the title for a specific segment.
 
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1.
  @return The title for a specific segment.
  */
 - (nullable NSString *)titleForSegmentAtIndex:(NSUInteger)index;
@@ -295,45 +203,46 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns the image for a specific segment.
 
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
+ @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1.
  @return The image for a specific segment.
  */
 - (nullable UIImage *)imageForSegmentAtIndex:(NSUInteger)index;
-
-/**
- Replaces the deselected images with new images. The receiver uses the same images by default, no matter whether a specific image selected.
-
- @param images An array of `UIImage` objects.
- */
-- (void)replaceDeselectedImagesWithImages:(NSArray <UIImage *> *)images;
-
-/**
- Replaces the deselected image with given image.
-
- @param image A new image display in the segment.
- @param index An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
- */
-- (void)replaceDeselectedImageWithImage:(UIImage *)image atIndex:(NSUInteger)index;
 
 ///-----------------------------------
 /// @name Managing Segments Appearance
 ///-----------------------------------
 
 /**
+ Sets the font of the text for a given control state.
+
+ @param font The font of the text.
+ @param state A control state. See the `YUSegmenedControlState` for more possible values.
+ */
+- (void)setFont:(UIFont *)font forState:(YUSegmentedControlState)state;
+
+/**
+ Sets the color of the text for a given control state.
+
+ @param textColor The color of the text.
+ @param state A control state. See the `YUSegmenedControlState` for more possible values.
+ */
+- (void)setTextColor:(UIColor *)textColor forState:(YUSegmentedControlState)state;
+
+/**
  Sets the text attributes of the title for a given control state.
 
  @param attributes The text attributes of the title.
- @param state A control state.
+ @param state A control state. See the `YUSegmenedControlState` for more possible values.
  */
-- (void)setTitleTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state;
+- (void)setTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state;
 
 /**
  Returns the text attributes of the title for a given control state.
 
- @param state A control state.
+ @param state A control state. See the `YUSegmenedControlState` for more possible values.
  @return The text attributes of the title for state.
  */
-- (nullable NSDictionary *)titleTextAttributesForState:(YUSegmentedControlState)state;
+- (nullable NSDictionary *)textAttributesForState:(YUSegmentedControlState)state;
 
 /**
  Returns a block which accepts an argument as the value of `borderWidth`.
@@ -358,9 +267,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YUIndicatorView (Deprecated)
 
-- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("This method is not supported.")));
-- (instancetype)init __attribute__((deprecated("This method is not supported.")));
-- (instancetype)new __attribute__((deprecated("This method is not supported.")));
+//- (instancetype)initWithFrame:(CGRect)frame __attribute__((deprecated("This method is not supported.")));
+//- (instancetype)init __attribute__((deprecated("This method is not supported.")));
+//- (instancetype)new __attribute__((deprecated("This method is not supported.")));
 
 @end
 
