@@ -11,24 +11,11 @@
 
 @interface YUSegment ()
 
-/// @name Views
-
-
-@property (nonatomic, strong) UIScrollView  *scrollView;
-
-
-/// @name Constraints
-
-//@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraintsNormal;
-//@property (nonatomic, strong) NSMutableArray <NSLayoutConstraint *> *leadingConstraintsSelected;
-
-/// @name Appearance
+@property (nonatomic, strong) UIScrollView *scrollView;
 
 @end
 
-@implementation YUSegment {
-    CGFloat _segmentWidth;
-}
+@implementation YUSegment
 
 #pragma mark - Initialization
 
@@ -104,17 +91,11 @@
     // Set default values.
     _scrollEnabled = NO;
     _selectedIndex = 0;
+    _contentOffset = kEachSegmentDefaultMargin;
     
     // Setup views.
     self.backgroundColor = [UIColor whiteColor];
-    _containerNormal = ({
-        UIView *containerView = [UIView new];
-        containerView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:containerView];
-        [self setupConstraintsWithItem:containerView toItem:self];
-        
-        containerView;
-    });
+    _containerNormal = [self setupContainer];
     _indicator = ({
         YUIndicatorView *indicator = [[YUIndicatorView alloc] init];
         [self addSubview:indicator];
@@ -224,16 +205,112 @@
 
 #pragma mark - Views Setup
 
+- (void)makeContainerUsable {
+    _containerSelected = [self setupContainer];
+    _containerSelected.layer.mask = _indicator.maskView.layer;
+}
+
+- (UIView *)setupContainer {
+    UIView *containerView = [UIView new];
+    containerView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:containerView];
+    [self setupConstraintsWithItem:containerView toItem:self];
+    
+    return containerView;
+}
+
+- (UILabel *)setupNormalLabelWithTitle:(NSString *)title {
+    UILabel *label = [[UILabel alloc] init];
+    label.attributedText = [[NSAttributedString alloc] initWithString:title attributes:_textAttributesNormal];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.userInteractionEnabled = YES;
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+    return label;
+}
+
+- (UILabel *)setupSelectedLabelWithTitle:(NSString *)title {
+    UILabel *label = [[UILabel alloc] init];
+    label.attributedText = [[NSAttributedString alloc] initWithString:title attributes:_textAttributesSelected];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+    return label;
+}
+
+- (void)addLabels {
+    UILabel *label;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        label = [self setupNormalLabelWithTitle:_internalTitles[i]];
+        [_labelsNormal addObject:label];
+        [_containerNormal addSubview:label];
+    }
+    [self layoutSubviewsInContainer:_containerNormal];
+    
+    if (_containerSelected) {
+        self.labelsSelected = [NSMutableArray array];
+        for (int i = 0; i < _numberOfSegments; i++) {
+            label = [self setupSelectedLabelWithTitle:_internalTitles[i]];
+            [_labelsSelected addObject:label];
+            [_containerSelected addSubview:label];
+        }
+        [self layoutSubviewsInContainer:_containerSelected];
+    }
+}
+
+- (UIImageView *)setupImageViewWithImage:(UIImage *)image {
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.userInteractionEnabled = YES;
+    imageView.translatesAutoresizingMaskIntoConstraints = NO;
+    return imageView;
+}
+
+- (void)addImageViews {
+    UIImageView *imageView;
+    NSArray *images = _unselectImages ?: _internalImages;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        imageView = [self setupImageViewWithImage:images[i]];
+        [_imageViewsNormal addObject:imageView];
+        [_containerNormal addSubview:imageView];
+    }
+    [self layoutSubviewsInContainer:_containerNormal];
+    
+    if (_containerSelected) {
+        self.imageViewsSelected = [NSMutableArray array];
+        for (int i = 0; i < _numberOfSegments; i++) {
+            imageView = [self setupImageViewWithImage:_internalImages[i]];
+            [_imageViewsSelected addObject:imageView];
+            [_containerSelected addSubview:imageView];
+        }
+        [self layoutSubviewsInContainer:_containerSelected];
+    }
+}
+
 #pragma mark - Views Update
 
 - (void)updateViewHierarchy {
+    _scrollView = ({
+        UIScrollView *scrollView = [UIScrollView new];
+        scrollView.showsVerticalScrollIndicator = NO;
+        scrollView.showsHorizontalScrollIndicator = NO;
+        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:scrollView];
+        [self setupConstraintsWithItem:scrollView toItem:self];
+        
+        scrollView;
+    });
+    
     [_containerNormal removeFromSuperview];
-    [self.scrollView addSubview:_containerNormal];
+    [_scrollView addSubview:_containerNormal];
     [self setupConstraintsToScrollViewWithItem:_containerNormal];
+    [self resetWidthConstraintsForSubviewsInContainer:_containerNormal];
     [_indicator removeFromSuperview];
     [_scrollView addSubview:_indicator];
-    [self updateWidthConstraintsForSegments];
-    // Subclasses override this.
+    
+    if (_containerSelected) {
+        [_scrollView addSubview:_containerSelected];
+        [self setupConstraintsToScrollViewWithItem:_containerSelected];
+        [self resetWidthConstraintsForSubviewsInContainer:_containerSelected];
+    }
 }
 
 - (void)setFont:(UIFont *)font forState:(YUSegmentedControlState)state {
@@ -304,28 +381,38 @@
 #pragma mark -
 
 - (void)makeSegmentCenterIfNeeded {
-    CGFloat finalOffset = self.segmentWidth * (_selectedIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
-    CGFloat maxOffset = _scrollView.contentSize.width - CGRectGetWidth(self.frame);
-    CGPoint contentOffset = _scrollView.contentOffset;
-    if (finalOffset <= 0) {
-        contentOffset.x = 0;
-    }
-    else if (finalOffset >= maxOffset) {
-        contentOffset.x = maxOffset;
-    }
-    else {
-        contentOffset.x = finalOffset;
-    }
-    [UIView animateWithDuration:kMovingAnimationDuration animations:^{
-        _scrollView.contentOffset = contentOffset;
-    }];
+//    CGFloat finalOffset = self.segmentWidth * (_selectedIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
+//    CGFloat maxOffset = _scrollView.contentSize.width - CGRectGetWidth(self.frame);
+//    CGPoint contentOffset = _scrollView.contentOffset;
+//    if (finalOffset <= 0) {
+//        contentOffset.x = 0;
+//    }
+//    else if (finalOffset >= maxOffset) {
+//        contentOffset.x = maxOffset;
+//    }
+//    else {
+//        contentOffset.x = finalOffset;
+//    }
+//    [UIView animateWithDuration:kMovingAnimationDuration animations:^{
+//        _scrollView.contentOffset = contentOffset;
+//    }];
 }
 
 #pragma mark - Setters
 
-- (void)setSegmentWidth:(CGFloat)segmentWidth {
-    _segmentWidth = segmentWidth;
-    // Subclasses implement this.
+- (void)setScrollEnabled:(BOOL)scrollEnabled {
+    _scrollEnabled = scrollEnabled;
+    if (scrollEnabled) {
+        [self updateViewHierarchy];
+    }
+}
+
+- (void)setContentOffset:(CGFloat)contentOffset {
+    if (_contentOffset == contentOffset) {
+        return;
+    }
+    _contentOffset = contentOffset;
+    [self updateOffsetForEachSegment];
 }
 
 #pragma mark - Getters
@@ -338,32 +425,6 @@
     return [_internalImages copy];
 }
 
-- (CGFloat)segmentWidth {
-    if (!_segmentWidth) {
-        return CGRectGetWidth(self.bounds) / _numberOfSegments;
-    }
-    return _segmentWidth;
-}
-
-- (UIScrollView *)scrollView {
-    if (_scrollView) {
-        return _scrollView;
-    }
-    _scrollView = ({
-        UIScrollView *scrollView = [UIScrollView new];
-        scrollView.showsVerticalScrollIndicator = NO;
-        scrollView.showsHorizontalScrollIndicator = NO;
-        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:scrollView];
-        _scrollEnabled = YES;
-        
-        scrollView;
-    });
-    [self setupConstraintsWithItem:_scrollView toItem:self];
-    
-    return _scrollView;
-}
-
 #pragma mark - Constraints
 
 + (BOOL)requiresConstraintBasedLayout {
@@ -374,25 +435,27 @@
     id lastView;
     NSArray *subviews = container.subviews;
     for (int i = 0; i < _numberOfSegments; i++) {
-        [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeTop multiplier:1.0 constant:8.0].active = YES;
-        
-        [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-8.0].active = YES;
+        [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
         
         if (lastView) {
-            NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
-            leading.active = YES;
-            leading.identifier = [NSString stringWithFormat:@"%d", i];
+            NSLayoutConstraint *offset = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
+            offset.active = YES;
+            offset.identifier = @"o";
             
-            [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0].active = YES;
+            NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0];
+            width.active = YES;
+            width.identifier = @"w";
         }
         else {
-            NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];
-            leading.active = YES;
-            leading.identifier = [NSString stringWithFormat:@"%d", i];
+            NSLayoutConstraint *edge = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];
+            edge.active = YES;
+            edge.identifier = @"e";
         }
         lastView = subviews[i];
     }
-    [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
+    NSLayoutConstraint *edge = [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
+    edge.active = YES;
+    edge.identifier = @"e";
 }
 
 - (void)setupConstraintsWithItem:(id)item1 toItem:(id)item2 {
@@ -410,48 +473,22 @@
     [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:item attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0.0].active = YES;
 }
 
-- (void)updateWidthConstraintsForSegments {
-    id item = _containerNormal.subviews[0];
-    [NSLayoutConstraint constraintWithItem:item attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_segmentWidth].active = YES;
-//    item = _containerSelected.subviews[0];
-//    [NSLayoutConstraint constraintWithItem:item attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:_segmentWidth].active = YES;
-}
-
-- (void)updateConstraintsWithItem:(id)item1 toItem:(id)item2 atIndex:(NSUInteger)index {
-    NSString *identifier = [NSString stringWithFormat:@"%lu", (unsigned long)index];
-    __block NSLayoutConstraint *oldLeading;
-    [((UIView *)item2).constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.identifier && [obj.identifier isEqualToString:identifier]) {
-            oldLeading = obj;
-            *stop = YES;
+- (void)resetWidthConstraintsForSubviewsInContainer:(UIView *)container {
+    for (NSLayoutConstraint *constraint in container.constraints) {
+        if ([constraint.identifier isEqualToString:@"w"]) {
+            constraint.active = NO;
         }
-    }];
-    id item = oldLeading.firstItem;
-    id toItem = oldLeading.secondItem;
-    oldLeading.active = NO;
-    
-    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeTop multiplier:1.0 constant:8.0].active = YES;
-    
-    [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:item2 attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-8.0].active = YES;
-    
-    NSLayoutConstraint *newLeading = [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
-    newLeading.active = YES;
-//    [self.leadingConstraints insertObject:newLeading atIndex:index];
-    
-    oldLeading = [NSLayoutConstraint constraintWithItem:item attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:item1 attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:8.0];
-    oldLeading.active = YES;
-//    self.leadingConstraints[index + 1] = oldLeading;
-    
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:item1 attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:toItem attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0];
-    widthConstraint.active = YES;
-    
-//    [UIView animateWithDuration:3 animations:^{
-//        [self layoutIfNeeded];
-//    }];
+        if ([constraint.identifier isEqualToString:@"o"]) {
+            constraint.constant = _contentOffset * 2.0;
+        }
+        if ([constraint.identifier isEqualToString:@"e"]) {
+            constraint.constant = _contentOffset;
+        }
+    }
 }
 
-- (void)updateConstraintsWithDeleteSegmentViewAtIndex:(NSUInteger)index {
-    
+- (void)updateOffsetForEachSegment {
+
 }
 
 @end
@@ -464,24 +501,19 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _fitWidth = NO;
+        self.backgroundColor = [UIColor blackColor];
     }
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    NSLog(@"IndicatorView layoutSubviews");
     if (self.maskView) {
         self.maskView.frame = self.frame;
     }
 }
 
 #pragma mark -
-
-- (void)adjustsContentToFitWidth {
-    _fitWidth = YES;
-}
 
 - (void)setCenterX:(CGFloat)centerX {
     CGPoint center = self.center;
@@ -502,6 +534,12 @@
         self.layer.borderColor = borderColor.CGColor;
         return self;
     };
+}
+
+#pragma mark - Getters
+
+- (CGSize)size {
+    return _size;
 }
 
 @end

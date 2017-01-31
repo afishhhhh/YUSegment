@@ -9,11 +9,6 @@
 
 @interface YUSegmentBox ()
 
-@property (nonatomic, strong) UIView *containerSelected;
-
-@property (nonatomic, strong) NSMutableArray <UILabel *>        *labelsSelected;
-@property (nonatomic, strong) NSMutableArray <UIImageView *>    *imageViewsSelected;
-
 @end
 
 @implementation YUSegmentBox {
@@ -28,8 +23,7 @@
         self.textAttributesNormal = [NSMutableDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium], NSFontAttributeName, [UIColor blackColor], NSForegroundColorAttributeName, nil];
         self.textAttributesSelected = [NSMutableDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium], NSFontAttributeName, [UIColor whiteColor], NSForegroundColorAttributeName, nil];
         [self box_commonInit];
-        _labelsSelected = [NSMutableArray array];
-        [self setupLabelsWithTitles:titles];
+        [self addLabels];
     }
     return self;
 }
@@ -38,8 +32,7 @@
     self = [super initWithImages:images unselectedImages:unselectedImages];
     if (self) {
         [self box_commonInit];
-        _imageViewsSelected = [NSMutableArray array];
-        [self setupImageViewsWithImages:images unselectedImages:unselectedImages];
+        [self addImageViews];
     }
     return self;
 }
@@ -47,21 +40,10 @@
 - (void)box_commonInit {
     // Setup views
     YUIndicatorView *indicator = self.indicator;
-    indicator.backgroundColor = [UIColor colorWithWhite:0.2 alpha:1.0];
     indicator.maskView = [UIView new];
     indicator.maskView.backgroundColor = [UIColor whiteColor];
     indicator.layer.masksToBounds = YES;
-    _containerSelected = ({
-        UIView *container = [UIView new];
-        container.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:container];
-        [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
-        [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
-        [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
-        [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
-        container.layer.mask = indicator.maskView.layer;
-        container;
-    });
+    [self makeContainerUsable];
     // Setup gestures
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self addGestureRecognizer:tap];
@@ -71,83 +53,26 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    NSLog(@"YUSegmentLine layoutSubviews.");
-    CGFloat segmentWidth = self.segmentWidth;
+    NSUInteger index = self.selectedIndex;
     YUIndicatorView *indicator = self.indicator;
-    CGFloat indicatorWidth = indicator.width ?: segmentWidth;
-    CGFloat indicatorHeight = indicator.height ?: CGRectGetHeight(self.frame);
-    if (indicator.fitWidth) {
-        indicatorWidth = [self calculateIndicatorWidthAtSegmentIndex:self.selectedIndex];
-        CGFloat x = segmentWidth * self.selectedIndex + (segmentWidth - indicatorWidth) / 2.0;
-        CGFloat y = (CGRectGetHeight(self.frame) - indicatorHeight) / 2.0;
-        indicator.frame = (CGRect){x, y, indicatorWidth, indicatorHeight};
-    } else {
-        CGFloat x = segmentWidth * self.selectedIndex + (segmentWidth - indicatorWidth) / 2.0;
-        CGFloat y = (CGRectGetHeight(self.frame) - indicatorHeight) / 2.0;
-        indicator.frame = (CGRect){x, y, indicatorWidth, indicatorHeight};
+    CGFloat indicatorWidth = indicator.size.width ?: CGRectGetWidth(self.frame) / self.numberOfSegments;
+    CGFloat indicatorHeight = indicator.size.height ?: CGRectGetHeight(self.frame);
+    CGRect frame;
+    if (self.scrollEnabled) {
+        CGFloat x;
+        for (int i = 0; i < index; i++) {
+            x += [self calculateIndicatorWidthAtSegmentIndex:i];
+        }
+        x += index * 2 * kEachSegmentDefaultMargin;
+        frame = (CGRect){x, 0, 64.0 + [self calculateIndicatorWidthAtSegmentIndex:index], indicatorHeight};
     }
+    else {
+        frame = (CGRect){index * CGRectGetWidth(self.frame) / self.numberOfSegments, 0, indicatorWidth, indicatorHeight};
+    }
+    indicator.frame = frame;
+
     self.layer.cornerRadius = CGRectGetHeight(self.frame) / 2.0;
     indicator.layer.cornerRadius = indicatorHeight / 2.0;
-}
-
-- (UILabel *)configureNormalLabelWithTitle:(NSString *)title {
-    UILabel *label = [[UILabel alloc] init];
-    label.attributedText = [[NSAttributedString alloc] initWithString:title attributes:self.textAttributesNormal];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.translatesAutoresizingMaskIntoConstraints = NO;
-    return label;
-}
-
-- (UILabel *)configureSelectedLabelWithTitle:(NSString *)title {
-    UILabel *label = [[UILabel alloc] init];
-    label.attributedText = [[NSAttributedString alloc] initWithString:title attributes:self.textAttributesSelected];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.translatesAutoresizingMaskIntoConstraints = NO;
-    return label;
-}
-
-- (void)setupLabelsWithTitles:(NSArray *)titles {
-    UILabel *label;
-    NSUInteger count = [titles count];
-    NSMutableArray *labelsNormal = self.labelsNormal;
-    UIView *containerNormal = self.containerNormal;
-    for (int i = 0; i < count; i++) {
-        label = [self configureNormalLabelWithTitle:titles[i]];
-        [labelsNormal addObject:label];
-        [containerNormal addSubview:label];
-        
-        label = [self configureSelectedLabelWithTitle:titles[i]];
-        [_labelsSelected addObject:label];
-        [_containerSelected addSubview:label];
-    }
-    [self layoutSubviewsInContainer:containerNormal];
-    [self layoutSubviewsInContainer:_containerSelected];
-}
-
-- (UIImageView *)configureImageViewWithImage:(UIImage *)image {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.translatesAutoresizingMaskIntoConstraints = NO;
-    return imageView;
-}
-
-- (void)setupImageViewsWithImages:(NSArray *)images unselectedImages:(NSArray *)unselectedImages {
-    UIImageView *imageView;
-    NSUInteger count = [images count];
-    NSMutableArray *imageViewsNormal = self.imageViewsNormal;
-    UIView *containerNormal = self.containerNormal;
-    NSArray *u_images = unselectedImages ?: images;
-    for (int i = 0; i < count; i++) {
-        imageView = [self configureImageViewWithImage:u_images[i]];
-        [imageViewsNormal addObject:imageView];
-        [containerNormal addSubview:imageView];
-        
-        imageView = [self configureImageViewWithImage:images[i]];
-        [_imageViewsSelected addObject:imageView];
-        [_containerSelected addSubview:imageView];
-    }
-    [self layoutSubviewsInContainer:containerNormal];
-    [self layoutSubviewsInContainer:_containerSelected];
 }
 
 #pragma mark - Managing Segment Content
@@ -188,7 +113,7 @@
     NSUInteger numberOfSegments = self.numberOfSegments;
     NSArray *titles = self.internalTitles;
     for (int i = 0; i < numberOfSegments; i++) {
-        _labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:self.textAttributesSelected];
+        self.labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:self.textAttributesSelected];
     }
 }
 
@@ -197,7 +122,7 @@
     NSUInteger numberOfSegments = self.numberOfSegments;
     NSArray *titles = self.internalTitles;
     for (int i = 0; i < numberOfSegments; i++) {
-        _labelsSelected[i].attributedText = [[NSAttributedString alloc]initWithString:titles[i] attributes:self.textAttributesSelected];
+        self.labelsSelected[i].attributedText = [[NSAttributedString alloc]initWithString:titles[i] attributes:self.textAttributesSelected];
     }
 }
 
@@ -206,7 +131,7 @@
     NSUInteger numberOfSegments = self.numberOfSegments;
     NSArray *titles = self.internalTitles;
     for (int i = 0; i < numberOfSegments; i++) {
-        _labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:attributes];
+        self.labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:attributes];
     }
 }
 
@@ -219,9 +144,13 @@
 - (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:self.containerNormal];
     NSUInteger fromIndex = self.selectedIndex;
-    self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:location.x];
-    if (fromIndex != self.selectedIndex) {
-        [self moveIndicatorFromIndex:fromIndex toIndex:self.selectedIndex];
+    UIView *hitView = [self.containerNormal hitTest:location withEvent:nil];
+    NSUInteger toIndex = [self.containerNormal.subviews indexOfObject:hitView];
+    if (toIndex != NSNotFound) {
+        self.selectedIndex = toIndex;
+        if (fromIndex != toIndex) {
+            [self moveIndicatorFromIndex:fromIndex toIndex:toIndex];
+        }
     }
 }
 
@@ -239,25 +168,23 @@
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateCancelled: {
-            CGFloat indicatorCenterX = self.indicator.center.x;
             NSUInteger fromIndex = self.selectedIndex;
-            self.selectedIndex = [self nearestIndexOfSegmentAtXCoordinate:indicatorCenterX];
-            [self moveIndicatorFromIndex:fromIndex toIndex:self.selectedIndex];
+            UIView *hitView = [self.containerNormal hitTest:self.indicator.center withEvent:nil];
+            NSUInteger toIndex = [self.containerNormal.subviews indexOfObject:hitView];
+            if (toIndex != NSNotFound) {
+                self.selectedIndex = toIndex;
+                [self moveIndicatorFromIndex:fromIndex toIndex:toIndex];
+            }
         }
         default:
             break;
     }
 }
 
-- (NSUInteger)nearestIndexOfSegmentAtXCoordinate:(CGFloat)x {
-    NSUInteger index = x / self.segmentWidth;
-    NSUInteger numberOfSegments = self.numberOfSegments;
-    return index < numberOfSegments ? index : numberOfSegments - 1;
-}
-
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
+    UIView *view = self.containerNormal.subviews[toIndex];
     [UIView animateWithDuration:kMovingAnimationDuration animations:^{
-        [self.indicator setCenterX:self.segmentWidth * (0.5 + toIndex)];
+        [self.indicator setCenterX:view.center.x];
     } completion:^(BOOL finished) {
         if (finished) {
             [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -273,21 +200,15 @@
 - (CGFloat)calculateIndicatorWidthAtSegmentIndex:(NSUInteger)index {
     CGFloat finalWidth = 0.0;
     if (self.internalTitles) {
-        finalWidth = self.labelsNormal[index].intrinsicContentSize.width;
+        finalWidth = self.labelsSelected[index].intrinsicContentSize.width;
     } else {
-        finalWidth = self.imageViewsNormal[index].intrinsicContentSize.width;
+        finalWidth = self.imageViewsSelected[index].intrinsicContentSize.width;
     }
     return finalWidth;
 }
 
 #pragma mark - Setters
 
-- (void)setSegmentWidth:(CGFloat)segmentWidth {
-    if (segmentWidth == self.segmentWidth) {
-        return;
-    }
-    [super setSegmentWidth:segmentWidth];
-    [super updateViewHierarchy];
-}
+
 
 @end

@@ -8,13 +8,11 @@
 #define YUSegment_Internal_h
 
 static const NSTimeInterval kMovingAnimationDuration = 0.3;
-static const CGFloat        kIndicatorWidthOffset    = 20.0;
+static const CGFloat        kEachSegmentDefaultMargin = 32.0;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YUIndicatorView ()
-
-@property (nonatomic, assign) BOOL fitWidth;
 
 - (void)setCenterX:(CGFloat)centerX;
 
@@ -22,9 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YUSegment ()
 
-@property (nonatomic, assign) BOOL          scrollEnabled;
+/// @name Views
 
-@property (nonatomic, strong) UIView        *containerNormal;
+@property (nonatomic, strong) UIView *containerNormal;
+@property (nonatomic, strong) UIView *containerSelected;
+
+@property (nonatomic, strong) NSMutableArray <UILabel *>        *labelsSelected;
+@property (nonatomic, strong) NSMutableArray <UIImageView *>    *imageViewsSelected;
 
 @property (nonatomic, strong) NSMutableArray <NSString *>       *internalTitles;
 @property (nonatomic, strong) NSMutableArray <UIImage *>        *internalImages;
@@ -36,11 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong)   NSMutableDictionary  *textAttributesSelected;
 
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
-- (instancetype)initWithImages:(NSArray <UIImage *> *)images
-              unselectedImages:(nullable NSArray <UIImage *> *)unselectedImages;
-- (void)layoutSubviewsInContainer:(UIView *)container;
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images unselectedImages:(nullable NSArray <UIImage *> *)unselectedImages;
+- (void)makeContainerUsable;
+- (void)addLabels;
+- (void)addImageViews;
 - (void)makeSegmentCenterIfNeeded;
-- (void)updateViewHierarchy;
 
 @end
 

@@ -49,11 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface YUIndicatorView : UIView
 
-@property (nonatomic, assign) CGFloat width;
-
-@property (nonatomic, assign) CGFloat height;
-
-- (void)adjustsContentToFitWidth;
+@property (nonatomic, assign) CGSize size;
 
 /**
  Returns a block which accepts an argument as the value of `borderWidth`.
@@ -114,12 +110,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, readonly) YUSegmentStyle style;
 
-/**
- The width for each segment. Assignment to this value will make segment scroll enable. 
- 
- @note Set width to 0 is not valid.
- */
-@property (nonatomic, assign) CGFloat segmentWidth;
+@property (nonatomic, assign) BOOL scrollEnabled;
+
+@property (nonatomic, assign) CGFloat contentOffset;
 
 ///-------------------------
 /// @name Managing Indicator
