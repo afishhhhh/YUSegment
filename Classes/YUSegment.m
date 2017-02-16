@@ -67,6 +67,7 @@
         _internalTitles = [titles mutableCopy];
         _numberOfSegments = [titles count];
         _labelsNormal = [NSMutableArray array];
+        _titleAsContent = YES;
         [self commonInit];
     }
     return self;
@@ -82,6 +83,7 @@
         }
         _numberOfSegments = [images count];
         _imageViewsNormal = [NSMutableArray array];
+        _titleAsContent = NO;
         [self commonInit];
     }
     return self;
@@ -91,7 +93,8 @@
     // Set default values.
     _scrollEnabled = NO;
     _selectedIndex = 0;
-    _contentOffset = kEachSegmentDefaultMargin;
+    _contentOffset = kContentOffsetDefaultValue;
+    cache = malloc(sizeof(FrameCache) * _numberOfSegments);
     
     // Setup views.
     self.backgroundColor = [UIColor whiteColor];
@@ -99,9 +102,12 @@
     _indicator = ({
         YUIndicatorView *indicator = [[YUIndicatorView alloc] init];
         [self addSubview:indicator];
-        
         indicator;
     });
+    
+    // Setup gesture
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self addGestureRecognizer:tap];
 }
 
 #pragma mark - Managing Segment Content
@@ -135,73 +141,6 @@
     return _internalImages ? _internalImages[index] : nil;
     // Subclasses override this.
 }
-
-//- (void)addSegmentWithTitle:(NSString *)title {
-//    [self insertSegmentWithTitle:title atIndex:_numberOfSegments];
-//}
-//
-//- (void)addSegmentWithImage:(UIImage *)image {
-//    [self insertSegmentWithImage:image atIndex:_numberOfSegments];
-//}
-//
-//- (void)addSegmentWithTitle:(NSString *)title forImage:(UIImage *)image {
-//    [self insertSegmentWithTitle:title forImage:image atIndex:_numberOfSegments];
-//}
-//
-//- (void)insertSegmentWithTitle:(NSString *)title atIndex:(NSUInteger)index {
-//    NSAssert(_internalTitles, @"You should use this method when the content of segment is `NSString` objcet.");
-//    if (index > _numberOfSegments) {
-//        index = _numberOfSegments;
-//    }
-//    [self.internalTitles insertObject:title atIndex:index];
-//    _numberOfSegments++;
-//    [self insertViewWithTitle:title atIndex:index];
-//}
-//
-//- (void)insertSegmentWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-//    NSAssert(_internalImages, @"You should use this method when the content of segment is `UIImage` objcet.");
-//    if (index > _numberOfSegments) {
-//        index = _numberOfSegments;
-//    }
-//    [self.internalImages insertObject:image atIndex:index];
-//    _numberOfSegments++;
-//    [self insertViewWithImage:image atIndex:index];
-//}
-//
-//- (void)insertSegmentWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
-//    NSAssert(_internalTitles && _internalImages, @"You should use this method when the content of the segment including `NSString` object and `UIImage` object.");
-//    if (index > _numberOfSegments) {
-//        index = _numberOfSegments;
-//    }
-//    [self.internalTitles insertObject:title atIndex:index];
-//    [self.internalImages insertObject:image atIndex:index];
-//    _numberOfSegments++;
-//    [self insertViewWithTitle:title forImage:image atIndex:index];
-//}
-//
-//- (void)insertViewWithTitle:(NSString *)title atIndex:(NSUInteger)index {
-//    
-//}
-//
-//- (void)insertViewWithImage:(UIImage *)image atIndex:(NSUInteger)index {
-//    
-//}
-//
-//- (void)insertViewWithTitle:(NSString *)title forImage:(UIImage *)image atIndex:(NSUInteger)index {
-//    
-//}
-//
-//- (void)removeAllItems {
-//    
-//}
-//
-//- (void)removeLastItem {
-//    [self removeItemAtIndex:_numberOfSegments - 1];
-//}
-//
-//- (void)removeItemAtIndex:(NSUInteger)index {
-//    
-//}
 
 #pragma mark - Views Setup
 
@@ -242,6 +181,7 @@
         label = [self setupNormalLabelWithTitle:_internalTitles[i]];
         [_labelsNormal addObject:label];
         [_containerNormal addSubview:label];
+        cache[i].width = label.intrinsicContentSize.width;
     }
     [self layoutSubviewsInContainer:_containerNormal];
     
@@ -271,6 +211,7 @@
         imageView = [self setupImageViewWithImage:images[i]];
         [_imageViewsNormal addObject:imageView];
         [_containerNormal addSubview:imageView];
+        cache[i].width = imageView.intrinsicContentSize.width;
     }
     [self layoutSubviewsInContainer:_containerNormal];
     
@@ -307,6 +248,7 @@
     [_scrollView addSubview:_indicator];
     
     if (_containerSelected) {
+        [_containerSelected removeFromSuperview];
         [_scrollView addSubview:_containerSelected];
         [self setupConstraintsToScrollViewWithItem:_containerSelected];
         [self resetWidthConstraintsForSubviewsInContainer:_containerSelected];
@@ -378,7 +320,36 @@
     };
 }
 
+#pragma mark - Event Response
+
+- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:_containerNormal];
+    UIView *hitView = [_containerNormal hitTest:location withEvent:nil];
+    NSUInteger toIndex = [_containerNormal.subviews indexOfObject:hitView];
+    if (toIndex != NSNotFound) {
+        if (_selectedIndex != toIndex) {
+            [self moveIndicatorFromIndex:_selectedIndex toIndex:toIndex];
+        }
+    }
+}
+
+- (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
+    // subclasses implement this.
+}
+
 #pragma mark -
+
+- (FrameCache)cacheAt:(NSUInteger)index {
+    return cache[index];
+}
+
+- (void)setX:(CGFloat)x forCacheAt:(NSUInteger)index {
+    cache[index].x = x;
+}
+
+- (void)setWidth:(CGFloat)width forCacheAt:(NSUInteger)index {
+    cache[index].width = width;
+}
 
 - (void)makeSegmentCenterIfNeeded {
 //    CGFloat finalOffset = self.segmentWidth * (_selectedIndex + 0.5) - CGRectGetWidth(self.frame) / 2;
@@ -403,6 +374,15 @@
 - (void)setScrollEnabled:(BOOL)scrollEnabled {
     _scrollEnabled = scrollEnabled;
     if (scrollEnabled) {
+        // configure frame cache
+        CGFloat constant = kContentOffsetDefaultValue;
+        CGFloat x = 0.0;
+        for (int i = 0; i < _numberOfSegments; i++) {
+            cache[i].width += constant;
+            cache[i].x = x;
+            x += cache[i].width;
+        }
+        // update view hierarchy
         [self updateViewHierarchy];
     }
 }
@@ -425,6 +405,14 @@
     return [_internalImages copy];
 }
 
+- (NSMutableArray <NSLayoutConstraint *> *)widthConstraints {
+    if (_widthConstraints) {
+        return _widthConstraints;
+    }
+    _widthConstraints = [NSMutableArray array];
+    return _widthConstraints;
+}
+
 #pragma mark - Constraints
 
 + (BOOL)requiresConstraintBasedLayout {
@@ -438,24 +426,18 @@
         [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
         
         if (lastView) {
-            NSLayoutConstraint *offset = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
-            offset.active = YES;
-            offset.identifier = @"o";
+            [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
             
             NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0];
             width.active = YES;
             width.identifier = @"w";
         }
         else {
-            NSLayoutConstraint *edge = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];
-            edge.active = YES;
-            edge.identifier = @"e";
+            [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:container attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
         }
         lastView = subviews[i];
     }
-    NSLayoutConstraint *edge = [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
-    edge.active = YES;
-    edge.identifier = @"e";
+    [NSLayoutConstraint constraintWithItem:container attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:lastView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
 }
 
 - (void)setupConstraintsWithItem:(id)item1 toItem:(id)item2 {
@@ -478,12 +460,13 @@
         if ([constraint.identifier isEqualToString:@"w"]) {
             constraint.active = NO;
         }
-        if ([constraint.identifier isEqualToString:@"o"]) {
-            constraint.constant = _contentOffset * 2.0;
-        }
-        if ([constraint.identifier isEqualToString:@"e"]) {
-            constraint.constant = _contentOffset;
-        }
+    }
+    NSArray <UIView *> *subviews = container.subviews;
+    NSMutableArray *widthConstraints = self.widthConstraints;
+    for (int i = 0; i < _numberOfSegments; i++) {
+        NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:subviews[i] attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:cache[i].width];
+        width.active = YES;
+        [widthConstraints addObject:width];
     }
 }
 
@@ -536,10 +519,13 @@
     };
 }
 
-#pragma mark - Getters
+#pragma mark - Setters 
 
-- (CGSize)size {
-    return _size;
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    if (self.maskView) {
+        self.maskView.frame = frame;
+    }
 }
 
 @end

@@ -9,10 +9,6 @@
 
 static const CGFloat kIndicatorDefaultHeight = 2.0;
 
-@interface YUSegmentLine ()
-
-@end
-
 @implementation YUSegmentLine
 
 #pragma mark - Initialization
@@ -20,10 +16,9 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
 - (instancetype)initWithTitles:(NSArray <NSString *> *)titles {
     self = [super initWithTitles:titles];
     if (self) {
-        self.textAttributesNormal = [NSMutableDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium], NSFontAttributeName, [UIColor lightGrayColor], NSForegroundColorAttributeName, nil];
+        self.textAttributesNormal = [NSMutableDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium], NSFontAttributeName, [UIColor lightGrayColor], NSForegroundColorAttributeName, nil];
         self.textAttributesSelected = [NSMutableDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:16.0 weight:UIFontWeightMedium], NSFontAttributeName, [UIColor blackColor], NSForegroundColorAttributeName, nil];
         [self addLabels];
-        [self line_commonInit];
     }
     return self;
 }
@@ -32,53 +27,52 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
     self = [super initWithImages:images unselectedImages:unselectedImages];
     if (self) {
         [self addImageViews];
-        [self line_commonInit];
     }
     return self;
-}
-
-- (void)line_commonInit {
-    // Setup indicator
-    // ...
-    // Setup gesture
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:tap];
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     NSUInteger index = self.selectedIndex;
-    NSArray *titles = self.internalTitles;
-    NSArray *images = self.internalImages;
-    if (titles) {
-        self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:titles[index] attributes:self.textAttributesSelected];
-    }
-    if (images) {
-        self.imageViewsNormal[index].image = images[index];
+    if (self.isTitleAsContent) {
+        self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:self.internalTitles[index] attributes:self.textAttributesSelected];
+    } else {
+        self.imageViewsNormal[index].image = self.internalImages[index];
     }
     
     YUIndicatorView *indicator = self.indicator;
-    CGFloat indicatorHeight = indicator.size.height ?: kIndicatorDefaultHeight;
-    CGFloat indicatorWidth = indicator.size.width ?: [self calculateIndicatorWidthAtSegmentIndex:index];
-    CGRect frame;
+    CGFloat indicatorWidth;
+    CGRect bounds;
+    CGPoint center;
     if (self.scrollEnabled) {
-        CGFloat x;
-        for (int i = 0; i < index; i++) {
-            x += [self calculateIndicatorWidthAtSegmentIndex:i];
-        }
-        x += (index + 0.5) * (2 * kEachSegmentDefaultMargin);
-        frame = (CGRect){x, CGRectGetHeight(self.frame) - indicatorHeight, indicatorWidth, indicatorHeight};
+        indicatorWidth = [self cacheAt:index].width - kContentOffsetDefaultValue;
+        center = (CGPoint){[self cacheAt:index].x + [self cacheAt:index].width / 2.0, CGRectGetHeight(self.frame) - kIndicatorDefaultHeight / 2.0};
     }
     else {
-        frame = (CGRect){(index + 0.5) * CGRectGetWidth(self.frame) / self.numberOfSegments - indicatorWidth / 2.0, CGRectGetHeight(self.frame) - indicatorHeight, indicatorWidth, indicatorHeight};
+        indicatorWidth = CGRectGetWidth(self.frame) / self.numberOfSegments;
+        center = (CGPoint){(index + 0.5) * CGRectGetWidth(self.frame) / self.numberOfSegments, CGRectGetHeight(self.frame) - kIndicatorDefaultHeight / 2.0};
     }
-    indicator.frame = frame;
+    bounds = (CGRect){0, 0, indicatorWidth, kIndicatorDefaultHeight};
+    indicator.bounds = bounds;
+    indicator.center = center;
 }
 
 #pragma mark - Managing Segment Content
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
     [super setTitle:title forSegmentAtIndex:index];
+    
+    CGFloat constant = self.labelsNormal[index].intrinsicContentSize.width;
+    if (self.scrollEnabled) {
+        constant += kContentOffsetDefaultValue;
+        self.widthConstraints[index].constant = constant;
+        [self layoutIfNeeded];
+        for (int i = index + 1; i < self.numberOfSegments; i++) {
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
+    [self setWidth:constant forCacheAt:index];
+    
     if (index == self.selectedIndex) {
         self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:title attributes:self.textAttributesSelected];
     } else {
@@ -108,6 +102,15 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
 
 - (void)setFont:(UIFont *)font forState:(YUSegmentedControlState)state {
     [super setFont:font forState:state];
+    if (state == YUSegmentedControlStateNormal && self.scrollEnabled) {
+        for (int i = 0; i < self.numberOfSegments; i++) {
+            CGFloat constant = self.labelsNormal[i].intrinsicContentSize.width + kContentOffsetDefaultValue;
+            self.widthConstraints[i].constant = constant;
+            [self setWidth:constant forCacheAt:i];
+            [self layoutIfNeeded];
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
     NSUInteger index = self.selectedIndex;
     self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:self.internalTitles[index]
                                                                               attributes:self.textAttributesSelected];
@@ -122,6 +125,15 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
 
 - (void)setTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state {
     [super setTextAttributes:attributes forState:state];
+    if (state == YUSegmentedControlStateNormal && self.scrollEnabled) {
+        for (int i = 0; i < self.numberOfSegments; i++) {
+            CGFloat constant = self.labelsNormal[i].intrinsicContentSize.width + kContentOffsetDefaultValue;
+            self.widthConstraints[i].constant = constant;
+            [self setWidth:constant forCacheAt:i];
+            [self layoutIfNeeded];
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
     NSUInteger index = self.selectedIndex;
     self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:self.internalTitles[index]
                                                                               attributes:self.textAttributesSelected];
@@ -131,39 +143,23 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
     return [super textAttributesForState:state];
 }
 
-#pragma mark - Event Response
-
-- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
-    CGPoint location = [gestureRecognizer locationInView:self.containerNormal];
-    NSUInteger fromIndex = self.selectedIndex;
-    UIView *hitView = [self.containerNormal hitTest:location withEvent:nil];
-    NSUInteger toIndex = [self.containerNormal.subviews indexOfObject:hitView];
-    if (toIndex != NSNotFound) {
-        self.selectedIndex = toIndex;
-        if (fromIndex != toIndex) {
-            [self moveIndicatorFromIndex:fromIndex toIndex:toIndex];
-        }
-    }
-}
+#pragma mark - 
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
-    [self updateStateNewIndex:toIndex oldIndex:fromIndex];
+    YUIndicatorView *indicator = self.indicator;
+    CGRect frame = indicator.frame;
+    if (self.scrollEnabled) {
+        frame.size.width = [self cacheAt:toIndex].width - kContentOffsetDefaultValue;
+        frame.origin.x = [self cacheAt:toIndex].x + [self cacheAt:toIndex].width / 2.0 - CGRectGetWidth(frame) / 2.0;
+    }
+    else {
+        frame.origin.x = (toIndex + 0.5) * CGRectGetWidth(self.frame) / self.numberOfSegments - CGRectGetWidth(frame) / 2.0;
+    }
     [UIView animateWithDuration:kMovingAnimationDuration animations:^{
-        if (!self.indicator.size.width) {
-            CGFloat x;
-            for (int i = 0; i < toIndex; i++) {
-                x += [self calculateIndicatorWidthAtSegmentIndex:i];
-            }
-            x += (toIndex + 0.5) * (2 * kEachSegmentDefaultMargin);
-            CGFloat width = [self calculateIndicatorWidthAtSegmentIndex:toIndex];
-            CGRect frame = self.indicator.frame;
-            frame.origin.x = x;
-            frame.size.width = width;
-            self.indicator.frame = frame;
-        }
-//        [self.indicator setCenterX:view.center.x];
+        indicator.frame = frame;
     } completion:^(BOOL finished) {
         if (finished) {
+            self.selectedIndex = toIndex;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
             if (self.scrollEnabled) {
                 [self makeSegmentCenterIfNeeded];
@@ -172,31 +168,22 @@ static const CGFloat kIndicatorDefaultHeight = 2.0;
     }];
 }
 
-#pragma mark -
-
-- (void)updateStateNewIndex:(NSUInteger)newIndex oldIndex:(NSUInteger)oldIndex {
-    if (self.labelsNormal) {
-        self.labelsNormal[newIndex].attributedText = [[NSAttributedString alloc] initWithString:self.internalTitles[newIndex] attributes:self.textAttributesSelected];
-        self.labelsNormal[oldIndex].attributedText = [[NSAttributedString alloc] initWithString:self.internalTitles[oldIndex] attributes:self.textAttributesNormal];
-    }
-    if (self.unselectImages) {
-        self.imageViewsNormal[newIndex].image = self.internalImages[newIndex];
-        self.imageViewsNormal[oldIndex].image = self.unselectImages[oldIndex];
-    }
-}
-
-- (CGFloat)calculateIndicatorWidthAtSegmentIndex:(NSUInteger)index {
-    CGFloat finalWidth = 0.0;
-    if (self.internalTitles) {
-        finalWidth = self.labelsNormal[index].intrinsicContentSize.width;
-    } else {
-        finalWidth = self.imageViewsNormal[index].intrinsicContentSize.width;
-    }
-    return finalWidth;
-}
-
 #pragma mark - Setters
 
-
+- (void)setSelectedIndex:(NSUInteger)selectedIndex {
+    NSUInteger old = self.selectedIndex;
+    [super setSelectedIndex:selectedIndex];
+    
+    if (self.isTitleAsContent) {
+        NSArray <UILabel *> *labels = self.labelsNormal;
+        NSArray *titles = self.internalTitles;
+        labels[selectedIndex].attributedText = [[NSAttributedString alloc] initWithString:titles[selectedIndex] attributes:self.textAttributesSelected];
+        labels[old].attributedText = [[NSAttributedString alloc] initWithString:titles[old] attributes:self.textAttributesNormal];
+    }
+    else if (self.unselectImages) {
+        self.imageViewsNormal[selectedIndex].image = self.internalImages[selectedIndex];
+        self.imageViewsNormal[old].image = self.unselectImages[old];
+    }
+}
 
 @end

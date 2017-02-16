@@ -49,8 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface YUIndicatorView : UIView
 
-@property (nonatomic, assign) CGSize size;
-
 /**
  Returns a block which accepts an argument as the value of `borderWidth`.
  

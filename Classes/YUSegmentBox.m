@@ -7,10 +7,6 @@
 #import "YUSegmentBox.h"
 #import "YUSegment+Internal.h"
 
-@interface YUSegmentBox ()
-
-@end
-
 @implementation YUSegmentBox {
     CGFloat _panCorrection;
 }
@@ -44,9 +40,8 @@
     indicator.maskView.backgroundColor = [UIColor whiteColor];
     indicator.layer.masksToBounds = YES;
     [self makeContainerUsable];
+    
     // Setup gestures
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-    [self addGestureRecognizer:tap];
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
     [self addGestureRecognizer:pan];
 }
@@ -55,30 +50,46 @@
     [super layoutSubviews];
     NSUInteger index = self.selectedIndex;
     YUIndicatorView *indicator = self.indicator;
-    CGFloat indicatorWidth = indicator.size.width ?: CGRectGetWidth(self.frame) / self.numberOfSegments;
-    CGFloat indicatorHeight = indicator.size.height ?: CGRectGetHeight(self.frame);
-    CGRect frame;
+    CGFloat indicatorHeight;
+    CGFloat indicatorWidth;
+    CGRect bounds;
+    CGPoint center;
     if (self.scrollEnabled) {
-        CGFloat x;
-        for (int i = 0; i < index; i++) {
-            x += [self calculateIndicatorWidthAtSegmentIndex:i];
-        }
-        x += index * 2 * kEachSegmentDefaultMargin;
-        frame = (CGRect){x, 0, 64.0 + [self calculateIndicatorWidthAtSegmentIndex:index], indicatorHeight};
+        indicatorWidth = [self cacheAt:index].width - kContentOffsetDefaultValue + 16.0;
+        indicatorHeight = CGRectGetHeight(self.frame) - 16.0;
+        center = (CGPoint){[self cacheAt:index].x + [self cacheAt:index].width / 2.0, CGRectGetHeight(self.frame) / 2.0};
+        indicator.layer.cornerRadius = 3.0;
     }
     else {
-        frame = (CGRect){index * CGRectGetWidth(self.frame) / self.numberOfSegments, 0, indicatorWidth, indicatorHeight};
+        indicatorWidth = CGRectGetWidth(self.frame) / self.numberOfSegments;
+        indicatorHeight = CGRectGetHeight(self.frame);
+        center = (CGPoint){(index + 0.5) * CGRectGetWidth(self.frame) / self.numberOfSegments, CGRectGetHeight(self.frame) / 2.0};
+        self.layer.cornerRadius = CGRectGetHeight(self.frame) / 2.0;
+        indicator.layer.cornerRadius = indicatorHeight / 2.0;
     }
-    indicator.frame = frame;
+    bounds = (CGRect){0, 0, indicatorWidth, indicatorHeight};
+    indicator.bounds = bounds;
+    indicator.center = center;
 
-    self.layer.cornerRadius = CGRectGetHeight(self.frame) / 2.0;
-    indicator.layer.cornerRadius = indicatorHeight / 2.0;
 }
 
 #pragma mark - Managing Segment Content
 
 - (void)setTitle:(NSString *)title forSegmentAtIndex:(NSUInteger)index {
     [super setTitle:title forSegmentAtIndex:index];
+    
+    CGFloat constant = self.labelsNormal[index].intrinsicContentSize.width;
+    if (self.scrollEnabled) {
+        constant += kContentOffsetDefaultValue;
+        self.widthConstraints[index].constant = constant;
+        self.widthConstraints[index + self.numberOfSegments].constant = constant;
+        [self layoutIfNeeded];
+        for (int i = index + 1; i < self.numberOfSegments; i++) {
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
+    [self setWidth:constant forCacheAt:index];
+    
     self.labelsNormal[index].attributedText = [[NSAttributedString alloc] initWithString:title
                                                                               attributes:self.textAttributesNormal];
     self.labelsSelected[index].attributedText = [[NSAttributedString alloc] initWithString:title
@@ -111,6 +122,18 @@
 - (void)setFont:(UIFont *)font forState:(YUSegmentedControlState)state {
     [super setFont:font forState:state];
     NSUInteger numberOfSegments = self.numberOfSegments;
+    
+    if (state == YUSegmentedControlStateNormal && self.scrollEnabled) {
+        for (int i = 0; i < numberOfSegments; i++) {
+            CGFloat constant = self.labelsNormal[i].intrinsicContentSize.width + kContentOffsetDefaultValue;
+            self.widthConstraints[i].constant = constant;
+            self.widthConstraints[i + numberOfSegments].constant = constant;
+            [self setWidth:constant forCacheAt:i];
+            [self layoutIfNeeded];
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
+    
     NSArray *titles = self.internalTitles;
     for (int i = 0; i < numberOfSegments; i++) {
         self.labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:self.textAttributesSelected];
@@ -129,6 +152,18 @@
 - (void)setTextAttributes:(NSDictionary *)attributes forState:(YUSegmentedControlState)state {
     [super setTextAttributes:attributes forState:state];
     NSUInteger numberOfSegments = self.numberOfSegments;
+    
+    if (state == YUSegmentedControlStateNormal && self.scrollEnabled) {
+        for (int i = 0; i < numberOfSegments; i++) {
+            CGFloat constant = self.labelsNormal[i].intrinsicContentSize.width + kContentOffsetDefaultValue;
+            self.widthConstraints[i].constant = constant;
+            self.widthConstraints[i + numberOfSegments].constant = constant;
+            [self setWidth:constant forCacheAt:i];
+            [self layoutIfNeeded];
+            [self setX:self.labelsNormal[i].frame.origin.x forCacheAt:i];
+        }
+    }
+    
     NSArray *titles = self.internalTitles;
     for (int i = 0; i < numberOfSegments; i++) {
         self.labelsSelected[i].attributedText = [[NSAttributedString alloc] initWithString:titles[i] attributes:attributes];
@@ -140,19 +175,6 @@
 }
 
 #pragma mark - Event Response
-
-- (void)tap:(UITapGestureRecognizer *)gestureRecognizer {
-    CGPoint location = [gestureRecognizer locationInView:self.containerNormal];
-    NSUInteger fromIndex = self.selectedIndex;
-    UIView *hitView = [self.containerNormal hitTest:location withEvent:nil];
-    NSUInteger toIndex = [self.containerNormal.subviews indexOfObject:hitView];
-    if (toIndex != NSNotFound) {
-        self.selectedIndex = toIndex;
-        if (fromIndex != toIndex) {
-            [self moveIndicatorFromIndex:fromIndex toIndex:toIndex];
-        }
-    }
-}
 
 - (void)pan:(UIPanGestureRecognizer *)gestureRecognizer {
     switch (gestureRecognizer.state) {
@@ -172,7 +194,6 @@
             UIView *hitView = [self.containerNormal hitTest:self.indicator.center withEvent:nil];
             NSUInteger toIndex = [self.containerNormal.subviews indexOfObject:hitView];
             if (toIndex != NSNotFound) {
-                self.selectedIndex = toIndex;
                 [self moveIndicatorFromIndex:fromIndex toIndex:toIndex];
             }
         }
@@ -182,11 +203,20 @@
 }
 
 - (void)moveIndicatorFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
-    UIView *view = self.containerNormal.subviews[toIndex];
+    YUIndicatorView *indicator = self.indicator;
+    CGRect frame = indicator.frame;
+    if (self.scrollEnabled) {
+        frame.size.width = [self cacheAt:toIndex].width - kContentOffsetDefaultValue + 16.0;
+        frame.origin.x = [self cacheAt:toIndex].x + [self cacheAt:toIndex].width / 2.0 - CGRectGetWidth(frame) / 2.0;
+    }
+    else {
+        frame.origin.x = (toIndex + 0.5) * CGRectGetWidth(self.frame) / self.numberOfSegments - CGRectGetWidth(frame) / 2.0;
+    }
     [UIView animateWithDuration:kMovingAnimationDuration animations:^{
-        [self.indicator setCenterX:view.center.x];
+        indicator.frame = frame;
     } completion:^(BOOL finished) {
         if (finished) {
+            self.selectedIndex = toIndex;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
             if (self.scrollEnabled) {
                 [self makeSegmentCenterIfNeeded];
@@ -194,21 +224,5 @@
         }
     }];
 }
-
-#pragma mark - 
-
-- (CGFloat)calculateIndicatorWidthAtSegmentIndex:(NSUInteger)index {
-    CGFloat finalWidth = 0.0;
-    if (self.internalTitles) {
-        finalWidth = self.labelsSelected[index].intrinsicContentSize.width;
-    } else {
-        finalWidth = self.imageViewsSelected[index].intrinsicContentSize.width;
-    }
-    return finalWidth;
-}
-
-#pragma mark - Setters
-
-
 
 @end
