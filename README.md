@@ -1,20 +1,21 @@
 # YUSegment
 [![Pod Version](https://img.shields.io/cocoapods/v/YUSegment.svg)]()
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Pod Platform](https://img.shields.io/cocoapods/p/YUSegment.svg?style=flat)]()
 [![Pod License](https://img.shields.io/cocoapods/l/YUSegment.svg)]()
 
-[中文文档](http://www.jianshu.com/p/dfe654b749b3)
+[中文文档](https://afishhhhh.github.io/2017/04/05/yusegment-doc/)
 
 A customizable segmented control for iOS.
 
-![YUSegment-demo](https://github.com/afishhhhh/YUSegment/blob/master/Images/demo.png)
+![YUSegment-demo](https://github.com/afishhhhh/YUSegment/blob/master/Screenshots/demo.png)
 
 ## Features
 
 - Supports both (Attributed)text and image
-- Has two styles(linear and rectangular) to choose
-- Supports horizontal scrolling
-- Supports customize font and color
+- Supports show separator
+- Supports hide indicator
+- Indicator could be located at the top and bottom
 - YUSegment works on iOS 8.0+ and is compatible with ARC projects
 
 ## Installation
@@ -23,94 +24,129 @@ A customizable segmented control for iOS.
 
 1. Add a pod entry to your Podfile `pod 'YUSegment'`
 2. Running `pod install`
-3. `#import "YUSegment.h"` where you need
+3. `#import <YUSegment/YUSegment.h>` where you need
+
+### Carthage
+
+`github "afishhhhh/YUSegment"`
 
 ## Usage
 
-### Creating a YUSegment Programmatically (Recommended)
+`YUSegmentedControl` inherits from `UIControl`, supports `Target-Action`.
 
 ```objective-c
-NSArray *titles = @[@"Left", @"Medium", @"Right"];
-YUSegment *segment = [[YUSegment alloc] initWithTitles:titles];
-[self.view addSubview:segment];
-segment.frame = (CGRect){20, 60, [UIScreen mainScreen].bounds.size.width - 40, 44};
+YUSegmentedControl *segmentedControl = [[YUSegmentedControl alloc] initWithTitles:@[@"健身", @"摄影", @"科技", @"美食", @"旅行"]];
+[self.view addSubview:segmentedControl];
+[segmentedControl addTarget:self action:@selector(segmentedControlTapped:) forControlEvents:UIControlEventValueChanged];
 ```
 
-### Creating a YUSegment Using a Storyboard
-
-1. In the Object Library, select the "UIView" object and drag it into the view.
-2. Change the position and size of the view.
-
-  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/blob/master/Images/storyboard2.png)
-3. In the Identify Inspector, change the class to "YUSegment". Then connect outlet.
-
-  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/blob/master/Images/storyboard1.png)
-  ```objective-c
-  @property (weak, nonatomic) IBOutlet YUSegment *segment;
-  ```
-4. You could modify some properties in Attributes Inspector.
-
-  ![YUSegment-storyboard](https://github.com/afishhhhh/YUSegment/blob/master/Images/storyboard3.png)
-
-More details in [YUSegmentDemo](YUSegmentDemo).
+By default, the background color of segmented control is `whiteColor`, the color of indicator is `darkGrayColor`, the height of indicator is 3.0, the color of separator is `#e7e7e7`.
 
 ## APIs
 
-### Target-Action
+### Methods
 
-Similar to UISegmentedControl, you just need the following code:
 ```objective-c
-[segment addTarget:self action:@selector(someMethod) forControlEvents:UIControlEventValueChanged];
+- (instancetype)initWithTitles:(NSArray <NSString *> *)titles;
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images;
+- (instancetype)initWithImages:(NSArray <UIImage *> *)images
+                selectedImages:(nullable NSArray <UIImage *> *)selectedImages;
 ```
 
-### Image
+You can use `selectedImages` if you want to show different images when a specific segment selected.
 
-The image is the same by default, no matter whether the image selected. If you want to show different image when a specific segment selected, you should call `-replaceDeselectedImagesWithImages:` or `-replaceDeselectedImageWithImage:atIndex:`.
-
-### Attributed Text
-
-You should use `-setTitleTextAttributes:forState:` to set attributed string. For example:
-```objeective-c
-NSDictionary *attributes = @{NSFontAttributeName : [UIFont systemFontOfSize:20]};
-[segment setTitleTextAttributes:attributes forState:YUSegmentedControlStateNormal];
+```objective-c
+- (nullable NSString *)titleAtIndex:(NSUInteger)index;
+- (nullable UIImage *)imageAtIndex:(NSUInteger)index;
 ```
 
-### Layer
+You can get the corresponding text or image based on a specific index.
 
-You could set `borderColor`, `borderWidth`, and `cornerRadius` in Attributes Inspector. If you don't use interface builder, the code should look like this:
-```objective-c
-segment.layer.borderWidth = someValue;
-segment.layer.borderColor = someValue;
-```
-~~Note: You should use `cornerRadius` instead of `layer.cornerRadius`. Because if you set `cornerRaduis` for segmented control, the indicator will become rounded automatically.~~
-Note: About `cornerRadius`. Both segmented control and its indicator have default value of `cornerRadius`. The default value is equal to half the height of the segmented control. In version 0.2.0, the indicator will not become rounded automatically if you just set `cornerRaduis` of the segmented control. You also need to set `cornerRadius` for indicator manually.
-
-### Scrolling Enabled
-
-YUSegment don't have property look like `scrollEnabled`, you just need to set the width of each segment(`segmentWidth`). This property will make the segmented control scroll horizontally.
-
-## New Features
-
-###### Version 0.1.4:
-
-- Supports chainable syntax. You could set `borderWidth` and `borderColor` for segmented control look like:
-```objective-c
-sgement.borderWidth(1.0).borderColor([UIColor redColor]);
+```objectve-c
+- (void)showBadgeAtIndexes:(NSArray <NSNumber *> *)indexes;
+- (void)hideBadgeAtIndex:(NSUInteger)index;
 ```
 
-###### Version 0.2.0:
+example:
 
-- Exposes property `indicator(readonly)`, you could set attributes for indicator such as `backgroundColor`, `borderWidth`, `borderColor`, etc.
 ```objective-c
-segment.indicator.backgroundColor = [UIColor redColor];
-segment.indicator.layer.borderWidth = 1.0;
-segment.indicator.layer.borderColor = [UIColor redColor].CGColor;
+[segmentedControl show BadgeAtIndexes:@[@1, @2]];
 ```
 
-- Supports chainable syntax. You could set `borderWidth` and `borderColor` for indicator look like:
 ```objective-c
-segment.indicator.borderWidth(1.0).borderColor([UIColor redColor]);
-```	
+- (void)setTextAttributes:(nullable NSDictionary *)attributes 
+                 forState:(YUSegmentedControlState)state;
+```
+
+The attributes for text. For a list of attributes that you can include in this dictionary, see [Character Attributes](https://developer.apple.com/reference/foundation/nsattributedstring/character_attributes).
+The value of `state` could be `YUSegmentedControlNormal` and `YUSegmentedControlSelected`.
+
+### Properties
+
+* numberOfSegments(NSUInteger, readonly)
+
+  return the number of segments in a segmented control.
+
+* selectedSegmentIndex(NSUInteger, readonly)
+
+  The index number identifying the selected segment. Default is 0.
+
+* horizontalPadding
+
+  Default is 0。
+
+  ![padding-0](https://github.com/afishhhhh/YUSegment/blob/master/Screenshots/padding-0.png)
+
+  If it to 32.0。
+
+  ![padding-32](https://github.com/afishhhhh/YUSegment/blob/master/Screenshots/padding-32.png)
+
+* showsTopSeparator
+
+  A Boolean value that controls whether the top separator is visible. Default is `YES`.
+
+* showsBottomSeparator
+
+  A Boolean value that controls whether the bottom separator is visible. Default is `YES`.
+
+* showsVerticalDivider
+
+  A Boolean value that controls whether the vertical divider is visible. Default is `NO`.
+
+* showsIndicator
+
+  A Boolean value that controls whether the indicator is visible. Default is `YES`.
+
+* backgroundColor(YUSegmentedControl)
+
+  The background color of segmented control. Default is white.
+
+* height(YUSegmentedControlIndicator)
+
+  The height of indicator. Default is 3.0. 
+  You should use this property like this:
+
+  ```objective-c
+  segment.indicator.height = 3.0;
+  ```
+
+* locate(YUSegmentedControlIndicator)
+
+  The vertical alignment of indicator. Default is `YUSegmentedControlIndicatorLocateBottom`. Also could be `YUSegmentedControlIndicatorLocateTop`
+  You should use this property like this:
+
+  ```objective-c
+  segment.indicator.locate = YUSegmentedControlIndicatorLocateTop;
+  ```
+
+* backgroundColor(YUSegmentedControlIndicator)
+
+  The background color of indicator. Default is dark gray.
+  You should use this property like this:
+
+  ```objective-c
+  segment.indicator.backgroundColor = [UIColor whiteColor];
+  ```
 
 ## License
 
