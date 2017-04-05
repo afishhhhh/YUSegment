@@ -73,6 +73,8 @@ example:
 [segmentedControl show BadgeAtIndexes:@[@1, @2]];
 ```
 
+<br/>
+
 ```objective-c
 - (void)setTextAttributes:(nullable NSDictionary *)attributes 
                  forState:(YUSegmentedControlState)state;
@@ -80,6 +82,17 @@ example:
 
 The attributes for text. For a list of attributes that you can include in this dictionary, see [Character Attributes](https://developer.apple.com/reference/foundation/nsattributedstring/character_attributes).
 The value of `state` could be `YUSegmentedControlNormal` and `YUSegmentedControlSelected`.
+
+example:
+
+```objective-c
+[segmentedControl setTextAttributes:@{
+  NSFontAttributeName: [UIFont systemFontOfSize:20.0 weight:UIFontWeightLight],
+  NSForegroundColorAttributeName: [UIColor blackColor]
+} forState:YUSegmentedControlNormal];
+```
+
+<br/>
 
 ### Properties
 
@@ -93,11 +106,11 @@ The value of `state` could be `YUSegmentedControlNormal` and `YUSegmentedControl
 
 * horizontalPadding
 
-  Default is 0。
+  Default is 0.
 
   ![padding-0](https://github.com/afishhhhh/YUSegment/blob/master/Screenshots/padding-0.png)
 
-  If it to 32.0。
+  If assign it to 32.0.
 
   ![padding-32](https://github.com/afishhhhh/YUSegment/blob/master/Screenshots/padding-32.png)
 
