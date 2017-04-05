@@ -122,14 +122,14 @@ static const CGFloat        kIndicatorDefaultHeight = 3.0;
         case YUSegmentedControlIndicatorLocateBottom: {
             y = CGRectGetHeight(self.bounds) - height;
             if (_showsBottomSeparator) y -= kSeparatorDefaultHeight;
-            CGRect frame = (CGRect){_horizontalPadding, y, width, height};
+            CGRect frame = (CGRect){_horizontalPadding + width * _selectedSegmentIndex, y, width, height};
             _indicator.frame = frame;
             break;
         }
         case YUSegmentedControlIndicatorLocateTop: {
             y = 0;
             if (_showsTopSeparator) y += kSeparatorDefaultHeight;
-            CGRect frame = (CGRect){_horizontalPadding, y, width, height};
+            CGRect frame = (CGRect){_horizontalPadding + width * _selectedSegmentIndex, y, width, height};
             _indicator.frame = frame;
             break;
         }
